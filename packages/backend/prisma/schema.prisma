@@ -64,6 +64,7 @@ model User {
   // Usage tracking
   processingMinutesUsed   Int               @default(0) @map("processing_minutes_used")
   processingMinutesLimit  Int               @default(10) @map("processing_minutes_limit")
+  voiceCloneSlots         Int               @default(0) @map("voice_clone_slots")
   
   createdAt               DateTime          @default(now()) @map("created_at")
   updatedAt               DateTime          @updatedAt @map("updated_at")
@@ -383,6 +384,7 @@ model AbuseReport {
   description     String?
   status          String    @default("pending") // pending, reviewing, resolved, dismissed
   reviewedAt      DateTime? @map("reviewed_at")
+  reviewNotes     String?   @map("review_notes")
   
   createdAt       DateTime  @default(now()) @map("created_at")
   resolvedAt      DateTime? @map("resolved_at")
@@ -400,6 +402,7 @@ model Feedback {
   category        String?
   title           String
   description     String
+  content         String?   // Additional content field
   rating          Int?      // 1-5
   status          String    @default("open") // open, reviewing, planned, completed, closed
   priority        String    @default("medium") // low, medium, high
@@ -414,4 +417,22 @@ model Feedback {
   @@index([status])
   @@index([type])
   @@map("feedback")
+}
+
+// Analytics Events
+model AnalyticsEvent {
+  id              String    @id @default(cuid())
+  userId          String?   @map("user_id")
+  eventType       String    @map("event_type")
+  eventName       String    @map("event_name")
+  properties      Json?
+  sessionId       String?   @map("session_id")
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([eventName])
+  @@index([createdAt])
+  @@map("analytics_events")
 }
