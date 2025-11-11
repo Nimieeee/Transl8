@@ -7,7 +7,7 @@ const router = Router();
  * Get Privacy Policy
  * GET /api/legal/privacy-policy
  */
-router.get('/privacy-policy', (req, res) => {
+router.get('/privacy-policy', (_req, res) => {
   const privacyPolicy = {
     version: '1.0',
     effectiveDate: '2025-01-01',
@@ -86,7 +86,7 @@ router.get('/privacy-policy', (req, res) => {
  * Get Terms of Service
  * GET /api/legal/terms-of-service
  */
-router.get('/terms-of-service', (req, res) => {
+router.get('/terms-of-service', (_req, res) => {
   const termsOfService = {
     version: '1.0',
     effectiveDate: '2025-01-01',
@@ -166,7 +166,7 @@ router.get('/terms-of-service', (req, res) => {
  * Get Data Processing Agreement (DPA) for EU users
  * GET /api/legal/dpa
  */
-router.get('/dpa', (req, res) => {
+router.get('/dpa', (_req, res) => {
   const dpa = {
     version: '1.0',
     effectiveDate: '2025-01-01',
@@ -256,7 +256,7 @@ router.get('/dpa', (req, res) => {
  * Get Cookie Policy
  * GET /api/legal/cookie-policy
  */
-router.get('/cookie-policy', (req, res) => {
+router.get('/cookie-policy', (_req, res) => {
   const cookiePolicy = {
     version: '1.0',
     effectiveDate: '2025-01-01',

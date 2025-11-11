@@ -1,0 +1,184 @@
+# EKS Cluster Configuration with GPU Node Groups
+# This configuration sets up an Amazon EKS cluster with GPU-enabled node groups
+# for running AI model inference workloads
+
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: ai-dubbing-production
+  region: us-east-1
+  version: "1.28"
+
+# VPC Configuration
+vpc:
+  cidr: 10.0.0.0/16
+  nat:
+    gateway: HighlyAvailable
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: true
+
+# IAM Configuration
+iam:
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: cluster-autoscaler
+        namespace: kube-system
+      wellKnownPolicies:
+        autoScaler: true
+    - metadata:
+        name: aws-load-balancer-controller
+        namespace: kube-system
+      wellKnownPolicies:
+        awsLoadBalancerController: true
+
+# Managed Node Groups
+managedNodeGroups:
+  # GPU Node Group for A100 GPUs (High-performance inference)
+  - name: gpu-a100-ng
+    instanceType: p4d.24xlarge  # 8x A100 GPUs, 96 vCPUs, 1152GB RAM
+    minSize: 0
+    maxSize: 2
+    desiredCapacity: 0
+    
+    volumeSize: 200
+    volumeType: gp3
+    volumeIOPS: 3000
+    volumeThroughput: 125
+    
+    # Use spot instances for cost savings
+    instancesDistribution:
+      maxPrice: 10.0
+      instanceTypes:
+        - p4d.24xlarge
+      onDemandBaseCapacity: 0
+      onDemandPercentageAboveBaseCapacity: 0
+      spotInstancePools: 2
+    
+    labels:
+      workload-type: ai-inference
+      gpu-type: a100
+      tier: premium
+    
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/ai-dubbing-production: "owned"
+    
+    taints:
+      - key: nvidia.com/gpu
+        value: "true"
+        effect: NoSchedule
+    
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        cloudWatch: true
+        ebs: true
+    
+    ssh:
+      allow: false
+    
+    privateNetworking: true
+
+  # GPU Node Group for V100 GPUs (Cost-effective inference)
+  - name: gpu-v100-ng
+    instanceType: p3.2xlarge  # 1x V100 GPU, 8 vCPUs, 61GB RAM
+    minSize: 1
+    maxSize: 8
+    desiredCapacity: 1
+    
+    volumeSize: 150
+    volumeType: gp3
+    volumeIOPS: 3000
+    volumeThroughput: 125
+    
+    # Use spot instances for cost savings
+    instancesDistribution:
+      maxPrice: 3.0
+      instanceTypes:
+        - p3.2xlarge
+        - p3.8xlarge
+      onDemandBaseCapacity: 1
+      onDemandPercentageAboveBaseCapacity: 0
+      spotInstancePools: 2
+    
+    labels:
+      workload-type: ai-inference
+      gpu-type: v100
+      tier: standard
+    
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/ai-dubbing-production: "owned"
+    
+    taints:
+      - key: nvidia.com/gpu
+        value: "true"
+        effect: NoSchedule
+    
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        cloudWatch: true
+        ebs: true
+    
+    ssh:
+      allow: false
+    
+    privateNetworking: true
+
+  # CPU Node Group for non-GPU workloads
+  - name: cpu-ng
+    instanceType: m5.xlarge  # 4 vCPUs, 16GB RAM
+    minSize: 2
+    maxSize: 10
+    desiredCapacity: 2
+    
+    volumeSize: 100
+    volumeType: gp3
+    
+    labels:
+      workload-type: general
+      tier: standard
+    
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/ai-dubbing-production: "owned"
+    
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+        cloudWatch: true
+        ebs: true
+        albIngress: true
+    
+    ssh:
+      allow: false
+    
+    privateNetworking: true
+
+# Add-ons
+addons:
+  - name: vpc-cni
+    version: latest
+  - name: coredns
+    version: latest
+  - name: kube-proxy
+    version: latest
+  - name: aws-ebs-csi-driver
+    version: latest
+    wellKnownPolicies:
+      ebsCSIController: true
+
+# CloudWatch logging
+cloudWatch:
+  clusterLogging:
+    enableTypes:
+      - api
+      - audit
+      - authenticator
+      - controllerManager
+      - scheduler
+    logRetentionInDays: 30

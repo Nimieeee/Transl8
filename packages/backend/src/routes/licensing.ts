@@ -9,7 +9,7 @@ const router = Router();
  * Get licensing terms
  * GET /api/licensing/terms
  */
-router.get('/terms', (req, res) => {
+router.get('/terms', (_req, res) => {
   const licensingTerms = {
     version: '1.0',
     effectiveDate: '2025-01-01',
@@ -214,7 +214,7 @@ router.get('/status', authenticateToken, async (req, res) => {
  * Get voice clone consent form
  * GET /api/licensing/voice-clone-consent
  */
-router.get('/voice-clone-consent', (req, res) => {
+router.get('/voice-clone-consent', (_req, res) => {
   const consentForm = {
     title: 'Voice Clone Consent and Acknowledgment',
     content: {

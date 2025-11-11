@@ -1,0 +1,200 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: deployment-alert-rules
+  namespace: monitoring
+data:
+  deployment-alerts.yml: |
+    groups:
+    - name: deployment_alerts
+      interval: 30s
+      rules:
+      
+      # Deployment Failure Alerts
+      - alert: DeploymentFailed
+        expr: |
+          kube_deployment_status_condition{condition="Progressing",status="false"} == 1
+        for: 5m
+        labels:
+          severity: critical
+          category: deployment
+        annotations:
+          summary: "Deployment {{ $labels.deployment }} failed in {{ $labels.namespace }}"
+          description: "Deployment {{ $labels.deployment }} in namespace {{ $labels.namespace }} has failed to progress for 5 minutes."
+          runbook_url: "https://github.com/your-org/runbooks/deployment-failure.md"
+      
+      - alert: DeploymentReplicasMismatch
+        expr: |
+          kube_deployment_spec_replicas != kube_deployment_status_replicas_available
+        for: 10m
+        labels:
+          severity: warning
+          category: deployment
+        annotations:
+          summary: "Deployment {{ $labels.deployment }} has mismatched replicas"
+          description: "Deployment {{ $labels.deployment }} in {{ $labels.namespace }} has {{ $value }} available replicas but expects {{ $labels.spec_replicas }}."
+      
+      # Pod Crash Alerts
+      - alert: PodCrashLooping
+        expr: |
+          rate(kube_pod_container_status_restarts_total[15m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+          category: deployment
+        annotations:
+          summary: "Pod {{ $labels.pod }} is crash looping"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is restarting frequently."
+          runbook_url: "https://github.com/your-org/runbooks/pod-crash-loop.md"
+      
+      - alert: PodNotReady
+        expr: |
+          sum by (namespace, pod) (kube_pod_status_phase{phase=~"Pending|Unknown|Failed"}) > 0
+        for: 10m
+        labels:
+          severity: warning
+          category: deployment
+        annotations:
+          summary: "Pod {{ $labels.pod }} not ready"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} has been in {{ $labels.phase }} state for 10 minutes."
+      
+      # Image Pull Errors
+      - alert: ImagePullBackOff
+        expr: |
+          kube_pod_container_status_waiting_reason{reason="ImagePullBackOff"} == 1
+        for: 5m
+        labels:
+          severity: critical
+          category: deployment
+        annotations:
+          summary: "Image pull failed for {{ $labels.pod }}"
+          description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} cannot pull container image."
+      
+      # Rollout Alerts
+      - alert: RolloutStuck
+        expr: |
+          kube_deployment_status_condition{condition="Progressing",status="true"} == 1
+          and
+          kube_deployment_spec_replicas != kube_deployment_status_replicas_updated
+        for: 15m
+        labels:
+          severity: warning
+          category: deployment
+        annotations:
+          summary: "Rollout stuck for {{ $labels.deployment }}"
+          description: "Deployment {{ $labels.deployment }} rollout has been in progress for 15 minutes without completing."
+      
+      # Error Rate Spike After Deployment
+      - alert: ErrorRateSpikeAfterDeployment
+        expr: |
+          (
+            sum(rate(http_requests_total{status=~"5.."}[5m])) by (namespace, deployment)
+            /
+            sum(rate(http_requests_total[5m])) by (namespace, deployment)
+          ) > 0.05
+          and
+          changes(kube_deployment_status_observed_generation[10m]) > 0
+        for: 5m
+        labels:
+          severity: critical
+          category: deployment
+        annotations:
+          summary: "Error rate spike detected after deployment"
+          description: "Deployment {{ $labels.deployment }} in {{ $labels.namespace }} has error rate > 5% after recent deployment."
+          runbook_url: "https://github.com/your-org/runbooks/deployment-rollback.md"
+      
+      # Response Time Degradation
+      - alert: ResponseTimeDegradation
+        expr: |
+          (
+            histogram_quantile(0.95, 
+              sum(rate(http_request_duration_seconds_bucket[5m])) by (le, namespace, deployment)
+            ) > 2
+          )
+          and
+          changes(kube_deployment_status_observed_generation[10m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          category: deployment
+        annotations:
+          summary: "Response time degraded after deployment"
+          description: "P95 response time for {{ $labels.deployment }} is > 2s after recent deployment."
+      
+      # Database Migration Alerts
+      - alert: DatabaseMigrationFailed
+        expr: |
+          kube_job_status_failed{job_name=~"prisma-migrate.*"} > 0
+        labels:
+          severity: critical
+          category: deployment
+        annotations:
+          summary: "Database migration job failed"
+          description: "Migration job {{ $labels.job_name }} in {{ $labels.namespace }} has failed."
+          runbook_url: "https://github.com/your-org/runbooks/migration-failure.md"
+      
+      - alert: DatabaseMigrationTimeout
+        expr: |
+          time() - kube_job_status_start_time{job_name=~"prisma-migrate.*"} > 600
+          and
+          kube_job_status_active{job_name=~"prisma-migrate.*"} > 0
+        labels:
+          severity: warning
+          category: deployment
+        annotations:
+          summary: "Database migration taking too long"
+          description: "Migration job {{ $labels.job_name }} has been running for over 10 minutes."
+      
+      # Resource Exhaustion After Deployment
+      - alert: HighMemoryAfterDeployment
+        expr: |
+          (
+            container_memory_usage_bytes / container_spec_memory_limit_bytes > 0.9
+          )
+          and
+          changes(kube_deployment_status_observed_generation[10m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          category: deployment
+        annotations:
+          summary: "High memory usage after deployment"
+          description: "Container {{ $labels.container }} in pod {{ $labels.pod }} is using > 90% memory after deployment."
+      
+      - alert: HighCPUAfterDeployment
+        expr: |
+          (
+            rate(container_cpu_usage_seconds_total[5m]) / container_spec_cpu_quota * 100 > 90
+          )
+          and
+          changes(kube_deployment_status_observed_generation[10m]) > 0
+        for: 5m
+        labels:
+          severity: warning
+          category: deployment
+        annotations:
+          summary: "High CPU usage after deployment"
+          description: "Container {{ $labels.container }} in pod {{ $labels.pod }} is using > 90% CPU after deployment."
+      
+      # HPA Scaling Issues
+      - alert: HPAMaxedOut
+        expr: |
+          kube_horizontalpodautoscaler_status_current_replicas == kube_horizontalpodautoscaler_spec_max_replicas
+        for: 15m
+        labels:
+          severity: warning
+          category: deployment
+        annotations:
+          summary: "HPA {{ $labels.horizontalpodautoscaler }} maxed out"
+          description: "HPA {{ $labels.horizontalpodautoscaler }} in {{ $labels.namespace }} has reached maximum replicas."
+      
+      - alert: HPAScalingDisabled
+        expr: |
+          kube_horizontalpodautoscaler_status_condition{condition="ScalingActive",status="false"} == 1
+        for: 10m
+        labels:
+          severity: warning
+          category: deployment
+        annotations:
+          summary: "HPA scaling disabled"
+          description: "HPA {{ $labels.horizontalpodautoscaler }} in {{ $labels.namespace }} has scaling disabled."

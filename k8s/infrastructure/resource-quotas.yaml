@@ -1,0 +1,211 @@
+# Resource Quotas and Limits for Model Services
+# This configuration sets up resource quotas to prevent resource exhaustion
+# and ensure fair resource allocation across different model services
+
+---
+# Namespace for AI model services
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ai-models
+  labels:
+    name: ai-models
+    environment: production
+
+---
+# Resource Quota for STT Services (Whisper + Pyannote)
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: stt-quota
+  namespace: ai-models
+spec:
+  hard:
+    requests.cpu: "32"
+    requests.memory: 128Gi
+    requests.nvidia.com/gpu: "4"
+    limits.cpu: "64"
+    limits.memory: 256Gi
+    limits.nvidia.com/gpu: "4"
+    persistentvolumeclaims: "10"
+    services.loadbalancers: "2"
+  scopeSelector:
+    matchExpressions:
+      - operator: In
+        scopeName: PriorityClass
+        values: ["high-priority", "medium-priority"]
+
+---
+# Resource Quota for MT Services (Marian NMT)
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: mt-quota
+  namespace: ai-models
+spec:
+  hard:
+    requests.cpu: "16"
+    requests.memory: 64Gi
+    requests.nvidia.com/gpu: "2"
+    limits.cpu: "32"
+    limits.memory: 128Gi
+    limits.nvidia.com/gpu: "2"
+    persistentvolumeclaims: "5"
+    services.loadbalancers: "1"
+
+---
+# Resource Quota for TTS Services (StyleTTS + XTTS)
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: tts-quota
+  namespace: ai-models
+spec:
+  hard:
+    requests.cpu: "32"
+    requests.memory: 128Gi
+    requests.nvidia.com/gpu: "4"
+    limits.cpu: "64"
+    limits.memory: 256Gi
+    limits.nvidia.com/gpu: "4"
+    persistentvolumeclaims: "10"
+    services.loadbalancers: "2"
+
+---
+# Resource Quota for Lip-Sync Services (Wav2Lip)
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: lipsync-quota
+  namespace: ai-models
+spec:
+  hard:
+    requests.cpu: "16"
+    requests.memory: 64Gi
+    requests.nvidia.com/gpu: "2"
+    limits.cpu: "32"
+    limits.memory: 128Gi
+    limits.nvidia.com/gpu: "2"
+    persistentvolumeclaims: "5"
+    services.loadbalancers: "1"
+
+---
+# Limit Range for default resource limits
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: model-service-limits
+  namespace: ai-models
+spec:
+  limits:
+    # Container limits
+    - type: Container
+      max:
+        cpu: "16"
+        memory: 64Gi
+        nvidia.com/gpu: "2"
+      min:
+        cpu: 100m
+        memory: 128Mi
+      default:
+        cpu: "2"
+        memory: 4Gi
+      defaultRequest:
+        cpu: "1"
+        memory: 2Gi
+      maxLimitRequestRatio:
+        cpu: "2"
+        memory: "2"
+    
+    # Pod limits
+    - type: Pod
+      max:
+        cpu: "32"
+        memory: 128Gi
+        nvidia.com/gpu: "4"
+      min:
+        cpu: 100m
+        memory: 128Mi
+    
+    # PVC limits
+    - type: PersistentVolumeClaim
+      max:
+        storage: 500Gi
+      min:
+        storage: 10Gi
+
+---
+# Priority Classes for workload prioritization
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 1000000
+globalDefault: false
+description: "High priority for critical model inference workloads"
+
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: medium-priority
+value: 100000
+globalDefault: true
+description: "Medium priority for standard model inference workloads"
+
+---
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: low-priority
+value: 10000
+globalDefault: false
+description: "Low priority for batch processing and non-critical workloads"
+
+---
+# Network Policy for model services
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: model-service-network-policy
+  namespace: ai-models
+spec:
+  podSelector: {}
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    # Allow traffic from worker pods
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: workers
+        - podSelector:
+            matchLabels:
+              component: worker
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8080
+  egress:
+    # Allow DNS
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: kube-system
+      ports:
+        - protocol: UDP
+          port: 53
+    # Allow external model downloads
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443
+    # Allow storage access
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443

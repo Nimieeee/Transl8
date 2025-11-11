@@ -2,7 +2,6 @@ import { Router, Request, Response } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { authenticateToken } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
 import { Queue } from 'bullmq';
 import { redis } from '../lib/redis';

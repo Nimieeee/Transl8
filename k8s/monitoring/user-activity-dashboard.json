@@ -1,0 +1,259 @@
+{
+  "dashboard": {
+    "title": "User Activity & Subscription Dashboard",
+    "tags": ["users", "subscriptions", "activity"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Active Users (24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "count(count by (userId) (http_requests_total{userId!=\"\"}))",
+            "legendFormat": "Active Users"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 0
+          }
+        },
+        "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "New Projects (24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(projects_created_total[24h]))",
+            "legendFormat": "New Projects"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 0
+          }
+        },
+        "gridPos": {"h": 4, "w": 4, "x": 4, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Videos Processed (24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(videos_processed_total[24h]))",
+            "legendFormat": "Videos"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 0
+          }
+        },
+        "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Processing Minutes Used (24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(processing_minutes_used[24h]))",
+            "legendFormat": "Minutes"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 0
+          }
+        },
+        "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "New Subscriptions (24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(subscriptions_created_total[24h]))",
+            "legendFormat": "New Subs"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 5, "color": "yellow"},
+                {"value": 10, "color": "green"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0}
+      },
+      {
+        "id": 6,
+        "title": "Daily Active Users",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "count(count by (userId) (increase(http_requests_total{userId!=\"\"}[24h])))",
+            "legendFormat": "DAU"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Users"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+      },
+      {
+        "id": 7,
+        "title": "Projects Created per Day",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(increase(projects_created_total[24h]))",
+            "legendFormat": "Projects"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Projects"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+      },
+      {
+        "id": 8,
+        "title": "Users by Subscription Tier",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (tier) (users_by_tier)",
+            "legendFormat": "{{tier}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}
+      },
+      {
+        "id": 9,
+        "title": "Processing Minutes by Tier",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum by (tier) (rate(processing_minutes_used[1h]) * 60)",
+            "legendFormat": "{{tier}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Minutes/hour"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}
+      },
+      {
+        "id": 10,
+        "title": "Subscription Conversions",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum by (from_tier, to_tier) (increase(subscription_upgrades_total[24h]))",
+            "legendFormat": "{{from_tier}} → {{to_tier}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Conversions"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+      },
+      {
+        "id": 11,
+        "title": "Subscription Cancellations",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum by (tier) (increase(subscription_cancellations_total[24h]))",
+            "legendFormat": "{{tier}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Cancellations"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+      },
+      {
+        "id": 12,
+        "title": "Voice Clones Created",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(increase(voice_clones_created_total[24h]))",
+            "legendFormat": "Voice Clones"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Clones"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28}
+      },
+      {
+        "id": 13,
+        "title": "API Usage by Endpoint",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum by (path) (rate(http_requests_total[5m]))",
+            "legendFormat": "{{path}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "reqps", "label": "Requests/sec"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28}
+      },
+      {
+        "id": 14,
+        "title": "User Retention (7-day)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "count(count by (userId) (increase(http_requests_total{userId!=\"\"}[7d]))) / count(count by (userId) (increase(users_created_total[7d]))) * 100",
+            "legendFormat": "Retention %"
+          }
+        ],
+        "yaxes": [
+          {"format": "percent", "min": 0, "max": 100}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 36}
+      },
+      {
+        "id": 15,
+        "title": "Average Project Completion Time",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "avg(project_completion_duration_avg)",
+            "legendFormat": "Avg Time"
+          }
+        ],
+        "yaxes": [
+          {"format": "s", "label": "Duration"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 36}
+      }
+    ],
+    "refresh": "1m",
+    "time": {
+      "from": "now-7d",
+      "to": "now"
+    }
+  }
+}

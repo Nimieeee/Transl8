@@ -54,3 +54,29 @@ temp/
 
 # Uploads
 uploads/
+
+# Python virtual environments
+venv/
+venv_*/
+.venv/
+env/
+ENV/
+
+# Model checkpoints and weights (large files)
+*.pth
+*.ckpt
+*.safetensors
+checkpoints/
+checkpoints_*/
+
+# Large binary files
+*.dylib
+*.so
+*.dll
+
+# Wav2Lip
+Wav2Lip/
+
+# OpenVoice
+packages/workers/docker/openvoice/OpenVoice/
+packages/workers/docker/openvoice/checkpoints*/

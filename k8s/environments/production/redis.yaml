@@ -1,0 +1,197 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: production
+data:
+  redis.conf: |
+    maxmemory 8gb
+    maxmemory-policy allkeys-lru
+    save 900 1
+    save 300 10
+    save 60 10000
+    appendonly yes
+    appendfsync everysec
+    auto-aof-rewrite-percentage 100
+    auto-aof-rewrite-min-size 64mb
+---
+# Redis Master
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-master-pvc
+  namespace: production
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
+  storageClassName: fast-ssd
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-master
+  namespace: production
+spec:
+  serviceName: redis-master
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      role: master
+      environment: production
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: master
+        environment: production
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+          name: redis
+        command:
+        - redis-server
+        - /etc/redis/redis.conf
+        volumeMounts:
+        - name: redis-config
+          mountPath: /etc/redis
+        - name: redis-storage
+          mountPath: /data
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 4Gi
+          limits:
+            cpu: 2000m
+            memory: 8Gi
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+      volumes:
+      - name: redis-config
+        configMap:
+          name: redis-config
+      - name: redis-storage
+        persistentVolumeClaim:
+          claimName: redis-master-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-master-service
+  namespace: production
+spec:
+  selector:
+    app: redis
+    role: master
+    environment: production
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP
+---
+# Redis Replica for read scaling
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-replica
+  namespace: production
+spec:
+  serviceName: redis-replica
+  replicas: 2
+  selector:
+    matchLabels:
+      app: redis
+      role: replica
+      environment: production
+  template:
+    metadata:
+      labels:
+        app: redis
+        role: replica
+        environment: production
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+          name: redis
+        command:
+        - redis-server
+        - --replicaof
+        - redis-master-service
+        - "6379"
+        - --maxmemory
+        - 4gb
+        - --maxmemory-policy
+        - allkeys-lru
+        resources:
+          requests:
+            cpu: 500m
+            memory: 2Gi
+          limits:
+            cpu: 1000m
+            memory: 4Gi
+        livenessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - redis-cli
+            - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-replica-service
+  namespace: production
+spec:
+  selector:
+    app: redis
+    role: replica
+    environment: production
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP
+---
+# Main Redis service (points to master for writes)
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+  namespace: production
+spec:
+  selector:
+    app: redis
+    role: master
+    environment: production
+  ports:
+  - port: 6379
+    targetPort: 6379
+  type: ClusterIP

@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: s3-credentials
+  namespace: staging
+type: Opaque
+stringData:
+  AWS_ACCESS_KEY_ID: REPLACE_WITH_ACTUAL_KEY
+  AWS_SECRET_ACCESS_KEY: REPLACE_WITH_ACTUAL_SECRET
+  AWS_REGION: us-east-1
+  S3_BUCKET_NAME: dubbing-platform-staging
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: storage-config
+  namespace: staging
+data:
+  STORAGE_PROVIDER: s3
+  S3_ENDPOINT: https://s3.amazonaws.com
+  FILE_RETENTION_DAYS: "30"
+  MAX_FILE_SIZE: "524288000"  # 500MB

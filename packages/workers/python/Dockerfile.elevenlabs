@@ -1,0 +1,17 @@
+FROM python:3.10-slim
+
+WORKDIR /app
+
+# Install dependencies
+RUN pip install --no-cache-dir \
+    flask \
+    requests
+
+# Copy service file
+COPY elevenlabs_dubbing_service.py .
+
+# Expose port
+EXPOSE 8010
+
+# Run service
+CMD ["python", "elevenlabs_dubbing_service.py"]

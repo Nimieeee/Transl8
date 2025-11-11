@@ -276,7 +276,7 @@ router.delete('/clones/:id', authenticateToken, async (req, res) => {
  * PUT /api/voices/projects/:projectId/mapping
  * Update speaker-to-voice mapping for a project
  */
-router.put('/projects/:projectId/mapping', authenticateToken, async (_req, res) => {
+router.put('/projects/:projectId/mapping', authenticateToken, async (req, res) => {
   try {
     const { speakerMapping } = req.body;
 

@@ -123,14 +123,12 @@ router.post('/', authenticateToken, async (req: Request, res: Response) => {
     }
 
     // Check if term already exists
-    const existingTerm = await prisma.glossary.findUnique({
+    const existingTerm = await prisma.glossary.findFirst({
       where: {
-        userId_sourceLanguage_targetLanguage_sourceTerm: {
-          userId,
-          sourceLanguage,
-          targetLanguage,
-          sourceTerm: sourceTerm.trim(),
-        },
+        userId,
+        sourceLanguage,
+        targetLanguage,
+        sourceTerm: sourceTerm.trim(),
       },
     });
 

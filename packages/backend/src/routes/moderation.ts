@@ -113,14 +113,6 @@ router.get('/reports', authenticateToken, requireAdmin, async (req, res) => {
         orderBy: { createdAt: 'desc' },
         skip,
         take: Number(limit),
-        include: {
-          reporter: {
-            select: {
-              id: true,
-              email: true,
-            },
-          },
-        },
       }),
       prisma.abuseReport.count({ where }),
     ]);
@@ -169,7 +161,6 @@ router.put('/reports/:id/review', authenticateToken, requireAdmin, async (req, r
       data: {
         status: action === 'approve' ? 'approved' : action === 'reject' ? 'rejected' : 'removed',
         reviewedAt: new Date(),
-        reviewedBy: req.user!.userId,
         reviewNotes: notes || '',
       },
     });
@@ -206,7 +197,7 @@ router.put('/reports/:id/review', authenticateToken, requireAdmin, async (req, r
  * Get content policy
  * GET /api/moderation/content-policy
  */
-router.get('/content-policy', (req, res) => {
+router.get('/content-policy', (_req, res) => {
   const contentPolicy = {
     version: '1.0',
     effectiveDate: '2025-01-01',

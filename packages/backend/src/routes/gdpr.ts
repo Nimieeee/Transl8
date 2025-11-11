@@ -28,7 +28,6 @@ router.get('/export', authenticateToken, async (req, res) => {
         },
         voiceClones: true,
         feedback: true,
-        subscriptionHistory: true,
       },
     }) as any;
 
@@ -76,7 +75,6 @@ router.get('/export', authenticateToken, async (req, res) => {
         createdAt: clone.createdAt,
       })),
       feedback: user.feedback,
-      subscriptionHistory: user.subscriptionHistory || [],
       exportDate: new Date().toISOString(),
       exportVersion: '1.0',
     };

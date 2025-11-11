@@ -22,7 +22,6 @@ router.post('/events', async (req, res) => {
         userId,
         sessionId,
         eventName,
-        eventData: eventData || {},
         pageUrl,
         userAgent,
         ipAddress
@@ -55,7 +54,6 @@ router.get('/users/:userId/events', authenticateToken, async (req, res) => {
       select: {
         id: true,
         eventName: true,
-        eventData: true,
         pageUrl: true,
         createdAt: true
       }

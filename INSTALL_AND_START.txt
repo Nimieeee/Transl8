@@ -1,0 +1,22 @@
+# Copy and paste these commands one by one:
+
+# 1. Install the missing dependency that's causing the error
+pip3 install python-multipart
+
+# 2. Install all other dependencies (this may take a few minutes)
+pip3 install fastapi uvicorn torch transformers librosa soundfile pydub noisereduce flask requests numpy scipy openai-whisper pyannote.audio demucs
+
+# 3. Now start Whisper again (in this terminal)
+./start-whisper.sh
+
+# 4. Open 4 more terminals and run these (one per terminal):
+# Terminal 2: ./start-pyannote.sh
+# Terminal 3: ./start-noisereduce.sh
+# Terminal 4: ./start-emotion.sh
+# Terminal 5: ./start-openvoice.sh
+
+# 5. Check status (in a new terminal)
+./check-services-status.sh
+
+# 6. Run the test (in a new terminal)
+python3 test-robust-pipeline.py

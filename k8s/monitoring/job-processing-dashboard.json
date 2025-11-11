@@ -1,0 +1,250 @@
+{
+  "dashboard": {
+    "title": "Job Processing Dashboard",
+    "tags": ["jobs", "queue", "processing"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Jobs Processed (24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(jobs_completed_total[24h]))",
+            "legendFormat": "Total Jobs"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 0
+          }
+        },
+        "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Jobs Failed (24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(jobs_failed_total[24h]))",
+            "legendFormat": "Failed Jobs"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 10, "color": "yellow"},
+                {"value": 50, "color": "red"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 4, "w": 4, "x": 4, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Success Rate",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(jobs_completed_total[24h])) / (sum(increase(jobs_completed_total[24h])) + sum(increase(jobs_failed_total[24h]))) * 100",
+            "legendFormat": "Success Rate"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "decimals": 1,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "red"},
+                {"value": 90, "color": "yellow"},
+                {"value": 95, "color": "green"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0}
+      },
+      {
+        "id": 4,
+        "title": "Average Processing Time",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "avg(jobs_duration_avg)",
+            "legendFormat": "Avg Time"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "ms",
+            "decimals": 0
+          }
+        },
+        "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0}
+      },
+      {
+        "id": 5,
+        "title": "Total Queue Depth",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(jobs_queue_depth)",
+            "legendFormat": "Queued Jobs"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 0,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 50, "color": "yellow"},
+                {"value": 100, "color": "red"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0}
+      },
+      {
+        "id": 6,
+        "title": "Jobs Processed per Hour by Stage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum by (stage) (rate(jobs_completed_total[1h]) * 3600)",
+            "legendFormat": "{{stage}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Jobs/hour"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+      },
+      {
+        "id": 7,
+        "title": "Queue Depth by Stage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "jobs_queue_depth",
+            "legendFormat": "{{stage}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Queue Depth"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+      },
+      {
+        "id": 8,
+        "title": "Processing Time by Stage (p50, p95, p99)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "jobs_duration_p50",
+            "legendFormat": "{{stage}} (p50)"
+          },
+          {
+            "expr": "jobs_duration_p95",
+            "legendFormat": "{{stage}} (p95)"
+          },
+          {
+            "expr": "jobs_duration_p99",
+            "legendFormat": "{{stage}} (p99)"
+          }
+        ],
+        "yaxes": [
+          {"format": "ms", "label": "Duration"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}
+      },
+      {
+        "id": 9,
+        "title": "Job Failure Rate by Stage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum by (stage) (rate(jobs_failed_total[5m]))",
+            "legendFormat": "{{stage}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Failures/sec"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}
+      },
+      {
+        "id": 10,
+        "title": "Worker Utilization",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "jobs_active / worker_concurrency * 100",
+            "legendFormat": "{{stage}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "percent", "min": 0, "max": 100}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+      },
+      {
+        "id": 11,
+        "title": "Job Throughput (jobs/min)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum by (stage) (rate(jobs_completed_total[1m]) * 60)",
+            "legendFormat": "{{stage}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "short", "label": "Jobs/min"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+      },
+      {
+        "id": 12,
+        "title": "Failed Jobs by Error Type",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "sum by (error) (increase(jobs_failed_total[24h]))",
+            "legendFormat": "{{error}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28}
+      },
+      {
+        "id": 13,
+        "title": "Job Duration Distribution",
+        "type": "heatmap",
+        "targets": [
+          {
+            "expr": "sum by (le) (rate(jobs_duration_bucket[5m]))",
+            "legendFormat": "{{le}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28}
+      }
+    ],
+    "refresh": "30s",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    }
+  }
+}

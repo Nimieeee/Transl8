@@ -7,7 +7,7 @@ import crypto from 'crypto';
 const router = Router();
 
 // Generate beta invite code
-router.post('/invite-codes', authenticateToken, async (req, res) => {
+router.post('/invite-codes', authenticateToken, async (_req, res) => {
   try {
     // Only admins can generate invite codes (add admin check in production)
     const inviteCode = crypto.randomBytes(8).toString('hex').toUpperCase();

@@ -1,0 +1,206 @@
+# Ingress and Load Balancing for Model Services
+# This configuration provides load balancing and external access to model inference services
+
+---
+# Internal Load Balancer Service for STT
+apiVersion: v1
+kind: Service
+metadata:
+  name: whisper-pyannote-stt-lb
+  namespace: ai-models
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"  # GKE internal LB
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"  # EKS internal LB
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: whisper-pyannote-stt
+
+---
+# Internal Load Balancer Service for MT
+apiVersion: v1
+kind: Service
+metadata:
+  name: marian-mt-lb
+  namespace: ai-models
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: marian-mt
+
+---
+# Internal Load Balancer Service for StyleTTS
+apiVersion: v1
+kind: Service
+metadata:
+  name: styletts-tts-lb
+  namespace: ai-models
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: styletts-tts
+
+---
+# Internal Load Balancer Service for XTTS
+apiVersion: v1
+kind: Service
+metadata:
+  name: xtts-tts-lb
+  namespace: ai-models
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: xtts-tts
+
+---
+# Internal Load Balancer Service for Wav2Lip
+apiVersion: v1
+kind: Service
+metadata:
+  name: wav2lip-lipsync-lb
+  namespace: ai-models
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+    service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+spec:
+  type: LoadBalancer
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+      name: http
+  selector:
+    app: wav2lip-lipsync
+
+---
+# Ingress for model services (optional, for HTTP routing)
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: model-services-ingress
+  namespace: ai-models
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "500m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - models.ai-dubbing.internal
+      secretName: model-services-tls
+  rules:
+    - host: models.ai-dubbing.internal
+      http:
+        paths:
+          - path: /stt
+            pathType: Prefix
+            backend:
+              service:
+                name: whisper-pyannote-stt
+                port:
+                  number: 8000
+          - path: /mt
+            pathType: Prefix
+            backend:
+              service:
+                name: marian-mt
+                port:
+                  number: 8000
+          - path: /tts/styletts
+            pathType: Prefix
+            backend:
+              service:
+                name: styletts-tts
+                port:
+                  number: 8000
+          - path: /tts/xtts
+            pathType: Prefix
+            backend:
+              service:
+                name: xtts-tts
+                port:
+                  number: 8000
+          - path: /lipsync
+            pathType: Prefix
+            backend:
+              service:
+                name: wav2lip-lipsync
+                port:
+                  number: 8000
+
+---
+# Service Monitor for Prometheus (if using Prometheus Operator)
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: model-services-monitor
+  namespace: ai-models
+  labels:
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      tier: inference
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s

@@ -1,0 +1,2 @@
+web: npm start
+worker: cd ../workers && npm start

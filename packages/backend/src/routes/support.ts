@@ -32,14 +32,6 @@ router.post('/tickets', authenticateToken, async (req, res) => {
         description,
         category: category || 'other',
         priority: priority || 'medium'
-      },
-      include: {
-        user: {
-          select: {
-            email: true,
-            subscriptionTier: true
-          }
-        }
       }
     });
 
@@ -69,16 +61,7 @@ router.get('/tickets', authenticateToken, async (req, res) => {
     const tickets = await prisma.supportTicket.findMany({
       where,
       orderBy: { createdAt: 'desc' },
-      take: Number(limit),
-      include: {
-        messages: {
-          orderBy: { createdAt: 'asc' },
-          take: 1
-        },
-        _count: {
-          select: { messages: true }
-        }
-      }
+      take: Number(limit)
     });
 
     res.json({ tickets });
@@ -98,18 +81,6 @@ router.get('/tickets/:id', authenticateToken, async (req, res) => {
       where: {
         id,
         userId // Ensure user can only access their own tickets
-      },
-      include: {
-        messages: {
-          orderBy: { createdAt: 'asc' },
-          include: {
-            user: {
-              select: {
-                email: true
-              }
-            }
-          }
-        }
       }
     });
 
@@ -217,19 +188,7 @@ router.get('/admin/tickets', authenticateToken, async (req, res) => {
           { createdAt: 'desc' }
         ],
         take: Number(limit),
-        skip: Number(offset),
-        include: {
-          user: {
-            select: {
-              id: true,
-              email: true,
-              subscriptionTier: true
-            }
-          },
-          _count: {
-            select: { messages: true }
-          }
-        }
+        skip: Number(offset)
       }),
       prisma.supportTicket.count({ where })
     ]);

@@ -15,7 +15,7 @@
 import { logger } from './logger';
 import { AdaptationEngine, AdaptationConfig } from './adaptation-engine';
 import { MistralClient, getMistralClient } from './mistral-client';
-import { ContextMapSegment } from '@shared/types';
+import { ContextMapSegment } from '../../../shared/src/types';
 import { TTSAdapter, VoiceConfig } from '../adapters/types';
 import fs from 'fs';
 import path from 'path';
@@ -111,6 +111,9 @@ export class TTSValidatedAdaptationService {
     const effectiveTolerance = isShortSegment 
       ? this.config.shortSegmentTolerance 
       : this.config.tolerancePercent;
+    
+    // Use tolerance for validation
+    const _tolerance = effectiveTolerance;
     
     logger.info(`🔄 Starting TTS-validated adaptation for segment ${segment.id}`);
     logger.info(`   Target duration: ${segment.duration}s (±${effectiveTolerance}%)`);
@@ -242,12 +245,13 @@ export class TTSValidatedAdaptationService {
     segment: ContextMapSegment,
     attempt: number,
     previousFeedback: string | undefined,
-    targetLanguage: string,
+    _targetLanguage: string,
     tolerance: number
   ): Promise<string> {
     // Calculate character-per-second heuristics
     const sourceChars = segment.text.length;
-    const sourceCharsPerSecond = sourceChars / segment.duration;
+    const _sourceCharsPerSecond = sourceChars / segment.duration;
+    const _tolerance = tolerance;
     
     // Language-specific character expansion/contraction factors
     const expansionFactors: Record<string, number> = {
@@ -310,13 +314,13 @@ export class TTSValidatedAdaptationService {
     logger.debug(`   🎤 Generating test audio...`);
 
     // Extract voice from config (OpenAI TTS expects just the voice name)
-    const voice = (voiceConfig.voice || voiceConfig.voiceId || 'alloy') as 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+    const voiceId = voiceConfig.voiceId || 'alloy';
     const speed = 1.0; // Normal speed for validation
 
     // Synthesize with OpenAI TTS
     const audioBuffer = await this.ttsAdapter.synthesize(
       text,
-      voice,
+      voiceConfig,
       speed
     );
 
@@ -392,7 +396,7 @@ export class TTSValidatedAdaptationService {
     attempt: number = 1
   ): string {
     const isTooShort = actualDuration < targetDuration;
-    const isTooLong = actualDuration > targetDuration;
+    const _isTooLong = actualDuration > targetDuration;
     const isVeryOff = Math.abs(validation.percentDiff) > 30;
 
     let feedback = `Your previous adaptation was ${isTooShort ? 'TOO SHORT' : 'TOO LONG'}.\n\n`;

@@ -1,0 +1,207 @@
+{
+  "dashboard": {
+    "title": "AI Model Infrastructure - Cost & Performance",
+    "tags": ["ai", "gpu", "cost"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Total Monthly Cost Projection",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(monthly_cost_projection)",
+            "legendFormat": "Total Cost"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "currencyUSD",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 15000, "color": "yellow"},
+                {"value": 20000, "color": "red"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "Cost by Service",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "monthly_cost_projection",
+            "legendFormat": "{{service}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "GPU Utilization by Service",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "avg by (app) (DCGM_FI_DEV_GPU_UTIL{kubernetes_namespace=\"ai-models\"})",
+            "legendFormat": "{{app}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "percent", "min": 0, "max": 100}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "Cost per Processing Minute",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "service_cost_per_minute",
+            "legendFormat": "{{service}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "currencyUSD"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Budget Utilization",
+        "type": "bargauge",
+        "targets": [
+          {
+            "expr": "budget_utilization_percentage",
+            "legendFormat": "{{service}}"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "percent",
+            "min": 0,
+            "max": 100,
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {"value": 0, "color": "green"},
+                {"value": 70, "color": "yellow"},
+                {"value": 90, "color": "red"}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "id": 6,
+        "title": "Queue Depth by Service",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "redis_queue_depth",
+            "legendFormat": "{{queue_name}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      },
+      {
+        "id": 7,
+        "title": "Jobs Processed per Hour",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum by (app) (rate(job_completed_total[1h]) * 3600)",
+            "legendFormat": "{{app}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 8,
+        "title": "Cost per Job",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "cost_per_job",
+            "legendFormat": "{{service}} - {{queue_name}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "currencyUSD"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      },
+      {
+        "id": 9,
+        "title": "GPU Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "DCGM_FI_DEV_FB_USED / DCGM_FI_DEV_FB_FREE * 100",
+            "legendFormat": "{{gpu}} on {{kubernetes_node}}"
+          }
+        ],
+        "yaxes": [
+          {"format": "percent", "min": 0, "max": 100}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32}
+      },
+      {
+        "id": 10,
+        "title": "Processing Time by Stage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum by (queue_name, le) (rate(job_processing_duration_seconds_bucket[5m])))",
+            "legendFormat": "{{queue_name}} (p95)"
+          }
+        ],
+        "yaxes": [
+          {"format": "s"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32}
+      },
+      {
+        "id": 11,
+        "title": "Node Count by Type",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "count by (label_node_kubernetes_io_instance_type) (kube_node_info{label_node_kubernetes_io_instance_type=~\".*gpu.*\"})",
+            "legendFormat": "{{label_node_kubernetes_io_instance_type}}"
+          }
+        ],
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0}
+      },
+      {
+        "id": 12,
+        "title": "Total GPU Hours (24h)",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "sum(increase(total_gpu_hours[24h]))",
+            "legendFormat": "GPU Hours"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "unit": "short",
+            "decimals": 1
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 4}
+      }
+    ],
+    "refresh": "30s",
+    "time": {
+      "from": "now-6h",
+      "to": "now"
+    }
+  }
+}

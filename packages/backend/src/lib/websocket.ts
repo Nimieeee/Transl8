@@ -2,9 +2,13 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { Server } from 'http';
 import jwt from 'jsonwebtoken';
 
-interface AuthenticatedWebSocket extends WebSocket {
+interface AuthenticatedWebSocket {
   userId?: string;
   projectId?: string;
+  readyState: number;
+  send: (data: string) => void;
+  on: (event: string, listener: (...args: any[]) => void) => void;
+  close: (code?: number, reason?: string) => void;
 }
 
 interface ProgressMessage {
@@ -24,7 +28,8 @@ class WebSocketManager {
   initialize(server: Server) {
     this.wss = new WebSocketServer({ server, path: '/ws' });
 
-    this.wss.on('connection', (ws: AuthenticatedWebSocket, req) => {
+    this.wss.on('connection', (ws: WebSocket, req) => {
+      const authWs = ws as any as AuthenticatedWebSocket;
       console.log('WebSocket connection attempt');
 
       // Extract token from query string
@@ -40,30 +45,30 @@ class WebSocketManager {
       try {
         // Verify JWT token
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string };
-        ws.userId = decoded.userId;
-        ws.projectId = projectId;
+        authWs.userId = decoded.userId;
+        authWs.projectId = projectId;
 
         // Add client to tracking by project
         if (!this.clients.has(projectId)) {
           this.clients.set(projectId, new Set());
         }
-        this.clients.get(projectId)!.add(ws);
+        this.clients.get(projectId)!.add(authWs);
 
         // Add client to tracking by user
-        if (!this.userClients.has(ws.userId)) {
-          this.userClients.set(ws.userId, new Set());
+        if (!this.userClients.has(authWs.userId)) {
+          this.userClients.set(authWs.userId, new Set());
         }
-        this.userClients.get(ws.userId)!.add(ws);
+        this.userClients.get(authWs.userId)!.add(authWs);
 
-        console.log(`WebSocket authenticated for user ${ws.userId}, project ${projectId}`);
+        console.log(`WebSocket authenticated for user ${authWs.userId}, project ${projectId}`);
 
         ws.on('close', () => {
-          this.removeClient(projectId, ws);
+          this.removeClient(projectId, authWs);
         });
 
         ws.on('error', (error) => {
           console.error('WebSocket error:', error);
-          this.removeClient(projectId, ws);
+          this.removeClient(projectId, authWs);
         });
 
         // Send connection confirmation

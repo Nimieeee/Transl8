@@ -33,8 +33,7 @@ router.post('/', authenticateToken, async (req, res) => {
         type,
         category,
         rating,
-        content,
-        metadata: metadata || {}
+        content
       }
     });
 

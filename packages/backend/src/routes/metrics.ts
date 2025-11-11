@@ -40,7 +40,7 @@ router.get('/prometheus', (_req, res) => {
  * Reset all metrics (admin only)
  * Requires authentication
  */
-router.post('/reset', authenticateToken, (req, res) => {
+router.post('/reset', authenticateToken, (_req, res) => {
   try {
     // Check if user is admin (you may want to add admin check middleware)
     metrics.reset();
