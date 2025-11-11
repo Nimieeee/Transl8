@@ -1,8 +1,8 @@
 /**
  * Voice Management Routes
- * 
+ *
  * Handles preset voice listing, voice clone creation, and speaker-to-voice mapping.
- * 
+ *
  * Requirements: 8.1, 8.3, 8.5, 12.3, 12.4
  */
 
@@ -39,10 +39,10 @@ const openVoiceAdapter = new OpenVoiceAdapter({
 /**
  * GET /api/voices
  * List available preset voices organized by language and style
- * 
+ *
  * Query params:
  * - language: Filter by language code (optional)
- * 
+ *
  * Requirements: 8.1, 8.2
  */
 router.get('/', authenticateToken, async (req, res) => {
@@ -52,14 +52,20 @@ router.get('/', authenticateToken, async (req, res) => {
     // OpenVoice supports multiple base speakers
     const baseVoices = [
       { id: 'default', name: 'Default', language: 'en', gender: 'neutral', style: 'neutral' },
-      { id: 'en_default', name: 'English Default', language: 'en', gender: 'neutral', style: 'neutral' },
+      {
+        id: 'en_default',
+        name: 'English Default',
+        language: 'en',
+        gender: 'neutral',
+        style: 'neutral',
+      },
       { id: 'en_us', name: 'English US', language: 'en', gender: 'neutral', style: 'neutral' },
       { id: 'zh', name: 'Chinese', language: 'zh', gender: 'neutral', style: 'neutral' },
     ];
 
     // Filter by language if specified
-    const filteredVoices = language 
-      ? baseVoices.filter(v => v.language === language)
+    const filteredVoices = language
+      ? baseVoices.filter((v) => v.language === language)
       : baseVoices;
 
     // Organize by language
@@ -97,13 +103,19 @@ router.get('/presets', authenticateToken, async (req, res) => {
 
     const baseVoices = [
       { id: 'default', name: 'Default', language: 'en', gender: 'neutral', style: 'neutral' },
-      { id: 'en_default', name: 'English Default', language: 'en', gender: 'neutral', style: 'neutral' },
+      {
+        id: 'en_default',
+        name: 'English Default',
+        language: 'en',
+        gender: 'neutral',
+        style: 'neutral',
+      },
       { id: 'en_us', name: 'English US', language: 'en', gender: 'neutral', style: 'neutral' },
       { id: 'zh', name: 'Chinese', language: 'zh', gender: 'neutral', style: 'neutral' },
     ];
 
-    const filteredVoices = language 
-      ? baseVoices.filter(v => v.language === language)
+    const filteredVoices = language
+      ? baseVoices.filter((v) => v.language === language)
       : baseVoices;
 
     const organizedVoices: any = {};
@@ -130,33 +142,30 @@ router.get('/presets', authenticateToken, async (req, res) => {
 /**
  * GET /api/voices/samples/:voiceId
  * Get audio sample preview for a preset voice
- * 
+ *
  * Requirements: 8.1, 8.2
  */
 router.get('/samples/:voiceId', authenticateToken, async (req, res) => {
   try {
     const { voiceId } = req.params;
-    
+
     // Generate a short sample text for preview
-    const sampleText = "Hello, this is a preview of this voice.";
-    
+    const sampleText = 'Hello, this is a preview of this voice.';
+
     // Synthesize sample audio using OpenVoice
-    const audioBuffer = await openVoiceAdapter.synthesize(
-      sampleText,
-      {
-        type: 'preset',
-        voiceId: voiceId,
-        parameters: {},
-      }
-    );
-    
+    const audioBuffer = await openVoiceAdapter.synthesize(sampleText, {
+      type: 'preset',
+      voiceId: voiceId,
+      parameters: {},
+    });
+
     // Send audio file
     res.set({
       'Content-Type': 'audio/wav',
       'Content-Length': audioBuffer.length,
       'Cache-Control': 'public, max-age=86400', // Cache for 24 hours
     });
-    
+
     res.send(audioBuffer);
   } catch (error: any) {
     console.error('Error generating voice sample:', error);
@@ -170,7 +179,7 @@ router.get('/samples/:voiceId', authenticateToken, async (req, res) => {
 /**
  * POST /api/voices/clone
  * Create a voice clone from audio sample
- * 
+ *
  * Requirements: 8.3, 8.4, 15.4
  */
 router.post('/clone', authenticateToken, upload.single('audio'), async (req, res) => {
@@ -188,11 +197,7 @@ router.post('/clone', authenticateToken, upload.single('audio'), async (req, res
     const audioPath = req.file.path;
 
     // Create voice clone using OpenVoice adapter
-    const voiceId = await openVoiceAdapter.createVoiceClone(
-      audioPath,
-      name,
-      language || 'en'
-    );
+    const voiceId = await openVoiceAdapter.createVoiceClone(audioPath, name, language || 'en');
 
     // Clean up temporary file
     fs.unlinkSync(audioPath);
@@ -209,7 +214,7 @@ router.post('/clone', authenticateToken, upload.single('audio'), async (req, res
     });
   } catch (error: any) {
     console.error('Error creating voice clone:', error);
-    
+
     // Clean up file on error
     if (req.file && fs.existsSync(req.file.path)) {
       fs.unlinkSync(req.file.path);
@@ -225,7 +230,7 @@ router.post('/clone', authenticateToken, upload.single('audio'), async (req, res
 /**
  * GET /api/voices/clones
  * List user's voice clones
- * 
+ *
  * Requirements: 8.5, 12.5
  */
 router.get('/clones', authenticateToken, async (req, res) => {

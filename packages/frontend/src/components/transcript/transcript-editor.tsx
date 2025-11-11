@@ -91,11 +91,7 @@ export function TranscriptEditor({ segments, onUpdate, isUpdating }: TranscriptE
           )}
         </div>
         {hasChanges && (
-          <button
-            onClick={handleSaveNow}
-            disabled={isUpdating}
-            className="btn-secondary text-sm"
-          >
+          <button onClick={handleSaveNow} disabled={isUpdating} className="btn-secondary text-sm">
             Save Now
           </button>
         )}
@@ -104,10 +100,7 @@ export function TranscriptEditor({ segments, onUpdate, isUpdating }: TranscriptE
       {/* Segments */}
       <div className="space-y-3">
         {editedSegments.map((segment) => (
-          <div
-            key={segment.id}
-            className="card hover:shadow-medium transition-shadow"
-          >
+          <div key={segment.id} className="card hover:shadow-medium transition-shadow">
             <div className="flex items-start space-x-4">
               {/* Timestamp */}
               <div className="flex-shrink-0 text-xs text-gray-500 font-mono pt-1 w-24">

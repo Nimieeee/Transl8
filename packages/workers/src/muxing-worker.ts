@@ -1,6 +1,6 @@
 /**
  * Muxing Worker
- * 
+ *
  * Combines synchronized audio with original video using FFmpeg.
  * Integrates with the absolute synchronization assembly system.
  */
@@ -29,7 +29,8 @@ export class MuxingWorker {
    * Process muxing job
    */
   async process(job: Job<MuxingJobData>): Promise<void> {
-    const { projectId, userId, videoPath, finalAudioPath, applyWatermark, subscriptionTier } = job.data;
+    const { projectId, userId, videoPath, finalAudioPath, applyWatermark, subscriptionTier } =
+      job.data;
 
     try {
       logger.info(`Starting video muxing for project ${projectId}`);
@@ -39,7 +40,7 @@ export class MuxingWorker {
 
       // Step 1: Verify input files exist
       logger.info('Verifying input files');
-      
+
       try {
         await fs.access(videoPath);
         logger.info(`Video file verified: ${videoPath}`);
@@ -69,7 +70,7 @@ export class MuxingWorker {
       // Step 3: Prepare output path
       const outputDir = path.join('temp', projectId);
       await fs.mkdir(outputDir, { recursive: true });
-      
+
       const timestamp = Date.now();
       const outputFilename = `dubbed_video_${timestamp}.mp4`;
       const outputPath = path.join(outputDir, outputFilename);
@@ -79,8 +80,8 @@ export class MuxingWorker {
       await job.updateProgress(40);
 
       // Step 4: Determine if watermark should be applied
-      const shouldApplyWatermark = applyWatermark !== false && 
-        (subscriptionTier === 'free' || !subscriptionTier);
+      const shouldApplyWatermark =
+        applyWatermark !== false && (subscriptionTier === 'free' || !subscriptionTier);
 
       if (shouldApplyWatermark) {
         logger.info('Applying watermark for free tier');
@@ -93,21 +94,16 @@ export class MuxingWorker {
       // Step 5: Mux audio and video
       logger.info('Muxing audio and video with FFmpeg');
 
-      await videoProcessor.muxAudioVideo(
-        videoPath,
-        finalAudioPath,
-        outputPath,
-        {
-          applyWatermark: shouldApplyWatermark,
-          watermarkText: 'Preview - Upgrade to remove watermark',
-        }
-      );
+      await videoProcessor.muxAudioVideo(videoPath, finalAudioPath, outputPath, {
+        applyWatermark: shouldApplyWatermark,
+        watermarkText: 'Preview - Upgrade to remove watermark',
+      });
 
       await job.updateProgress(80);
 
       // Step 6: Verify output file
       logger.info('Verifying output file');
-      
+
       try {
         await fs.access(outputPath);
         const stats = await fs.stat(outputPath);
@@ -120,23 +116,21 @@ export class MuxingWorker {
 
       // Step 7: Validate audio-video synchronization
       logger.info('Validating audio-video synchronization');
-      
+
       const metadata = await videoProcessor.getVideoMetadata(outputPath);
-      
+
       if (contextMap) {
         const expectedDurationMs = contextMap.original_duration_ms;
         const actualDurationMs = metadata.duration * 1000;
         const differenceMs = Math.abs(actualDurationMs - expectedDurationMs);
-        
+
         logger.info(
           `Duration validation: expected ${expectedDurationMs}ms, ` +
-          `got ${actualDurationMs}ms (difference: ${differenceMs}ms)`
+            `got ${actualDurationMs}ms (difference: ${differenceMs}ms)`
         );
-        
+
         if (differenceMs > 100) {
-          logger.warn(
-            `Duration mismatch exceeds tolerance: ${differenceMs}ms > 100ms`
-          );
+          logger.warn(`Duration mismatch exceeds tolerance: ${differenceMs}ms > 100ms`);
         } else {
           logger.info('Audio-video synchronization validated successfully');
         }
@@ -196,13 +190,12 @@ export class MuxingWorker {
       if (!isValid) {
         logger.error(
           `Synchronization validation failed: ` +
-          `expected ${expectedDurationMs}ms, got ${actualDurationMs}ms ` +
-          `(difference: ${differenceMs}ms, tolerance: ${toleranceMs}ms)`
+            `expected ${expectedDurationMs}ms, got ${actualDurationMs}ms ` +
+            `(difference: ${differenceMs}ms, tolerance: ${toleranceMs}ms)`
         );
       } else {
         logger.info(
-          `Synchronization validated: ${actualDurationMs}ms ` +
-          `(difference: ${differenceMs}ms)`
+          `Synchronization validated: ${actualDurationMs}ms ` + `(difference: ${differenceMs}ms)`
         );
       }
 
@@ -216,4 +209,3 @@ export class MuxingWorker {
 
 // Export singleton instance
 export const muxingWorker = new MuxingWorker();
-

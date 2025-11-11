@@ -19,11 +19,7 @@ export class JobManager {
   /**
    * Create a new job in the database and enqueue it
    */
-  async createJob(
-    projectId: string,
-    stage: JobStage,
-    jobData: JobData
-  ): Promise<string> {
+  async createJob(projectId: string, stage: JobStage, jobData: JobData): Promise<string> {
     // Create job record in database
     const job = await prisma.job.create({
       data: {
@@ -37,13 +33,9 @@ export class JobManager {
 
     // Enqueue the job in the appropriate queue
     const queue = queueMap[stage as keyof typeof queueMap];
-    await queue.add(
-      `${stage.toLowerCase()}-${projectId}`,
-      jobData as any,
-      {
-        jobId: job.id,
-      }
-    );
+    await queue.add(`${stage.toLowerCase()}-${projectId}`, jobData as any, {
+      jobId: job.id,
+    });
 
     // Send WebSocket notification
     const project = await prisma.project.findUnique({
@@ -180,11 +172,7 @@ export class JobManager {
   /**
    * Update job progress
    */
-  async updateJobProgress(
-    jobId: string,
-    progress: number,
-    metadata?: any
-  ): Promise<void> {
+  async updateJobProgress(jobId: string, progress: number, metadata?: any): Promise<void> {
     const updateData: any = {
       progress,
       updatedAt: new Date(),
@@ -243,10 +231,7 @@ export class JobManager {
   /**
    * Mark job as completed and trigger next stage
    */
-  async markJobCompleted(
-    jobId: string,
-    outputData?: any
-  ): Promise<void> {
+  async markJobCompleted(jobId: string, outputData?: any): Promise<void> {
     const job = await prisma.job.update({
       where: { id: jobId },
       data: {
@@ -257,7 +242,7 @@ export class JobManager {
       },
       include: {
         project: {
-          select: { 
+          select: {
             userId: true,
             status: true,
             targetLanguage: true,
@@ -283,10 +268,7 @@ export class JobManager {
   /**
    * Mark job as failed
    */
-  async markJobFailed(
-    jobId: string,
-    errorMessage: string
-  ): Promise<void> {
+  async markJobFailed(jobId: string, errorMessage: string): Promise<void> {
     const job = await prisma.job.update({
       where: { id: jobId },
       data: {
@@ -396,9 +378,8 @@ export class JobManager {
 
       case 'MUXING':
         // After muxing, check if lip-sync is enabled (premium feature)
-        const shouldApplyLipSync = 
-          project.user.subscriptionTier === 'PRO' || 
-          project.user.subscriptionTier === 'ENTERPRISE';
+        const shouldApplyLipSync =
+          project.user.subscriptionTier === 'PRO' || project.user.subscriptionTier === 'ENTERPRISE';
 
         if (shouldApplyLipSync) {
           const muxingJob = await prisma.job.findFirst({

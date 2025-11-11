@@ -1,10 +1,10 @@
 /**
  * OpenVoice Adapter
- * 
+ *
  * Implements TTSAdapter interface for OpenVoice model.
  * Provides zero-shot voice cloning with style transfer from clean style prompts.
  * Supports emotion-aware synthesis for expressive dubbing.
- * 
+ *
  * Requirements: 4.1, 4.2, 4.3, 4.4
  */
 
@@ -30,7 +30,7 @@ export interface OpenVoiceConfig {
 export class OpenVoiceAdapter extends TTSAdapter {
   name = 'OpenVoice';
   version = '2.0.0';
-  
+
   private serviceUrl: string;
   private timeout: number;
 
@@ -69,11 +69,13 @@ export class OpenVoiceAdapter extends TTSAdapter {
       );
 
       const processingTime = Date.now() - startTime;
-      
-      const emotionInfo = voiceConfig.parameters?.emotion 
-        ? ` with emotion=${voiceConfig.parameters.emotion}` 
+
+      const emotionInfo = voiceConfig.parameters?.emotion
+        ? ` with emotion=${voiceConfig.parameters.emotion}`
         : '';
-      console.log(`[OpenVoice] Synthesized ${text.length} chars in ${processingTime}ms${emotionInfo}`);
+      console.log(
+        `[OpenVoice] Synthesized ${text.length} chars in ${processingTime}ms${emotionInfo}`
+      );
 
       return Buffer.from(response.data);
     } catch (error: any) {
@@ -116,11 +118,10 @@ export class OpenVoiceAdapter extends TTSAdapter {
         }
 
         // Synthesize this segment
-        const audioData = await this.synthesize(
-          segment.translatedText,
-          enhancedVoiceConfig,
-          { start: segment.start, end: segment.end }
-        );
+        const audioData = await this.synthesize(segment.translatedText, enhancedVoiceConfig, {
+          start: segment.start,
+          end: segment.end,
+        });
 
         audioSegments.push({
           segmentId: i,
@@ -137,10 +138,7 @@ export class OpenVoiceAdapter extends TTSAdapter {
       }
 
       // Concatenate all audio segments
-      const concatenatedAudio = await this.concatenateAudioSegments(
-        audioSegments,
-        segments
-      );
+      const concatenatedAudio = await this.concatenateAudioSegments(audioSegments, segments);
 
       const totalTime = Date.now() - startTime;
 
@@ -188,22 +186,18 @@ export class OpenVoiceAdapter extends TTSAdapter {
       formData.append('language', targetLanguage);
       formData.append('reference_audio', fs.createReadStream(cleanPromptPath));
       formData.append('speed', '1.0');
-      
+
       // Note: emotion and timestamps are not supported by the current OpenVoice service
       // They would need to be added to the service implementation
 
-      const response = await axios.post(
-        `${this.serviceUrl}/synthesize-with-voice`,
-        formData,
-        {
-          headers: formData.getHeaders(),
-          responseType: 'arraybuffer',
-          timeout: this.timeout,
-        }
-      );
+      const response = await axios.post(`${this.serviceUrl}/synthesize-with-voice`, formData, {
+        headers: formData.getHeaders(),
+        responseType: 'arraybuffer',
+        timeout: this.timeout,
+      });
 
       const processingTime = Date.now() - startTime;
-      
+
       const emotionInfo = emotion ? ` with emotion=${emotion}` : '';
       console.log(`[OpenVoice] Synthesized with clean prompt in ${processingTime}ms${emotionInfo}`);
 
@@ -217,7 +211,7 @@ export class OpenVoiceAdapter extends TTSAdapter {
         config: {
           url: error.config?.url,
           method: error.config?.method,
-        }
+        },
       });
       throw new Error(`OpenVoice clean prompt synthesis failed: ${error.message}`);
     }
@@ -262,13 +256,13 @@ export class OpenVoiceAdapter extends TTSAdapter {
   private generateSilence(duration: number): Buffer {
     const sampleRate = 24000;
     const numSamples = Math.floor(sampleRate * duration);
-    
+
     // WAV header (44 bytes) + silence samples
     const dataSize = numSamples * 2; // 16-bit samples
     const fileSize = 44 + dataSize;
-    
+
     const buffer = Buffer.alloc(fileSize);
-    
+
     // WAV header
     buffer.write('RIFF', 0);
     buffer.writeUInt32LE(fileSize - 8, 4);
@@ -283,14 +277,18 @@ export class OpenVoiceAdapter extends TTSAdapter {
     buffer.writeUInt16LE(16, 34);
     buffer.write('data', 36);
     buffer.writeUInt32LE(dataSize, 40);
-    
+
     return buffer;
   }
 
   /**
    * Create a voice clone from audio sample
    */
-  async createVoiceClone(audioPath: string, voiceName: string, language: string = 'en'): Promise<string> {
+  async createVoiceClone(
+    audioPath: string,
+    voiceName: string,
+    language: string = 'en'
+  ): Promise<string> {
     const startTime = Date.now();
 
     try {
@@ -308,14 +306,10 @@ export class OpenVoiceAdapter extends TTSAdapter {
       formData.append('language', language);
 
       // Send to OpenVoice service
-      const response = await axios.post(
-        `${this.serviceUrl}/clone`,
-        formData,
-        {
-          headers: formData.getHeaders(),
-          timeout: this.timeout,
-        }
-      );
+      const response = await axios.post(`${this.serviceUrl}/clone`, formData, {
+        headers: formData.getHeaders(),
+        timeout: this.timeout,
+      });
 
       const { voiceId, processingTime } = response.data;
 
@@ -324,11 +318,11 @@ export class OpenVoiceAdapter extends TTSAdapter {
       return voiceId;
     } catch (error: any) {
       console.error('[OpenVoice] Voice clone creation error:', error.message);
-      
+
       if (error.response?.data?.error) {
         throw new Error(`Voice clone creation failed: ${error.response.data.error}`);
       }
-      
+
       throw new Error(`Voice clone creation failed: ${error.message}`);
     }
   }

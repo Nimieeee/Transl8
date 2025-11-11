@@ -16,7 +16,7 @@ export function BetaOnboarding() {
 
     try {
       const response = await apiClient.post('/api/beta/activate', {
-        inviteCode: inviteCode.trim().toUpperCase()
+        inviteCode: inviteCode.trim().toUpperCase(),
       });
 
       setSuccess(true);
@@ -36,7 +36,8 @@ export function BetaOnboarding() {
       <div className="max-w-md mx-auto p-6 bg-green-50 border border-green-200 rounded-lg">
         <h2 className="text-2xl font-bold text-green-800 mb-4">Welcome to the Beta!</h2>
         <p className="text-green-700 mb-4">
-          Your beta access has been activated. You now have free Pro tier access with unlimited processing.
+          Your beta access has been activated. You now have free Pro tier access with unlimited
+          processing.
         </p>
         <p className="text-sm text-green-600">Redirecting to dashboard...</p>
       </div>

@@ -35,10 +35,7 @@ export async function storeRefreshToken(
 /**
  * Check if refresh token exists in Redis
  */
-export async function isRefreshTokenValid(
-  userId: string,
-  token: string
-): Promise<boolean> {
+export async function isRefreshTokenValid(userId: string, token: string): Promise<boolean> {
   const key = `refresh_token:${userId}:${token}`;
   const exists = await redis.exists(key);
   return exists === 1;
@@ -47,10 +44,7 @@ export async function isRefreshTokenValid(
 /**
  * Invalidate a specific refresh token
  */
-export async function invalidateRefreshToken(
-  userId: string,
-  token: string
-): Promise<void> {
+export async function invalidateRefreshToken(userId: string, token: string): Promise<void> {
   const key = `refresh_token:${userId}:${token}`;
   await redis.del(key);
 }
@@ -61,7 +55,7 @@ export async function invalidateRefreshToken(
 export async function invalidateAllUserTokens(userId: string): Promise<void> {
   const pattern = `refresh_token:${userId}:*`;
   const keys = await redis.keys(pattern);
-  
+
   if (keys.length > 0) {
     await redis.del(...keys);
   }

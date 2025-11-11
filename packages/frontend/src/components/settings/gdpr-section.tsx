@@ -48,7 +48,7 @@ export function GDPRSection() {
       });
 
       alert('Your account has been deleted. You will be logged out.');
-      
+
       // Clear local storage and redirect to home
       localStorage.clear();
       window.location.href = '/';
@@ -73,7 +73,8 @@ export function GDPRSection() {
       <div className="border border-gray-200 rounded-lg p-6">
         <h3 className="text-lg font-semibold mb-2">Export Your Data</h3>
         <p className="text-gray-600 mb-4">
-          Download a copy of all your personal data, including projects, transcripts, translations, and voice clones.
+          Download a copy of all your personal data, including projects, transcripts, translations,
+          and voice clones.
         </p>
         <button
           onClick={handleExportData}
@@ -90,7 +91,7 @@ export function GDPRSection() {
         <p className="text-gray-700 mb-4">
           Permanently delete your account and all associated data. This action cannot be undone.
         </p>
-        
+
         {!showDeleteConfirm ? (
           <button
             onClick={() => setShowDeleteConfirm(true)}
@@ -102,7 +103,9 @@ export function GDPRSection() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Type <span className="font-mono bg-gray-200 px-2 py-1 rounded">DELETE_MY_ACCOUNT</span> to confirm:
+                Type{' '}
+                <span className="font-mono bg-gray-200 px-2 py-1 rounded">DELETE_MY_ACCOUNT</span>{' '}
+                to confirm:
               </label>
               <input
                 type="text"

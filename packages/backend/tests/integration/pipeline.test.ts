@@ -2,7 +2,11 @@ import { Queue } from 'bullmq';
 import { prisma, redis } from '../setup';
 import { createTestUser } from '../fixtures/users';
 import { createTestProject } from '../fixtures/projects';
-import { mockTranscript, mockTranslation, mockMultiSpeakerTranscript } from '../fixtures/transcripts';
+import {
+  mockTranscript,
+  mockTranslation,
+  mockMultiSpeakerTranscript,
+} from '../fixtures/transcripts';
 import { JobManager } from '../../src/lib/job-manager';
 
 describe('Pipeline Integration Tests', () => {
@@ -14,7 +18,7 @@ describe('Pipeline Integration Tests', () => {
 
   beforeAll(() => {
     jobManager = new JobManager();
-    
+
     // Initialize queues
     sttQueue = new Queue('stt', { connection: redis });
     mtQueue = new Queue('mt', { connection: redis });
@@ -199,7 +203,7 @@ describe('Pipeline Integration Tests', () => {
       const project = await createTestProject(prisma, user.id, 'processing');
 
       const stages = ['STT', 'MT', 'TTS', 'MUXING'];
-      
+
       for (const stage of stages) {
         const job = await prisma.job.create({
           data: {
@@ -231,7 +235,7 @@ describe('Pipeline Integration Tests', () => {
       });
 
       expect(jobs.length).toBe(stages.length);
-      expect(jobs.every(j => j.status === 'COMPLETED')).toBe(true);
+      expect(jobs.every((j) => j.status === 'COMPLETED')).toBe(true);
     });
   });
 
@@ -253,7 +257,7 @@ describe('Pipeline Integration Tests', () => {
 
       // Attempting to create translation without approval should be blocked
       // (This would be enforced in the API layer)
-      
+
       // Approve transcript
       await prisma.transcript.update({
         where: { id: transcript.id },
@@ -320,7 +324,7 @@ describe('Pipeline Integration Tests', () => {
       // Edit transcript
       const editedContent = {
         ...mockTranscript,
-        segments: mockTranscript.segments.map(s => ({
+        segments: mockTranscript.segments.map((s) => ({
           ...s,
           text: s.text + ' [edited]',
         })),
@@ -482,7 +486,7 @@ describe('Pipeline Integration Tests', () => {
       const project = await createTestProject(prisma, user.id, 'basic');
 
       const attempts = [];
-      
+
       // Simulate 3 retry attempts
       for (let i = 0; i < 3; i++) {
         const job = await prisma.job.create({

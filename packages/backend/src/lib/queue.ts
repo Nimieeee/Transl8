@@ -2,15 +2,15 @@ import { Queue, QueueEvents } from 'bullmq';
 import { redis } from './redis';
 
 // Define job stages
-export type JobStage = 
-  | 'STT' 
-  | 'MT' 
-  | 'TTS' 
-  | 'MUXING' 
-  | 'LIPSYNC' 
-  | 'VOCAL_ISOLATION' 
-  | 'EMOTION_ANALYSIS' 
-  | 'ADAPTATION' 
+export type JobStage =
+  | 'STT'
+  | 'MT'
+  | 'TTS'
+  | 'MUXING'
+  | 'LIPSYNC'
+  | 'VOCAL_ISOLATION'
+  | 'EMOTION_ANALYSIS'
+  | 'ADAPTATION'
   | 'FINAL_ASSEMBLY';
 
 // Queue configuration with exponential backoff retry
@@ -110,7 +110,16 @@ export interface FinalAssemblyJobData extends BaseJobData {
   contextMapPath?: string;
 }
 
-export type JobData = STTJobData | MTJobData | TTSJobData | MuxingJobData | LipSyncJobData | VocalIsolationJobData | EmotionAnalysisJobData | AdaptationJobData | FinalAssemblyJobData;
+export type JobData =
+  | STTJobData
+  | MTJobData
+  | TTSJobData
+  | MuxingJobData
+  | LipSyncJobData
+  | VocalIsolationJobData
+  | EmotionAnalysisJobData
+  | AdaptationJobData
+  | FinalAssemblyJobData;
 
 // Create queues for each pipeline stage
 export const sttQueue = new Queue<STTJobData>('stt', queueConfig);
@@ -119,7 +128,10 @@ export const ttsQueue = new Queue<TTSJobData>('tts', queueConfig);
 export const muxingQueue = new Queue<MuxingJobData>('muxing', queueConfig);
 export const lipSyncQueue = new Queue<LipSyncJobData>('lipsync', queueConfig);
 export const vocalIsolationQueue = new Queue<VocalIsolationJobData>('vocal-isolation', queueConfig);
-export const emotionAnalysisQueue = new Queue<EmotionAnalysisJobData>('emotion-analysis', queueConfig);
+export const emotionAnalysisQueue = new Queue<EmotionAnalysisJobData>(
+  'emotion-analysis',
+  queueConfig
+);
 export const adaptationQueue = new Queue<AdaptationJobData>('adaptation', queueConfig);
 export const finalAssemblyQueue = new Queue<FinalAssemblyJobData>('final-assembly', queueConfig);
 
@@ -130,7 +142,9 @@ export const ttsQueueEvents = new QueueEvents('tts', { connection: redis });
 export const muxingQueueEvents = new QueueEvents('muxing', { connection: redis });
 export const lipSyncQueueEvents = new QueueEvents('lipsync', { connection: redis });
 export const vocalIsolationQueueEvents = new QueueEvents('vocal-isolation', { connection: redis });
-export const emotionAnalysisQueueEvents = new QueueEvents('emotion-analysis', { connection: redis });
+export const emotionAnalysisQueueEvents = new QueueEvents('emotion-analysis', {
+  connection: redis,
+});
 export const adaptationQueueEvents = new QueueEvents('adaptation', { connection: redis });
 export const finalAssemblyQueueEvents = new QueueEvents('final-assembly', { connection: redis });
 
@@ -165,7 +179,7 @@ export const queueEventsMap = {
  */
 export async function getQueueStats(stage: JobStage) {
   const queue = queueMap[stage as keyof typeof queueMap];
-  
+
   const [waiting, active, completed, failed, delayed] = await Promise.all([
     queue.getWaitingCount(),
     queue.getActiveCount(),
@@ -190,12 +204,15 @@ export async function getQueueStats(stage: JobStage) {
  */
 export async function getAllQueueStats() {
   const stages: JobStage[] = ['STT', 'MT', 'TTS', 'MUXING', 'LIPSYNC'];
-  const stats = await Promise.all(stages.map(stage => getQueueStats(stage)));
-  
-  return stats.reduce((acc, stat) => {
-    acc[stat.stage] = stat;
-    return acc;
-  }, {} as Record<JobStage, Awaited<ReturnType<typeof getQueueStats>>>);
+  const stats = await Promise.all(stages.map((stage) => getQueueStats(stage)));
+
+  return stats.reduce(
+    (acc, stat) => {
+      acc[stat.stage] = stat;
+      return acc;
+    },
+    {} as Record<JobStage, Awaited<ReturnType<typeof getQueueStats>>>
+  );
 }
 
 /**

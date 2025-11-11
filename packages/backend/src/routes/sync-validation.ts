@@ -12,9 +12,9 @@ const router = Router();
 router.get('/dashboard', authenticateToken, async (req, res) => {
   try {
     const days = parseInt(req.query.days as string) || 30;
-    
+
     const dashboard = await syncValidator.getDashboard(days);
-    
+
     res.json(dashboard);
   } catch (error) {
     logger.error('Failed to get sync validation dashboard:', error);
@@ -29,13 +29,13 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
 router.get('/report/:projectId', authenticateToken, async (req, res) => {
   try {
     const { projectId } = req.params;
-    
+
     const report = await syncValidator.getReport(projectId);
-    
+
     if (!report) {
       return res.status(404).json({ error: 'No sync report found for this project' });
     }
-    
+
     res.json(report);
   } catch (error) {
     logger.error('Failed to get sync report:', error);
@@ -57,7 +57,7 @@ router.post('/validate/:projectId', authenticateToken, async (req, res) => {
     }
 
     const report = await syncValidator.validateSync(projectId, finalAudioPath);
-    
+
     res.json(report);
   } catch (error) {
     logger.error('Failed to validate sync:', error);
@@ -72,9 +72,9 @@ router.post('/validate/:projectId', authenticateToken, async (req, res) => {
 router.get('/visualization/:projectId', authenticateToken, async (req, res) => {
   try {
     const { projectId } = req.params;
-    
+
     const visualization = await syncValidator.generateAlignmentVisualization(projectId);
-    
+
     res.json(visualization);
   } catch (error) {
     logger.error('Failed to generate visualization:', error);

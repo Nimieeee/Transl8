@@ -1,9 +1,9 @@
 /**
  * Vocal Isolation Service
- * 
+ *
  * Service for extracting and isolating vocal segments from audio files.
  * Combines audio slicing with Demucs vocal separation and noise reduction.
- * 
+ *
  * Requirements: 16.1, 16.2, 16.3, 16.4
  */
 
@@ -39,7 +39,7 @@ export class VocalIsolationService {
     this.demucsAdapter = new DemucsAdapter();
     this.noiseReduceAdapter = new NoiseReduceAdapter();
     this.tempDir = options.tempDir || '/tmp/vocal-isolation';
-    
+
     // Create temp directory if it doesn't exist
     if (!fs.existsSync(this.tempDir)) {
       fs.mkdirSync(this.tempDir, { recursive: true });
@@ -48,7 +48,7 @@ export class VocalIsolationService {
 
   /**
    * Extract audio segment from full audio file
-   * 
+   *
    * @param audioPath - Path to full audio file
    * @param startMs - Start time in milliseconds
    * @param endMs - End time in milliseconds
@@ -67,7 +67,7 @@ export class VocalIsolationService {
 
       // Use FFmpeg to extract segment
       const cmd = `ffmpeg -i "${audioPath}" -ss ${startSec} -t ${duration} -acodec pcm_s16le -ar 16000 "${outputPath}" -y`;
-      
+
       await execAsync(cmd);
 
       if (!fs.existsSync(outputPath)) {
@@ -75,7 +75,6 @@ export class VocalIsolationService {
       }
 
       return outputPath;
-
     } catch (error: any) {
       logger.error(`Audio segment extraction error: ${error.message}`);
       throw new Error(`Failed to extract audio segment: ${error.message}`);
@@ -84,24 +83,20 @@ export class VocalIsolationService {
 
   /**
    * Isolate vocals from a single audio segment (Demucs only, no noise reduction)
-   * 
+   *
    * @param segmentPath - Path to audio segment
    * @param outputPath - Path for clean vocals
    * @returns Path to clean vocals
    */
-  async isolateSegmentVocals(
-    segmentPath: string,
-    outputPath: string
-  ): Promise<string> {
+  async isolateSegmentVocals(segmentPath: string, outputPath: string): Promise<string> {
     try {
       // Separate vocals from music/effects using Demucs only
       const demucsResult = await this.demucsAdapter.separateVocals(segmentPath, outputPath);
-      
+
       logger.info(`Vocals separated: ${demucsResult.vocalsPath}`);
 
       // Return the Demucs output directly (no noise reduction)
       return demucsResult.vocalsPath;
-
     } catch (error: any) {
       logger.error(`Vocal isolation error: ${error.message}`);
       throw new Error(`Failed to isolate vocals: ${error.message}`);
@@ -110,7 +105,7 @@ export class VocalIsolationService {
 
   /**
    * Process a segment: extract from full audio and isolate vocals
-   * 
+   *
    * @param audioPath - Path to full audio file
    * @param segment - Segment information
    * @param outputDir - Directory for output files
@@ -122,7 +117,7 @@ export class VocalIsolationService {
     outputDir: string
   ): Promise<string> {
     const segmentId = segment.id.toString().padStart(4, '0');
-    
+
     try {
       // Create output directory if it doesn't exist
       if (!fs.existsSync(outputDir)) {
@@ -132,13 +127,13 @@ export class VocalIsolationService {
       // Step 1: Extract segment
       const segmentPath = path.join(this.tempDir, `segment_${segmentId}_raw.wav`);
       await this.extractSegment(audioPath, segment.startMs, segment.endMs, segmentPath);
-      
+
       logger.info(`Extracted segment ${segmentId}: ${segment.startMs}ms - ${segment.endMs}ms`);
 
       // Step 2: Isolate vocals
       const vocalsPath = path.join(outputDir, `clean_prompt_${segmentId}.wav`);
       await this.isolateSegmentVocals(segmentPath, vocalsPath);
-      
+
       logger.info(`Isolated vocals for segment ${segmentId}: ${vocalsPath}`);
 
       // Clean up temporary segment file
@@ -147,7 +142,6 @@ export class VocalIsolationService {
       }
 
       return vocalsPath;
-
     } catch (error: any) {
       logger.error(`Segment processing error for segment ${segmentId}: ${error.message}`);
       throw error;
@@ -156,7 +150,7 @@ export class VocalIsolationService {
 
   /**
    * Process multiple segments in batch
-   * 
+   *
    * @param audioPath - Path to full audio file
    * @param segments - Array of segment information
    * @param outputDir - Directory for output files
@@ -188,7 +182,7 @@ export class VocalIsolationService {
 
   /**
    * Health check for vocal isolation service
-   * 
+   *
    * @returns Health status
    */
   async healthCheck(): Promise<boolean> {

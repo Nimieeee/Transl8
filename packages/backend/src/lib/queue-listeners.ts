@@ -9,7 +9,7 @@ import { moveToDeadLetterQueue } from './dead-letter-queue';
 export function setupQueueListeners() {
   const stages: JobStage[] = ['STT', 'MT', 'TTS', 'MUXING', 'LIPSYNC'];
 
-  stages.forEach(stage => {
+  stages.forEach((stage) => {
     const queueEvents = queueEventsMap[stage as keyof typeof queueEventsMap];
 
     // Job started
@@ -34,24 +34,30 @@ export function setupQueueListeners() {
     });
 
     // Job completed
-    queueEvents.on('completed', async ({ jobId, returnvalue }: { jobId: string; returnvalue: any }) => {
-      try {
-        await jobManager.markJobCompleted(jobId, returnvalue);
-        console.log(`[${stage}] Job ${jobId} completed`);
-      } catch (error) {
-        console.error(`[${stage}] Error marking job ${jobId} as completed:`, error);
+    queueEvents.on(
+      'completed',
+      async ({ jobId, returnvalue }: { jobId: string; returnvalue: any }) => {
+        try {
+          await jobManager.markJobCompleted(jobId, returnvalue);
+          console.log(`[${stage}] Job ${jobId} completed`);
+        } catch (error) {
+          console.error(`[${stage}] Error marking job ${jobId} as completed:`, error);
+        }
       }
-    });
+    );
 
     // Job failed
-    queueEvents.on('failed', async ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
-      try {
-        await jobManager.markJobFailed(jobId, failedReason || 'Unknown error');
-        console.error(`[${stage}] Job ${jobId} failed: ${failedReason}`);
-      } catch (error) {
-        console.error(`[${stage}] Error marking job ${jobId} as failed:`, error);
+    queueEvents.on(
+      'failed',
+      async ({ jobId, failedReason }: { jobId: string; failedReason: string }) => {
+        try {
+          await jobManager.markJobFailed(jobId, failedReason || 'Unknown error');
+          console.error(`[${stage}] Job ${jobId} failed: ${failedReason}`);
+        } catch (error) {
+          console.error(`[${stage}] Error marking job ${jobId} as failed:`, error);
+        }
       }
-    });
+    );
 
     // Job stalled (worker crashed or took too long)
     queueEvents.on('stalled', async ({ jobId }: { jobId: string }) => {
@@ -61,16 +67,16 @@ export function setupQueueListeners() {
     // Job retrying
     queueEvents.on('retries-exhausted', async ({ jobId }: { jobId: string }) => {
       console.error(`[${stage}] Job ${jobId} exhausted all retries`);
-      
+
       try {
         // Get the job from the queue
         const queue = queueMap[stage as keyof typeof queueMap];
         const job = await queue.getJob(jobId);
-        
+
         if (job) {
           const jobData = job.data;
           const failedReason = job.failedReason || 'Unknown error';
-          
+
           // Build error history from job attempts
           const errorHistory = [];
           for (let i = 1; i <= job.attemptsMade; i++) {
@@ -80,7 +86,7 @@ export function setupQueueListeners() {
               timestamp: new Date(job.processedOn || Date.now()),
             });
           }
-          
+
           // Move to dead letter queue
           await moveToDeadLetterQueue(
             jobId,
@@ -108,7 +114,7 @@ export function setupQueueListeners() {
 export function cleanupQueueListeners() {
   const stages: JobStage[] = ['STT', 'MT', 'TTS', 'MUXING', 'LIPSYNC'];
 
-  stages.forEach(stage => {
+  stages.forEach((stage) => {
     const queueEvents = queueEventsMap[stage as keyof typeof queueEventsMap];
     queueEvents.removeAllListeners();
   });

@@ -60,11 +60,9 @@ async function startWorkers() {
 
     // Muxing Worker (FFmpeg)
     muxingWorkerInstance = new MuxingWorker();
-    muxingBullWorker = new Worker(
-      'muxing',
-      async (job) => muxingWorkerInstance.process(job),
-      { connection: redis }
-    );
+    muxingBullWorker = new Worker('muxing', async (job) => muxingWorkerInstance.process(job), {
+      connection: redis,
+    });
     console.log('✓ Muxing Worker started (FFmpeg)');
 
     console.log('');
@@ -92,14 +90,14 @@ async function startWorkers() {
 // Graceful shutdown
 async function shutdown() {
   console.log('Shutting down workers...');
-  
+
   if (sttWorker) await sttWorker.stop();
   if (adaptationWorker) await adaptationWorker.close();
   if (ttsWorker) await ttsWorker.stop();
   if (finalAssemblyBullWorker) await finalAssemblyBullWorker.close();
   if (finalAssemblyWorkerInstance) await finalAssemblyWorkerInstance.close();
   if (muxingBullWorker) await muxingBullWorker.close();
-  
+
   await redis.quit();
   console.log('All workers stopped');
   process.exit(0);

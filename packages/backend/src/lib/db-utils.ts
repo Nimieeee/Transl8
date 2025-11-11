@@ -21,7 +21,7 @@ export async function withRetry<T>(
       return await operation();
     } catch (error) {
       lastError = error as Error;
-      
+
       // Don't retry on certain errors
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -31,7 +31,7 @@ export async function withRetry<T>(
       }
 
       if (attempt < maxRetries) {
-        await new Promise(resolve => setTimeout(resolve, delayMs * attempt));
+        await new Promise((resolve) => setTimeout(resolve, delayMs * attempt));
       }
     }
   }
@@ -116,11 +116,7 @@ export async function softDelete(model: any, id: string): Promise<void> {
 /**
  * Bulk upsert helper
  */
-export async function bulkUpsert<T>(
-  model: any,
-  data: T[],
-  uniqueField: keyof T
-): Promise<void> {
+export async function bulkUpsert<T>(model: any, data: T[], uniqueField: keyof T): Promise<void> {
   await prisma.$transaction(
     data.map((item: any) =>
       model.upsert({
@@ -136,21 +132,15 @@ export async function bulkUpsert<T>(
  * Get database statistics
  */
 export async function getDatabaseStats() {
-  const [
-    userCount,
-    projectCount,
-    transcriptCount,
-    translationCount,
-    voiceCloneCount,
-    jobCount,
-  ] = await Promise.all([
-    prisma.user.count(),
-    prisma.project.count(),
-    prisma.transcript.count(),
-    prisma.translation.count(),
-    prisma.voiceClone.count(),
-    prisma.job.count(),
-  ]);
+  const [userCount, projectCount, transcriptCount, translationCount, voiceCloneCount, jobCount] =
+    await Promise.all([
+      prisma.user.count(),
+      prisma.project.count(),
+      prisma.transcript.count(),
+      prisma.translation.count(),
+      prisma.voiceClone.count(),
+      prisma.job.count(),
+    ]);
 
   return {
     users: userCount,
@@ -213,10 +203,7 @@ export async function checkProcessingLimit(userId: string): Promise<boolean> {
 /**
  * Update user processing minutes
  */
-export async function updateProcessingMinutes(
-  userId: string,
-  minutesToAdd: number
-): Promise<void> {
+export async function updateProcessingMinutes(userId: string, minutesToAdd: number): Promise<void> {
   await prisma.user.update({
     where: { id: userId },
     data: {

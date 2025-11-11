@@ -76,7 +76,11 @@ export default function TranscriptPage() {
                   disabled={isApproving || transcript.approved}
                   className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {isApproving ? 'Approving...' : transcript.approved ? 'Approved' : 'Approve & Continue'}
+                  {isApproving
+                    ? 'Approving...'
+                    : transcript.approved
+                      ? 'Approved'
+                      : 'Approve & Continue'}
                 </button>
               </div>
             </div>
@@ -103,8 +107,8 @@ export default function TranscriptPage() {
               </svg>
               <div className="ml-3">
                 <p className="text-sm text-blue-700">
-                  Review the transcript for accuracy. You can edit any text directly. Changes are auto-saved.
-                  Segments with low confidence are highlighted for your attention.
+                  Review the transcript for accuracy. You can edit any text directly. Changes are
+                  auto-saved. Segments with low confidence are highlighted for your attention.
                 </p>
               </div>
             </div>
@@ -115,7 +119,10 @@ export default function TranscriptPage() {
             <div className="card">
               <div className="text-sm text-gray-600">Duration</div>
               <div className="text-2xl font-bold text-gray-900 mt-1">
-                {Math.floor(transcript.duration / 60)}:{Math.floor(transcript.duration % 60).toString().padStart(2, '0')}
+                {Math.floor(transcript.duration / 60)}:
+                {Math.floor(transcript.duration % 60)
+                  .toString()
+                  .padStart(2, '0')}
               </div>
             </div>
             <div className="card">

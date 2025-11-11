@@ -34,8 +34,8 @@ router.post('/', authenticateToken, async (req, res) => {
         type,
         category,
         rating,
-        content
-      }
+        content,
+      },
     });
 
     logger.info(`Feedback submitted by user ${userId}: ${type}`);
@@ -45,8 +45,8 @@ router.post('/', authenticateToken, async (req, res) => {
       feedback: {
         id: feedback.id,
         type: feedback.type,
-        createdAt: feedback.createdAt
-      }
+        createdAt: feedback.createdAt,
+      },
     });
   } catch (error) {
     logger.error('Error submitting feedback:', error);
@@ -76,8 +76,8 @@ router.get('/my-feedback', authenticateToken, async (req, res) => {
         rating: true,
         content: true,
         status: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
     res.json({ feedback });
@@ -108,12 +108,12 @@ router.get('/all', authenticateToken, async (req, res) => {
             select: {
               id: true,
               email: true,
-              subscriptionTier: true
-            }
-          }
-        }
+              subscriptionTier: true,
+            },
+          },
+        },
       }),
-      prisma.feedback.count({ where })
+      prisma.feedback.count({ where }),
     ]);
 
     res.json({
@@ -121,8 +121,8 @@ router.get('/all', authenticateToken, async (req, res) => {
       pagination: {
         total,
         limit: Number(limit),
-        offset: Number(offset)
-      }
+        offset: Number(offset),
+      },
     });
   } catch (error) {
     logger.error('Error fetching all feedback:', error);
@@ -143,7 +143,7 @@ router.patch('/:id/status', authenticateToken, async (req, res) => {
 
     const feedback = await prisma.feedback.update({
       where: { id },
-      data: { status }
+      data: { status },
     });
 
     res.json({ message: 'Feedback status updated', feedback });
@@ -165,34 +165,29 @@ router.get('/stats', authenticateToken, async (req, res) => {
       if (endDate) where.createdAt.lte = new Date(endDate as string);
     }
 
-    const [
-      totalCount,
-      byType,
-      byStatus,
-      averageRating
-    ] = await Promise.all([
+    const [totalCount, byType, byStatus, averageRating] = await Promise.all([
       prisma.feedback.count({ where }),
       prisma.feedback.groupBy({
         by: ['type'],
         where,
-        _count: true
+        _count: true,
       }),
       prisma.feedback.groupBy({
         by: ['status'],
         where,
-        _count: true
+        _count: true,
       }),
       prisma.feedback.aggregate({
         where: { ...where, rating: { not: null } },
-        _avg: { rating: true }
-      })
+        _avg: { rating: true },
+      }),
     ]);
 
     res.json({
       totalCount,
       byType,
       byStatus,
-      averageRating: averageRating._avg.rating
+      averageRating: averageRating._avg.rating,
     });
   } catch (error) {
     logger.error('Error fetching feedback stats:', error);

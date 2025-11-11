@@ -1,9 +1,9 @@
 /**
  * Transcript Quality Analysis
- * 
+ *
  * Utilities for analyzing transcript quality, calculating confidence scores,
  * and flagging segments that need user review.
- * 
+ *
  * Requirements: 15.2
  */
 
@@ -43,7 +43,7 @@ const CONFIDENCE_THRESHOLDS = {
  */
 export function calculateQualityMetrics(transcript: Transcript): QualityMetrics {
   const segments = transcript.segments;
-  
+
   if (segments.length === 0) {
     return {
       averageConfidence: 0,
@@ -58,16 +58,14 @@ export function calculateQualityMetrics(transcript: Transcript): QualityMetrics 
   }
 
   // Calculate confidence statistics
-  const confidences = segments.map(s => s.confidence);
+  const confidences = segments.map((s) => s.confidence);
   const averageConfidence = confidences.reduce((a, b) => a + b, 0) / confidences.length;
   const minConfidence = Math.min(...confidences);
   const maxConfidence = Math.max(...confidences);
 
   // Identify low confidence segments
-  const lowConfidenceSegments = segments.filter(
-    s => s.confidence < CONFIDENCE_THRESHOLDS.FAIR
-  );
-  const lowConfidenceSegmentIds = lowConfidenceSegments.map(s => s.id);
+  const lowConfidenceSegments = segments.filter((s) => s.confidence < CONFIDENCE_THRESHOLDS.FAIR);
+  const lowConfidenceSegmentIds = lowConfidenceSegments.map((s) => s.id);
 
   // Determine quality level
   const qualityLevel = determineQualityLevel(averageConfidence);
@@ -167,7 +165,7 @@ function generateQualityWarnings(
   if (averageConfidence < CONFIDENCE_THRESHOLDS.FAIR) {
     warnings.push(
       `Low average confidence (${(averageConfidence * 100).toFixed(1)}%). ` +
-      `Audio quality may be poor or contain significant background noise.`
+        `Audio quality may be poor or contain significant background noise.`
     );
   }
 
@@ -176,12 +174,10 @@ function generateQualityWarnings(
   if (lowConfidencePercentage > 20) {
     warnings.push(
       `${lowConfidenceCount} of ${totalSegments} segments (${lowConfidencePercentage.toFixed(1)}%) ` +
-      `have low confidence and should be reviewed.`
+        `have low confidence and should be reviewed.`
     );
   } else if (lowConfidenceCount > 0) {
-    warnings.push(
-      `${lowConfidenceCount} segment(s) have low confidence and may need review.`
-    );
+    warnings.push(`${lowConfidenceCount} segment(s) have low confidence and may need review.`);
   }
 
   // Speaker detection warning
@@ -190,7 +186,7 @@ function generateQualityWarnings(
   } else if (speakerCount > 10) {
     warnings.push(
       `Detected ${speakerCount} speakers. This may indicate over-segmentation. ` +
-      `Consider reviewing speaker labels.`
+        `Consider reviewing speaker labels.`
     );
   }
 
@@ -231,7 +227,7 @@ function generateRecommendations(
   if (lowConfidencePercentage > 50) {
     recommendations.push(
       'More than half of the segments have low confidence. ' +
-      'Consider re-uploading with better audio quality.'
+        'Consider re-uploading with better audio quality.'
     );
   }
 
@@ -254,12 +250,11 @@ export function calculateWordConfidenceStats(segment: TranscriptSegment): {
     };
   }
 
-  const wordConfidences = segment.words.map(w => w.confidence);
-  const averageWordConfidence = 
-    wordConfidences.reduce((a, b) => a + b, 0) / wordConfidences.length;
-  
+  const wordConfidences = segment.words.map((w) => w.confidence);
+  const averageWordConfidence = wordConfidences.reduce((a, b) => a + b, 0) / wordConfidences.length;
+
   const lowConfidenceWordCount = segment.words.filter(
-    w => w.confidence < CONFIDENCE_THRESHOLDS.FAIR
+    (w) => w.confidence < CONFIDENCE_THRESHOLDS.FAIR
   ).length;
 
   return {
@@ -280,20 +275,22 @@ export function meetsMinimumQuality(metrics: QualityMetrics): {
   if (metrics.averageConfidence < CONFIDENCE_THRESHOLDS.POOR) {
     return {
       passes: false,
-      reason: `Average confidence (${(metrics.averageConfidence * 100).toFixed(1)}%) ` +
+      reason:
+        `Average confidence (${(metrics.averageConfidence * 100).toFixed(1)}%) ` +
         `is below minimum threshold (${(CONFIDENCE_THRESHOLDS.POOR * 100).toFixed(1)}%). ` +
         `Please improve audio quality and try again.`,
     };
   }
 
   // Check if too many segments have low confidence
-  const lowConfidencePercentage = 
+  const lowConfidencePercentage =
     (metrics.lowConfidenceSegmentCount / (metrics.lowConfidenceSegmentIds.length || 1)) * 100;
-  
+
   if (lowConfidencePercentage > 80) {
     return {
       passes: false,
-      reason: `More than 80% of segments have low confidence. ` +
+      reason:
+        `More than 80% of segments have low confidence. ` +
         `Please review audio quality and consider re-recording.`,
     };
   }
@@ -312,19 +309,17 @@ export function formatQualityMetrics(metrics: QualityMetrics): string {
   ];
 
   if (metrics.lowConfidenceSegmentCount > 0) {
-    lines.push(
-      `Low Confidence Segments: ${metrics.lowConfidenceSegmentCount}`
-    );
+    lines.push(`Low Confidence Segments: ${metrics.lowConfidenceSegmentCount}`);
   }
 
   if (metrics.warnings.length > 0) {
     lines.push('', 'Warnings:');
-    metrics.warnings.forEach(w => lines.push(`  - ${w}`));
+    metrics.warnings.forEach((w) => lines.push(`  - ${w}`));
   }
 
   if (metrics.recommendations.length > 0) {
     lines.push('', 'Recommendations:');
-    metrics.recommendations.forEach(r => lines.push(`  - ${r}`));
+    metrics.recommendations.forEach((r) => lines.push(`  - ${r}`));
   }
 
   return lines.join('\n');

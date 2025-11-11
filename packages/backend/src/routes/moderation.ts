@@ -169,7 +169,7 @@ router.put('/reports/:id/review', authenticateToken, requireAdmin, async (req, r
     // If content should be removed, take action
     if (action === 'remove_content') {
       await contentModerationService.removeContent(report.contentType, report.contentId);
-      
+
       logger.warn('Content removed due to abuse report', {
         reportId: id,
         contentType: report.contentType,
@@ -216,7 +216,7 @@ router.get('/content-policy', (_req, res) => {
       'Deepfakes or misleading synthetic media without disclosure',
     ],
     voiceCloneRestrictions: [
-      'You must have explicit permission to clone someone\'s voice',
+      "You must have explicit permission to clone someone's voice",
       'You cannot clone voices of public figures without authorization',
       'Voice clones must not be used for impersonation or fraud',
       'Voice clones must not be used to create misleading content',
@@ -227,7 +227,8 @@ router.get('/content-policy', (_req, res) => {
       'Third violation: Permanent account termination',
       'Severe violations may result in immediate termination',
     ],
-    reporting: 'If you encounter content that violates this policy, please report it using the report button.',
+    reporting:
+      'If you encounter content that violates this policy, please report it using the report button.',
   };
 
   return res.json(contentPolicy);

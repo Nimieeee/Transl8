@@ -1,6 +1,6 @@
 /**
  * Model Adapter Layer - Public API
- * 
+ *
  * This module exports all adapter interfaces, types, and base classes
  * for use throughout the application.
  */
@@ -13,7 +13,7 @@ export {
   LipSyncAdapter,
   VocalIsolationAdapter,
   EmotionAnalysisAdapter,
-  
+
   // Result types
   type STTResult,
   type MTResult,
@@ -21,7 +21,7 @@ export {
   type LipSyncResult,
   type VocalIsolationResult,
   type EmotionAnalysisResult,
-  
+
   // Data structure types
   type Transcript,
   type TranscriptSegment,
@@ -29,15 +29,15 @@ export {
   type Translation,
   type TranslationSegment,
   type AudioSegment,
-  
+
   // Configuration types
   type VoiceConfig,
   type SpeakerVoiceMapping,
-  
+
   // Metadata types
   type AdapterMetadata,
   type HealthCheckResult,
-  
+
   // Emotion types
   EmotionTag,
 } from './types';
@@ -70,18 +70,10 @@ export {
   OpenAIWhisperAdapter,
 } from './openai-whisper-adapter';
 
-export {
-  DemucsAdapter,
-} from './demucs-adapter';
+export { DemucsAdapter } from './demucs-adapter';
 
-export {
-  NoiseReduceAdapter,
-} from './noisereduce-adapter';
+export { NoiseReduceAdapter } from './noisereduce-adapter';
 
-export {
-  Wav2Vec2EmotionAdapter,
-} from './emotion-adapter';
+export { Wav2Vec2EmotionAdapter } from './emotion-adapter';
 
-export {
-  OpenVoiceAdapter,
-} from './openvoice-adapter';
+export { OpenVoiceAdapter } from './openvoice-adapter';

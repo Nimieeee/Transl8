@@ -31,9 +31,7 @@ export default function DashboardPage() {
 
     // Filter by search query
     if (searchQuery) {
-      filtered = filtered.filter((p) =>
-        p.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
+      filtered = filtered.filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()));
     }
 
     // Sort
@@ -75,15 +73,10 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-sm text-gray-600 mt-1">
-                  Welcome back, {user?.email}
-                </p>
+                <p className="text-sm text-gray-600 mt-1">Welcome back, {user?.email}</p>
               </div>
               <div className="flex items-center space-x-4">
-                <button
-                  onClick={() => router.push('/settings')}
-                  className="btn-secondary"
-                >
+                <button onClick={() => router.push('/settings')} className="btn-secondary">
                   Settings
                 </button>
                 <button onClick={() => logout()} className="btn-outline">
@@ -98,10 +91,7 @@ export default function DashboardPage() {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Actions Bar */}
           <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <button
-              onClick={() => setIsCreateModalOpen(true)}
-              className="btn-primary"
-            >
+            <button onClick={() => setIsCreateModalOpen(true)} className="btn-primary">
               <svg
                 className="w-5 h-5 mr-2 inline-block"
                 fill="none"
@@ -198,10 +188,7 @@ export default function DashboardPage() {
               </p>
               {!searchQuery && statusFilter === 'all' && (
                 <div className="mt-6">
-                  <button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="btn-primary"
-                  >
+                  <button onClick={() => setIsCreateModalOpen(true)} className="btn-primary">
                     Create Project
                   </button>
                 </div>
@@ -210,11 +197,7 @@ export default function DashboardPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredAndSortedProjects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  onDelete={deleteProject}
-                />
+                <ProjectCard key={project.id} project={project} onDelete={deleteProject} />
               ))}
             </div>
           )}

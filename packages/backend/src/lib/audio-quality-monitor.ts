@@ -1,6 +1,6 @@
 /**
  * Audio Quality Monitoring Service
- * 
+ *
  * Measures and tracks audio quality metrics including vocal isolation quality,
  * noise reduction effectiveness, and TTS output quality.
  */
@@ -78,7 +78,9 @@ export class AudioQualityMonitor {
     // Check for quality degradation and alert
     await this.checkQualityAlerts(metrics);
 
-    logger.debug(`Recorded audio quality metrics for project ${metrics.projectId}, segment ${metrics.segmentId}`);
+    logger.debug(
+      `Recorded audio quality metrics for project ${metrics.projectId}, segment ${metrics.segmentId}`
+    );
   }
 
   /**
@@ -94,13 +96,10 @@ export class AudioQualityMonitor {
    * Calculate spectral purity (how much music/noise remains after isolation)
    * Returns a value between 0 (very impure) and 1 (very pure)
    */
-  calculateSpectralPurity(
-    vocalSpectrum: number[],
-    originalSpectrum: number[]
-  ): number {
+  calculateSpectralPurity(vocalSpectrum: number[], originalSpectrum: number[]): number {
     // Simplified calculation - compare energy in music frequency bands
     // In production, use more sophisticated spectral analysis
-    
+
     if (vocalSpectrum.length !== originalSpectrum.length) {
       throw new Error('Spectrum arrays must have same length');
     }
@@ -133,7 +132,7 @@ export class AudioQualityMonitor {
   ): { snrImprovement: number; dbReduction: number } {
     const snrBefore = this.calculateSnr(noisyAudioRms, noiseFloorBefore);
     const snrAfter = this.calculateSnr(cleanAudioRms, noiseFloorAfter);
-    
+
     const snrImprovement = snrAfter - snrBefore;
     const dbReduction = 20 * Math.log10(noiseFloorBefore / noiseFloorAfter);
 
@@ -157,7 +156,7 @@ export class AudioQualityMonitor {
     // - MOS prediction models (e.g., NISQA, DNSMOS)
     // - Prosody analysis
     // - Emotion preservation verification
-    
+
     return Promise.resolve({
       qualityScore: 0.85, // Placeholder
       confidence: 0.9, // Placeholder
@@ -170,24 +169,47 @@ export class AudioQualityMonitor {
   private async checkQualityAlerts(metrics: AudioQualityMetrics): Promise<void> {
     const alerts: string[] = [];
 
-    if (metrics.vocalIsolationSnr !== undefined && metrics.vocalIsolationSnr < this.VOCAL_SNR_THRESHOLD) {
-      alerts.push(`Low vocal isolation SNR: ${metrics.vocalIsolationSnr.toFixed(2)} dB (threshold: ${this.VOCAL_SNR_THRESHOLD} dB)`);
+    if (
+      metrics.vocalIsolationSnr !== undefined &&
+      metrics.vocalIsolationSnr < this.VOCAL_SNR_THRESHOLD
+    ) {
+      alerts.push(
+        `Low vocal isolation SNR: ${metrics.vocalIsolationSnr.toFixed(2)} dB (threshold: ${this.VOCAL_SNR_THRESHOLD} dB)`
+      );
     }
 
-    if (metrics.spectralPurity !== undefined && metrics.spectralPurity < this.SPECTRAL_PURITY_THRESHOLD) {
-      alerts.push(`Low spectral purity: ${metrics.spectralPurity.toFixed(2)} (threshold: ${this.SPECTRAL_PURITY_THRESHOLD})`);
+    if (
+      metrics.spectralPurity !== undefined &&
+      metrics.spectralPurity < this.SPECTRAL_PURITY_THRESHOLD
+    ) {
+      alerts.push(
+        `Low spectral purity: ${metrics.spectralPurity.toFixed(2)} (threshold: ${this.SPECTRAL_PURITY_THRESHOLD})`
+      );
     }
 
-    if (metrics.noiseReductionDb !== undefined && metrics.noiseReductionDb < this.NOISE_REDUCTION_THRESHOLD) {
-      alerts.push(`Insufficient noise reduction: ${metrics.noiseReductionDb.toFixed(2)} dB (threshold: ${this.NOISE_REDUCTION_THRESHOLD} dB)`);
+    if (
+      metrics.noiseReductionDb !== undefined &&
+      metrics.noiseReductionDb < this.NOISE_REDUCTION_THRESHOLD
+    ) {
+      alerts.push(
+        `Insufficient noise reduction: ${metrics.noiseReductionDb.toFixed(2)} dB (threshold: ${this.NOISE_REDUCTION_THRESHOLD} dB)`
+      );
     }
 
-    if (metrics.ttsQualityScore !== undefined && metrics.ttsQualityScore < this.TTS_QUALITY_THRESHOLD) {
-      alerts.push(`Low TTS quality score: ${metrics.ttsQualityScore.toFixed(2)} (threshold: ${this.TTS_QUALITY_THRESHOLD})`);
+    if (
+      metrics.ttsQualityScore !== undefined &&
+      metrics.ttsQualityScore < this.TTS_QUALITY_THRESHOLD
+    ) {
+      alerts.push(
+        `Low TTS quality score: ${metrics.ttsQualityScore.toFixed(2)} (threshold: ${this.TTS_QUALITY_THRESHOLD})`
+      );
     }
 
     if (alerts.length > 0) {
-      logger.warn(`Audio quality alerts for project ${metrics.projectId}, segment ${metrics.segmentId}:`, alerts);
+      logger.warn(
+        `Audio quality alerts for project ${metrics.projectId}, segment ${metrics.segmentId}:`,
+        alerts
+      );
       // In production, send to monitoring system (DataDog, Sentry, etc.)
     }
   }
@@ -209,39 +231,50 @@ export class AudioQualityMonitor {
     });
 
     // Calculate overall metrics
-    const validVocalSnr = allMetrics.filter(m => m.vocalIsolationSnr !== null);
-    const validSpectralPurity = allMetrics.filter(m => m.spectralPurity !== null);
-    const validNoiseReduction = allMetrics.filter(m => m.noiseReductionDb !== null);
-    const validTtsQuality = allMetrics.filter(m => m.ttsQualityScore !== null);
+    const validVocalSnr = allMetrics.filter((m) => m.vocalIsolationSnr !== null);
+    const validSpectralPurity = allMetrics.filter((m) => m.spectralPurity !== null);
+    const validNoiseReduction = allMetrics.filter((m) => m.noiseReductionDb !== null);
+    const validTtsQuality = allMetrics.filter((m) => m.ttsQualityScore !== null);
 
-    const averageVocalIsolationSnr = validVocalSnr.length > 0
-      ? validVocalSnr.reduce((sum, m) => sum + (m.vocalIsolationSnr || 0), 0) / validVocalSnr.length
-      : 0;
+    const averageVocalIsolationSnr =
+      validVocalSnr.length > 0
+        ? validVocalSnr.reduce((sum, m) => sum + (m.vocalIsolationSnr || 0), 0) /
+          validVocalSnr.length
+        : 0;
 
-    const averageSpectralPurity = validSpectralPurity.length > 0
-      ? validSpectralPurity.reduce((sum, m) => sum + (m.spectralPurity || 0), 0) / validSpectralPurity.length
-      : 0;
+    const averageSpectralPurity =
+      validSpectralPurity.length > 0
+        ? validSpectralPurity.reduce((sum, m) => sum + (m.spectralPurity || 0), 0) /
+          validSpectralPurity.length
+        : 0;
 
-    const averageNoiseReductionDb = validNoiseReduction.length > 0
-      ? validNoiseReduction.reduce((sum, m) => sum + (m.noiseReductionDb || 0), 0) / validNoiseReduction.length
-      : 0;
+    const averageNoiseReductionDb =
+      validNoiseReduction.length > 0
+        ? validNoiseReduction.reduce((sum, m) => sum + (m.noiseReductionDb || 0), 0) /
+          validNoiseReduction.length
+        : 0;
 
-    const averageTtsQuality = validTtsQuality.length > 0
-      ? validTtsQuality.reduce((sum, m) => sum + (m.ttsQualityScore || 0), 0) / validTtsQuality.length
-      : 0;
+    const averageTtsQuality =
+      validTtsQuality.length > 0
+        ? validTtsQuality.reduce((sum, m) => sum + (m.ttsQualityScore || 0), 0) /
+          validTtsQuality.length
+        : 0;
 
     // Group by project
-    const byProjectMap = new Map<string, {
-      segmentCount: number;
-      totalVocalSnr: number;
-      totalNoiseReduction: number;
-      totalTtsQuality: number;
-      vocalSnrCount: number;
-      noiseReductionCount: number;
-      ttsQualityCount: number;
-    }>();
+    const byProjectMap = new Map<
+      string,
+      {
+        segmentCount: number;
+        totalVocalSnr: number;
+        totalNoiseReduction: number;
+        totalTtsQuality: number;
+        vocalSnrCount: number;
+        noiseReductionCount: number;
+        ttsQualityCount: number;
+      }
+    >();
 
-    allMetrics.forEach(metric => {
+    allMetrics.forEach((metric) => {
       const existing = byProjectMap.get(metric.projectId);
       if (existing) {
         existing.segmentCount++;
@@ -274,14 +307,18 @@ export class AudioQualityMonitor {
       projectId,
       segmentCount: data.segmentCount,
       averageVocalSnr: data.vocalSnrCount > 0 ? data.totalVocalSnr / data.vocalSnrCount : 0,
-      averageNoiseReduction: data.noiseReductionCount > 0 ? data.totalNoiseReduction / data.noiseReductionCount : 0,
+      averageNoiseReduction:
+        data.noiseReductionCount > 0 ? data.totalNoiseReduction / data.noiseReductionCount : 0,
       averageTtsQuality: data.ttsQualityCount > 0 ? data.totalTtsQuality / data.ttsQualityCount : 0,
     }));
 
     // Generate quality alerts
     const qualityAlerts: AudioQualityDashboard['qualityAlerts'] = [];
-    allMetrics.forEach(metric => {
-      if (metric.vocalIsolationSnr !== null && metric.vocalIsolationSnr < this.VOCAL_SNR_THRESHOLD) {
+    allMetrics.forEach((metric) => {
+      if (
+        metric.vocalIsolationSnr !== null &&
+        metric.vocalIsolationSnr < this.VOCAL_SNR_THRESHOLD
+      ) {
         qualityAlerts.push({
           projectId: metric.projectId,
           segmentId: metric.segmentId,
@@ -292,7 +329,10 @@ export class AudioQualityMonitor {
         });
       }
 
-      if (metric.noiseReductionDb !== null && metric.noiseReductionDb < this.NOISE_REDUCTION_THRESHOLD) {
+      if (
+        metric.noiseReductionDb !== null &&
+        metric.noiseReductionDb < this.NOISE_REDUCTION_THRESHOLD
+      ) {
         qualityAlerts.push({
           projectId: metric.projectId,
           segmentId: metric.segmentId,
@@ -319,19 +359,22 @@ export class AudioQualityMonitor {
     qualityAlerts.sort((a, b) => a.value - b.value);
 
     // Calculate trends over time
-    const trendsMap = new Map<string, {
-      vocalSnrSum: number;
-      vocalSnrCount: number;
-      noiseReductionSum: number;
-      noiseReductionCount: number;
-      ttsQualitySum: number;
-      ttsQualityCount: number;
-    }>();
+    const trendsMap = new Map<
+      string,
+      {
+        vocalSnrSum: number;
+        vocalSnrCount: number;
+        noiseReductionSum: number;
+        noiseReductionCount: number;
+        ttsQualitySum: number;
+        ttsQualityCount: number;
+      }
+    >();
 
-    allMetrics.forEach(metric => {
+    allMetrics.forEach((metric) => {
       const dateKey = metric.createdAt.toISOString().split('T')[0];
       const existing = trendsMap.get(dateKey);
-      
+
       if (existing) {
         if (metric.vocalIsolationSnr !== null) {
           existing.vocalSnrSum += metric.vocalIsolationSnr;
@@ -361,7 +404,8 @@ export class AudioQualityMonitor {
       .map(([date, data]) => ({
         date,
         avgVocalSnr: data.vocalSnrCount > 0 ? data.vocalSnrSum / data.vocalSnrCount : 0,
-        avgNoiseReduction: data.noiseReductionCount > 0 ? data.noiseReductionSum / data.noiseReductionCount : 0,
+        avgNoiseReduction:
+          data.noiseReductionCount > 0 ? data.noiseReductionSum / data.noiseReductionCount : 0,
         avgTtsQuality: data.ttsQualityCount > 0 ? data.ttsQualitySum / data.ttsQualityCount : 0,
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
@@ -388,7 +432,7 @@ export class AudioQualityMonitor {
       orderBy: { segmentId: 'asc' },
     });
 
-    return metrics.map(m => ({
+    return metrics.map((m) => ({
       projectId: m.projectId,
       segmentId: m.segmentId,
       vocalIsolationSnr: m.vocalIsolationSnr || undefined,

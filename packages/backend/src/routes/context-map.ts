@@ -1,6 +1,6 @@
 /**
  * Context Map API Routes
- * 
+ *
  * Provides endpoints for accessing and managing Context Maps
  */
 
@@ -56,7 +56,7 @@ router.get('/:projectId/context-map/summary', async (req: Request, res: Response
     res.json(summary);
   } catch (error) {
     logger.error('Error fetching Context Map summary:', error);
-    
+
     if (error instanceof Error && error.message.includes('not found')) {
       return res.status(404).json({
         error: {
@@ -92,7 +92,7 @@ router.get('/:projectId/context-map/export', async (req: Request, res: Response)
     res.send(jsonContent);
   } catch (error) {
     logger.error('Error exporting Context Map:', error);
-    
+
     if (error instanceof Error && error.message.includes('not found')) {
       return res.status(404).json({
         error: {
@@ -166,7 +166,7 @@ router.put('/:projectId/context-map/segments/:segmentId', async (req: Request, r
     res.json(contextMap);
   } catch (error) {
     logger.error('Error updating Context Map segment:', error);
-    
+
     if (error instanceof Error && error.message.includes('not found')) {
       return res.status(404).json({
         error: {

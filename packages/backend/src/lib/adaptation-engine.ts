@@ -1,6 +1,6 @@
 /**
  * Adaptation Engine
- * 
+ *
  * Intelligent translation adaptation system that uses LLMs with few-shot examples
  * and validation loops to generate timing-aware translations.
  */
@@ -39,10 +39,7 @@ export class AdaptationEngine {
     };
 
     // Load few-shot examples for this language pair
-    this.fewShotExamples = fewShotLoader.getExamples(
-      config.sourceLanguage,
-      config.targetLanguage
-    );
+    this.fewShotExamples = fewShotLoader.getExamples(config.sourceLanguage, config.targetLanguage);
 
     if (this.fewShotExamples.length === 0) {
       logger.warn(
@@ -54,13 +51,9 @@ export class AdaptationEngine {
   /**
    * Build dynamic prompt with few-shot examples and context
    */
-  buildPrompt(
-    segment: ContextMapSegment,
-    attempt: number = 0,
-    previousFeedback?: string
-  ): string {
+  buildPrompt(segment: ContextMapSegment, attempt: number = 0, previousFeedback?: string): string {
     const targetLangName = this.getLanguageName(this.config.targetLanguage);
-    
+
     // ============================================================
     // SYSTEM PROMPT: Define the core mission
     // ============================================================
@@ -98,7 +91,7 @@ KEY PRINCIPLE: If the original text cannot fit in the time available, you MUST a
     prompt += '═══════════════════════════════════════════════════\n';
     prompt += 'TIMING GUIDELINES (CRITICAL):\n';
     prompt += '═══════════════════════════════════════════════════\n\n';
-    
+
     // Provide specific guidance based on segment duration
     if (segment.duration < 1.0) {
       prompt += `⚠️  VERY SHORT SEGMENT (${segment.duration.toFixed(1)}s)\n`;
@@ -141,18 +134,18 @@ KEY PRINCIPLE: If the original text cannot fit in the time available, you MUST a
     prompt += '═══════════════════════════════════════════════════\n';
     prompt += 'YOUR TASK:\n';
     prompt += '═══════════════════════════════════════════════════\n\n';
-    
+
     if (segment.previous_line) {
       prompt += `[Context] Previous dialogue: "${segment.previous_line}"\n\n`;
     }
-    
+
     prompt += `⏱️  TIME AVAILABLE: ${segment.duration.toFixed(1)} seconds\n`;
     if (segment.emotion) {
       prompt += `😊 EMOTION: ${segment.emotion}\n`;
     }
     prompt += `🎬 TRANSLATE THIS LINE (and ONLY this line): "${segment.text}"\n`;
     prompt += `🌍 TARGET LANGUAGE: ${targetLangName}\n\n`;
-    
+
     if (segment.next_line) {
       prompt += `[Context] Next dialogue: "${segment.next_line}"\n\n`;
     }
@@ -164,9 +157,9 @@ KEY PRINCIPLE: If the original text cannot fit in the time available, you MUST a
       prompt += '═══════════════════════════════════════════════════\n';
       prompt += '⚠️  RETRY REQUIRED - YOUR PREVIOUS ATTEMPT FAILED:\n';
       prompt += '═══════════════════════════════════════════════════\n\n';
-      
+
       prompt += `Problem: ${previousFeedback}\n\n`;
-      
+
       if (previousFeedback.includes('too long') || previousFeedback.includes('too fast')) {
         prompt += `🔴 ACTION REQUIRED: Your translation was TOO LONG.\n\n`;
         prompt += `You MUST make it SIGNIFICANTLY SHORTER:\n`;
@@ -174,7 +167,7 @@ KEY PRINCIPLE: If the original text cannot fit in the time available, you MUST a
         prompt += `   • Use shorter synonyms\n`;
         prompt += `   • Simplify the sentence structure\n`;
         prompt += `   • Focus on the core message only\n\n`;
-        
+
         if (segment.duration < 1.0) {
           prompt += `REMINDER: For ${segment.duration.toFixed(1)}s, you need 1-2 words MAX.\n`;
           prompt += `Think: "Stop!" not "Please stop doing that!"\n\n`;
@@ -194,7 +187,7 @@ KEY PRINCIPLE: If the original text cannot fit in the time available, you MUST a
     prompt += '═══════════════════════════════════════════════════\n';
     prompt += 'OUTPUT INSTRUCTIONS:\n';
     prompt += '═══════════════════════════════════════════════════\n\n';
-    
+
     prompt += `Create a ${targetLangName} adaptation that:\n`;
     prompt += `✓ Can be spoken naturally in ${segment.duration.toFixed(1)} seconds\n`;
     prompt += `✓ Preserves the core meaning\n`;
@@ -203,7 +196,7 @@ KEY PRINCIPLE: If the original text cannot fit in the time available, you MUST a
       prompt += `✓ Maintains the ${segment.emotion} emotional tone\n`;
     }
     prompt += `✓ Sounds like natural ${targetLangName} dialogue\n\n`;
-    
+
     prompt += `🎯 RESPOND WITH ONLY THE ADAPTED ${targetLangName} TEXT.\n`;
     prompt += `   NO explanations, NO notes, NO quotation marks.\n`;
     prompt += `   Just the dialogue that an actor would speak.\n`;

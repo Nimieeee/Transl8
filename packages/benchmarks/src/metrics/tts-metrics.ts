@@ -29,11 +29,7 @@ export interface EmotionAccuracyResult {
  * In production, this would involve human raters
  * For automated testing, we use heuristic scoring
  */
-export function calculateMOS(
-  audioPath: string,
-  text: string,
-  expectedDuration: number
-): MOSResult {
+export function calculateMOS(audioPath: string, text: string, expectedDuration: number): MOSResult {
   // Placeholder implementation
   // In production, this would:
   // 1. Use human raters for subjective evaluation
@@ -71,7 +67,7 @@ export function calculateVoiceSimilarity(
 
   // For now, return mock similarity scores
   const spectralSimilarity = 0.85 + Math.random() * 0.1; // 0.85-0.95
-  const pitchSimilarity = 0.80 + Math.random() * 0.15; // 0.80-0.95
+  const pitchSimilarity = 0.8 + Math.random() * 0.15; // 0.80-0.95
   const timbreSimilarity = 0.82 + Math.random() * 0.13; // 0.82-0.95
 
   const similarity = (spectralSimilarity + pitchSimilarity + timbreSimilarity) / 3;
@@ -150,7 +146,7 @@ export function calculatePronunciationAccuracy(
   // 3. Calculate accuracy score
 
   // For now, return mock score
-  const accuracy = 0.90 + Math.random() * 0.08; // 0.90-0.98
+  const accuracy = 0.9 + Math.random() * 0.08; // 0.90-0.98
 
   return Math.round(accuracy * 10000) / 100; // Percentage
 }
@@ -174,7 +170,7 @@ export function compareWithCommercial(
     'Google Cloud TTS': 4.3,
     'Amazon Polly': 4.2,
     'Microsoft Azure TTS': 4.25,
-    'ElevenLabs': 4.5,
+    ElevenLabs: 4.5,
   };
 
   const theirMOS = commercialBaselines[commercialService] || 4.0;

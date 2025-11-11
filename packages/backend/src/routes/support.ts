@@ -31,15 +31,15 @@ router.post('/tickets', authenticateToken, async (req, res) => {
         subject,
         description,
         category: category || 'other',
-        priority: priority || 'medium'
-      }
+        priority: priority || 'medium',
+      },
     });
 
     logger.info(`Support ticket created by user ${userId}: ${ticket.id}`);
 
     res.status(201).json({
       message: 'Support ticket created successfully',
-      ticket
+      ticket,
     });
   } catch (error) {
     logger.error('Error creating support ticket:', error);
@@ -61,7 +61,7 @@ router.get('/tickets', authenticateToken, async (req, res) => {
     const tickets = await prisma.supportTicket.findMany({
       where,
       orderBy: { createdAt: 'desc' },
-      take: Number(limit)
+      take: Number(limit),
     });
 
     res.json({ tickets });
@@ -80,8 +80,8 @@ router.get('/tickets/:id', authenticateToken, async (req, res) => {
     const ticket = await prisma.supportTicket.findFirst({
       where: {
         id,
-        userId // Ensure user can only access their own tickets
-      }
+        userId, // Ensure user can only access their own tickets
+      },
     });
 
     if (!ticket) {
@@ -108,7 +108,7 @@ router.post('/tickets/:id/messages', authenticateToken, async (req, res) => {
 
     // Verify ticket belongs to user
     const ticket = await prisma.supportTicket.findFirst({
-      where: { id, userId }
+      where: { id, userId },
     });
 
     if (!ticket) {
@@ -120,21 +120,21 @@ router.post('/tickets/:id/messages', authenticateToken, async (req, res) => {
         ticketId: id,
         userId,
         message,
-        isStaff: false
-      }
+        isStaff: false,
+      },
     });
 
     // Update ticket status if it was resolved
     if (ticket.status === 'resolved' || ticket.status === 'closed') {
       await prisma.supportTicket.update({
         where: { id },
-        data: { status: 'open' }
+        data: { status: 'open' },
       });
     }
 
     res.status(201).json({
       message: 'Message added successfully',
-      ticketMessage
+      ticketMessage,
     });
   } catch (error) {
     logger.error('Error adding ticket message:', error);
@@ -160,7 +160,7 @@ router.patch('/tickets/:id/status', authenticateToken, async (req, res) => {
 
     const ticket = await prisma.supportTicket.update({
       where: { id },
-      data: updateData
+      data: updateData,
     });
 
     res.json({ message: 'Ticket status updated', ticket });
@@ -183,14 +183,11 @@ router.get('/admin/tickets', authenticateToken, async (req, res) => {
     const [tickets, total] = await Promise.all([
       prisma.supportTicket.findMany({
         where,
-        orderBy: [
-          { priority: 'desc' },
-          { createdAt: 'desc' }
-        ],
+        orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
         take: Number(limit),
-        skip: Number(offset)
+        skip: Number(offset),
       }),
-      prisma.supportTicket.count({ where })
+      prisma.supportTicket.count({ where }),
     ]);
 
     res.json({
@@ -198,8 +195,8 @@ router.get('/admin/tickets', authenticateToken, async (req, res) => {
       pagination: {
         total,
         limit: Number(limit),
-        offset: Number(offset)
-      }
+        offset: Number(offset),
+      },
     });
   } catch (error) {
     logger.error('Error fetching all tickets:', error);
@@ -219,54 +216,51 @@ router.get('/stats', authenticateToken, async (req, res) => {
       if (endDate) where.createdAt.lte = new Date(endDate as string);
     }
 
-    const [
-      totalTickets,
-      byStatus,
-      byPriority,
-      byCategory,
-      averageResolutionTime
-    ] = await Promise.all([
-      prisma.supportTicket.count({ where }),
-      prisma.supportTicket.groupBy({
-        by: ['status'],
-        where,
-        _count: true
-      }),
-      prisma.supportTicket.groupBy({
-        by: ['priority'],
-        where,
-        _count: true
-      }),
-      prisma.supportTicket.groupBy({
-        by: ['category'],
-        where,
-        _count: true
-      }),
-      prisma.supportTicket.findMany({
-        where: {
-          ...where,
-          resolvedAt: { not: null }
-        },
-        select: {
-          createdAt: true,
-          resolvedAt: true
-        }
-      }).then(tickets => {
-        if (tickets.length === 0) return null;
-        const totalTime = tickets.reduce((sum, ticket) => {
-          const time = ticket.resolvedAt!.getTime() - ticket.createdAt.getTime();
-          return sum + time;
-        }, 0);
-        return Math.round(totalTime / tickets.length / (1000 * 60 * 60)); // hours
-      })
-    ]);
+    const [totalTickets, byStatus, byPriority, byCategory, averageResolutionTime] =
+      await Promise.all([
+        prisma.supportTicket.count({ where }),
+        prisma.supportTicket.groupBy({
+          by: ['status'],
+          where,
+          _count: true,
+        }),
+        prisma.supportTicket.groupBy({
+          by: ['priority'],
+          where,
+          _count: true,
+        }),
+        prisma.supportTicket.groupBy({
+          by: ['category'],
+          where,
+          _count: true,
+        }),
+        prisma.supportTicket
+          .findMany({
+            where: {
+              ...where,
+              resolvedAt: { not: null },
+            },
+            select: {
+              createdAt: true,
+              resolvedAt: true,
+            },
+          })
+          .then((tickets) => {
+            if (tickets.length === 0) return null;
+            const totalTime = tickets.reduce((sum, ticket) => {
+              const time = ticket.resolvedAt!.getTime() - ticket.createdAt.getTime();
+              return sum + time;
+            }, 0);
+            return Math.round(totalTime / tickets.length / (1000 * 60 * 60)); // hours
+          }),
+      ]);
 
     res.json({
       totalTickets,
       byStatus,
       byPriority,
       byCategory,
-      averageResolutionTimeHours: averageResolutionTime
+      averageResolutionTimeHours: averageResolutionTime,
     });
   } catch (error) {
     logger.error('Error fetching support stats:', error);

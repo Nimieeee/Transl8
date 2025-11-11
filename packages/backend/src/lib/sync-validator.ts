@@ -1,7 +1,7 @@
 // @ts-nocheck
 /**
  * Synchronization Validation Tool
- * 
+ *
  * Implements automated sync drift detection, measures timing accuracy per segment,
  * visualizes audio alignment, and generates sync quality reports.
  */
@@ -93,7 +93,7 @@ export class SyncValidator {
       // 1. Load the final audio file
       // 2. Detect where this segment actually appears
       // 3. Compare with expected position
-      
+
       // For now, we'll simulate the analysis
       const accuracy = await this.analyzeSegmentSync(
         segment,
@@ -114,17 +114,23 @@ export class SyncValidator {
     // Check for issues
     const issues: string[] = [];
     if (maxDrift > this.MAX_DRIFT_THRESHOLD_MS) {
-      issues.push(`Maximum drift (${maxDrift.toFixed(2)}ms) exceeds threshold (${this.MAX_DRIFT_THRESHOLD_MS}ms)`);
+      issues.push(
+        `Maximum drift (${maxDrift.toFixed(2)}ms) exceeds threshold (${this.MAX_DRIFT_THRESHOLD_MS}ms)`
+      );
     }
     if (averageDriftMs > this.AVERAGE_DRIFT_THRESHOLD_MS) {
-      issues.push(`Average drift (${averageDriftMs.toFixed(2)}ms) exceeds threshold (${this.AVERAGE_DRIFT_THRESHOLD_MS}ms)`);
+      issues.push(
+        `Average drift (${averageDriftMs.toFixed(2)}ms) exceeds threshold (${this.AVERAGE_DRIFT_THRESHOLD_MS}ms)`
+      );
     }
 
     // Check for cumulative drift (last segment should not have excessive drift)
     if (segmentAccuracy.length > 0) {
       const lastSegment = segmentAccuracy[segmentAccuracy.length - 1];
       if (Math.abs(lastSegment.driftMs) > this.MAX_DRIFT_THRESHOLD_MS * 2) {
-        issues.push(`Cumulative drift detected: last segment has ${lastSegment.driftMs.toFixed(2)}ms drift`);
+        issues.push(
+          `Cumulative drift detected: last segment has ${lastSegment.driftMs.toFixed(2)}ms drift`
+        );
       }
     }
 
@@ -144,7 +150,9 @@ export class SyncValidator {
     // Store in database
     await this.storeSyncMetrics(report);
 
-    logger.info(`Sync validation complete for project ${projectId}: score ${syncQualityScore.toFixed(1)}, max drift ${maxDrift.toFixed(2)}ms`);
+    logger.info(
+      `Sync validation complete for project ${projectId}: score ${syncQualityScore.toFixed(1)}, max drift ${maxDrift.toFixed(2)}ms`
+    );
 
     return report;
   }
@@ -160,7 +168,7 @@ export class SyncValidator {
   ): Promise<SegmentSyncAccuracy> {
     // Placeholder implementation
     // In production, use audio fingerprinting or cross-correlation to detect actual position
-    
+
     // Simulate small random drift (in a real system, this would be measured)
     const simulatedDrift = (Math.random() - 0.5) * 10; // ±5ms random drift
 
@@ -188,8 +196,11 @@ export class SyncValidator {
   private calculateSyncQualityScore(maxDriftMs: number, averageDriftMs: number): number {
     // Score based on both max and average drift
     const maxDriftScore = Math.max(0, 100 - (maxDriftMs / this.MAX_DRIFT_THRESHOLD_MS) * 50);
-    const avgDriftScore = Math.max(0, 100 - (averageDriftMs / this.AVERAGE_DRIFT_THRESHOLD_MS) * 50);
-    
+    const avgDriftScore = Math.max(
+      0,
+      100 - (averageDriftMs / this.AVERAGE_DRIFT_THRESHOLD_MS) * 50
+    );
+
     // Weighted average (max drift is more important)
     return maxDriftScore * 0.6 + avgDriftScore * 0.4;
   }
@@ -270,15 +281,18 @@ export class SyncValidator {
     });
 
     const totalProjects = allMetrics.length;
-    const averageSyncQuality = totalProjects > 0
-      ? allMetrics.reduce((sum, m) => sum + m.syncQualityScore, 0) / totalProjects
-      : 0;
+    const averageSyncQuality =
+      totalProjects > 0
+        ? allMetrics.reduce((sum, m) => sum + m.syncQualityScore, 0) / totalProjects
+        : 0;
 
     const projectsWithIssues = allMetrics.filter(
-      m => m.maxDriftMs > this.MAX_DRIFT_THRESHOLD_MS || m.averageDriftMs > this.AVERAGE_DRIFT_THRESHOLD_MS
+      (m) =>
+        m.maxDriftMs > this.MAX_DRIFT_THRESHOLD_MS ||
+        m.averageDriftMs > this.AVERAGE_DRIFT_THRESHOLD_MS
     ).length;
 
-    const recentReports = allMetrics.slice(0, 20).map(m => ({
+    const recentReports = allMetrics.slice(0, 20).map((m) => ({
       projectId: m.projectId,
       syncQualityScore: m.syncQualityScore,
       maxDriftMs: m.maxDriftMs,
@@ -293,7 +307,7 @@ export class SyncValidator {
       poor: 0,
     };
 
-    allMetrics.forEach(m => {
+    allMetrics.forEach((m) => {
       if (m.maxDriftMs < this.EXCELLENT_DRIFT_MS) {
         driftDistribution.excellent++;
       } else if (m.maxDriftMs < this.GOOD_DRIFT_MS) {
@@ -345,7 +359,7 @@ export class SyncValidator {
 
     const contextMap = contextMapRecord.content as ContextMap;
 
-    const segments = report.segmentAccuracy.map(acc => ({
+    const segments = report.segmentAccuracy.map((acc) => ({
       id: acc.segmentId,
       expectedStart: acc.expectedStartMs,
       expectedEnd: acc.expectedEndMs,
@@ -379,10 +393,10 @@ export class SyncValidator {
     // Calculate drift rate (change in drift over time)
     const firstSegment = segmentAccuracy[0];
     const lastSegment = segmentAccuracy[segmentAccuracy.length - 1];
-    
+
     const driftChange = lastSegment.driftMs - firstSegment.driftMs;
     const timeSpan = (lastSegment.expectedEndMs - firstSegment.expectedStartMs) / 1000; // seconds
-    
+
     const driftRate = timeSpan > 0 ? driftChange / timeSpan : 0;
     const projectedDriftAt60s = driftRate * 60;
 

@@ -20,7 +20,7 @@
             "decimals": 0
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 }
       },
       {
         "id": 2,
@@ -39,14 +39,14 @@
             "thresholds": {
               "mode": "absolute",
               "steps": [
-                {"value": 0, "color": "red"},
-                {"value": 50, "color": "yellow"},
-                {"value": 70, "color": "green"}
+                { "value": 0, "color": "red" },
+                { "value": 50, "color": "yellow" },
+                { "value": 70, "color": "green" }
               ]
             }
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 4, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }
       },
       {
         "id": 3,
@@ -65,14 +65,14 @@
             "thresholds": {
               "mode": "absolute",
               "steps": [
-                {"value": 0, "color": "green"},
-                {"value": 1, "color": "yellow"},
-                {"value": 5, "color": "red"}
+                { "value": 0, "color": "green" },
+                { "value": 1, "color": "yellow" },
+                { "value": 5, "color": "red" }
               ]
             }
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 }
       },
       {
         "id": 4,
@@ -90,7 +90,7 @@
             "decimals": 0
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 }
       },
       {
         "id": 5,
@@ -108,7 +108,7 @@
             "decimals": 1
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 }
       },
       {
         "id": 6,
@@ -120,10 +120,8 @@
             "legendFormat": "{{model}}"
           }
         ],
-        "yaxes": [
-          {"format": "ms", "label": "Latency"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+        "yaxes": [{ "format": "ms", "label": "Latency" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
       },
       {
         "id": 7,
@@ -135,10 +133,8 @@
             "legendFormat": "{{model}}"
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 }
       },
       {
         "id": 8,
@@ -150,10 +146,8 @@
             "legendFormat": "{{model}}"
           }
         ],
-        "yaxes": [
-          {"format": "reqps", "label": "Inferences/sec"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}
+        "yaxes": [{ "format": "reqps", "label": "Inferences/sec" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
       },
       {
         "id": 9,
@@ -165,10 +159,8 @@
             "legendFormat": "{{model}}"
           }
         ],
-        "yaxes": [
-          {"format": "decgbytes", "label": "Memory (GB)"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}
+        "yaxes": [{ "format": "decgbytes", "label": "Memory (GB)" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
       },
       {
         "id": 10,
@@ -180,10 +172,8 @@
             "legendFormat": "{{model}}"
           }
         ],
-        "yaxes": [
-          {"format": "short", "label": "Errors/sec"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+        "yaxes": [{ "format": "short", "label": "Errors/sec" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
       },
       {
         "id": 11,
@@ -195,10 +185,8 @@
             "legendFormat": "{{model}}"
           }
         ],
-        "yaxes": [
-          {"format": "decbytes", "label": "Input Size"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+        "yaxes": [{ "format": "decbytes", "label": "Input Size" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
       },
       {
         "id": 12,
@@ -210,10 +198,8 @@
             "legendFormat": "GPU {{gpu}} on {{kubernetes_node}}"
           }
         ],
-        "yaxes": [
-          {"format": "celsius", "label": "Temperature"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28}
+        "yaxes": [{ "format": "celsius", "label": "Temperature" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 }
       },
       {
         "id": 13,
@@ -225,10 +211,8 @@
             "legendFormat": "GPU {{gpu}} on {{kubernetes_node}}"
           }
         ],
-        "yaxes": [
-          {"format": "watt", "label": "Power (W)"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28}
+        "yaxes": [{ "format": "watt", "label": "Power (W)" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 }
       },
       {
         "id": 14,
@@ -240,10 +224,8 @@
             "legendFormat": "{{model}}"
           }
         ],
-        "yaxes": [
-          {"format": "short", "label": "Batch Size"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 36}
+        "yaxes": [{ "format": "short", "label": "Batch Size" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 }
       },
       {
         "id": 15,
@@ -255,10 +237,8 @@
             "legendFormat": "{{model}}"
           }
         ],
-        "yaxes": [
-          {"format": "short", "label": "Items/sec"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 36}
+        "yaxes": [{ "format": "short", "label": "Items/sec" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 36 }
       }
     ],
     "refresh": "30s",

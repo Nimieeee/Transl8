@@ -8,11 +8,7 @@ describe('TTS Worker Unit Tests', () => {
   describe('Voice Synthesis with StyleTTS', () => {
     it('should synthesize audio from text', async () => {
       const adapter = new MockStyleTTSAdapter();
-      const audioBuffer = await adapter.synthesize(
-        'Hello world',
-        'voice-1',
-        'en'
-      );
+      const audioBuffer = await adapter.synthesize('Hello world', 'voice-1', 'en');
 
       expect(audioBuffer).toBeInstanceOf(Buffer);
       expect(audioBuffer.length).toBeGreaterThan(0);
@@ -37,12 +33,7 @@ describe('TTS Worker Unit Tests', () => {
         emotion: 'happy',
       };
 
-      const audioBuffer = await adapter.synthesize(
-        'Test text',
-        'voice-1',
-        'en',
-        parameters
-      );
+      const audioBuffer = await adapter.synthesize('Test text', 'voice-1', 'en', parameters);
 
       expect(audioBuffer).toBeInstanceOf(Buffer);
     });
@@ -51,10 +42,7 @@ describe('TTS Worker Unit Tests', () => {
   describe('Voice Cloning with XTTS', () => {
     it('should clone voice from audio sample', async () => {
       const adapter = new MockXTTSAdapter();
-      const cloneResult = await adapter.cloneVoice(
-        '/tmp/voice-sample.wav',
-        'en'
-      );
+      const cloneResult = await adapter.cloneVoice('/tmp/voice-sample.wav', 'en');
 
       expect(cloneResult).toHaveProperty('voiceId');
       expect(cloneResult).toHaveProperty('embeddings');
@@ -64,12 +52,9 @@ describe('TTS Worker Unit Tests', () => {
 
     it('should synthesize with cloned voice', async () => {
       const adapter = new MockXTTSAdapter();
-      
+
       // First clone the voice
-      const cloneResult = await adapter.cloneVoice(
-        '/tmp/voice-sample.wav',
-        'en'
-      );
+      const cloneResult = await adapter.cloneVoice('/tmp/voice-sample.wav', 'en');
 
       // Then synthesize with cloned voice
       const audioBuffer = await adapter.synthesize(
@@ -86,7 +71,7 @@ describe('TTS Worker Unit Tests', () => {
   describe('Multi-Speaker Voice Assignment', () => {
     it('should assign different voices to different speakers', async () => {
       const adapter = new MockStyleTTSAdapter();
-      
+
       const speakerMapping = {
         SPEAKER_00: 'voice-1',
         SPEAKER_01: 'voice-2',
@@ -98,7 +83,7 @@ describe('TTS Worker Unit Tests', () => {
       ];
 
       const audioBuffers = await Promise.all(
-        segments.map(segment =>
+        segments.map((segment) =>
           adapter.synthesize(
             segment.text,
             speakerMapping[segment.speaker as keyof typeof speakerMapping],
@@ -108,7 +93,7 @@ describe('TTS Worker Unit Tests', () => {
       );
 
       expect(audioBuffers.length).toBe(2);
-      audioBuffers.forEach(buffer => {
+      audioBuffers.forEach((buffer) => {
         expect(buffer).toBeInstanceOf(Buffer);
       });
     });
@@ -146,10 +131,7 @@ describe('TTS Worker Unit Tests', () => {
       const user = await createTestUser(prisma, 'creator');
       const adapter = new MockXTTSAdapter();
 
-      const cloneResult = await adapter.cloneVoice(
-        '/tmp/voice-sample.wav',
-        'en'
-      );
+      const cloneResult = await adapter.cloneVoice('/tmp/voice-sample.wav', 'en');
 
       const voiceClone = await prisma.voiceClone.create({
         data: {
@@ -222,7 +204,7 @@ describe('TTS Worker Unit Tests', () => {
   describe('Voice Clone Slot Limits', () => {
     it('should enforce voice clone slot limits', async () => {
       const user = await createTestUser(prisma, 'creator');
-      
+
       // Creator tier has 3 slots
       expect(user.voiceCloneSlots).toBe(3);
 
@@ -252,7 +234,7 @@ describe('TTS Worker Unit Tests', () => {
 
     it('should block free tier from creating voice clones', async () => {
       const user = await createTestUser(prisma, 'free');
-      
+
       // Free tier has 0 slots
       expect(user.voiceCloneSlots).toBe(0);
     });
@@ -261,23 +243,23 @@ describe('TTS Worker Unit Tests', () => {
   describe('Error Handling', () => {
     it('should handle TTS service failure', async () => {
       const adapter = new MockStyleTTSAdapter();
-      
+
       // Mock a failure
       const originalSynthesize = adapter.synthesize;
       adapter.synthesize = async () => {
         throw new Error('TTS service unavailable');
       };
 
-      await expect(
-        adapter.synthesize('test', 'voice-1', 'en')
-      ).rejects.toThrow('TTS service unavailable');
+      await expect(adapter.synthesize('test', 'voice-1', 'en')).rejects.toThrow(
+        'TTS service unavailable'
+      );
 
       adapter.synthesize = originalSynthesize;
     });
 
     it('should validate voice clone audio quality', async () => {
       const adapter = new MockXTTSAdapter();
-      
+
       // Mock low quality result
       const originalClone = adapter.cloneVoice;
       adapter.cloneVoice = async () => ({

@@ -65,7 +65,7 @@ export default function UploadPage() {
 
       setJobId(response.data.jobId);
       setStatus('Processing...');
-      
+
       // Start polling for status
       pollStatus(response.data.jobId);
     } catch (err: any) {
@@ -88,7 +88,9 @@ export default function UploadPage() {
           clearInterval(interval);
           setIsUploading(false);
           setStatus('Completed! ✅');
-          setDownloadUrl(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/dub/download/${id}`);
+          setDownloadUrl(
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/dub/download/${id}`
+          );
         } else if (response.data.status === 'failed') {
           clearInterval(interval);
           setIsUploading(false);
@@ -107,12 +109,8 @@ export default function UploadPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            🎬 Transl8
-          </h1>
-          <p className="text-lg text-gray-600">
-            AI-powered video dubbing in 10 languages
-          </p>
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">🎬 Transl8</h1>
+          <p className="text-lg text-gray-600">AI-powered video dubbing in 10 languages</p>
         </div>
 
         <div className="bg-white rounded-lg shadow-xl p-8">
@@ -120,9 +118,7 @@ export default function UploadPage() {
             <>
               {/* File Upload */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Select Video
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Select Video</label>
                 <input
                   type="file"
                   accept="video/*"
@@ -158,7 +154,8 @@ export default function UploadPage() {
                   ))}
                 </select>
                 <p className="mt-2 text-xs text-gray-500">
-                  Your video will be translated from English to {SUPPORTED_LANGUAGES.find(l => l.code === targetLanguage)?.name}
+                  Your video will be translated from English to{' '}
+                  {SUPPORTED_LANGUAGES.find((l) => l.code === targetLanguage)?.name}
                 </p>
               </div>
 
@@ -203,12 +200,8 @@ export default function UploadPage() {
                 <div className="flex justify-center mb-6">
                   <div className="loader"></div>
                 </div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                  {status}
-                </h2>
-                <p className="text-gray-600 mb-4">
-                  Job ID: {jobId}
-                </p>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">{status}</h2>
+                <p className="text-gray-600 mb-4">Job ID: {jobId}</p>
                 <p className="text-sm text-gray-500">
                   This may take a few minutes. Please don't close this page.
                 </p>

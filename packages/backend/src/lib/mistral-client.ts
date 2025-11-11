@@ -1,6 +1,6 @@
 /**
  * Mistral AI API Client
- * 
+ *
  * Wrapper for Mistral AI API for translation and validation tasks.
  */
 
@@ -31,9 +31,9 @@ export class MistralClient {
   private lastRequestTime: number = 0;
   private minRequestInterval: number = 500; // 500ms between requests (allows 2 req/sec)
   private modelFallbackOrder: string[] = [
-    'mistral-small-latest',  // Smaller, faster, higher capacity
+    'mistral-small-latest', // Smaller, faster, higher capacity
     'mistral-medium-latest', // Medium size
-    'mistral-large-latest',  // Largest, best quality but limited capacity
+    'mistral-large-latest', // Largest, best quality but limited capacity
   ];
   private currentModelIndex: number = 0;
 
@@ -54,20 +54,20 @@ export class MistralClient {
   private async waitForRateLimit(retryCount: number = 0): Promise<void> {
     const now = Date.now();
     const timeSinceLastRequest = now - this.lastRequestTime;
-    
+
     // Only wait on retries or if we're going too fast
     if (retryCount > 0) {
       // Exponential backoff on retries: 1s, 2s, 4s
       const backoffWait = 1000 * Math.pow(2, retryCount - 1);
       logger.debug(`Rate limiting: waiting ${backoffWait}ms (retry backoff)`);
-      await new Promise(resolve => setTimeout(resolve, backoffWait));
+      await new Promise((resolve) => setTimeout(resolve, backoffWait));
     } else if (timeSinceLastRequest < this.minRequestInterval) {
       // Normal rate limiting
       const waitTime = this.minRequestInterval - timeSinceLastRequest;
       logger.debug(`Rate limiting: waiting ${waitTime}ms`);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
     }
-    
+
     this.lastRequestTime = Date.now();
   }
 
@@ -132,7 +132,7 @@ export class MistralClient {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
         },
         body: JSON.stringify(requestBody),
       });
@@ -160,7 +160,7 @@ export class MistralClient {
           if (retryCount < 2) {
             const backoffTime = 1000 * Math.pow(2, retryCount); // 1s, 2s
             logger.warn(`Rate limited, retrying in ${backoffTime}ms (attempt ${retryCount + 1}/2)`);
-            await new Promise(resolve => setTimeout(resolve, backoffTime));
+            await new Promise((resolve) => setTimeout(resolve, backoffTime));
             return this.generate(prompt, {
               ...options,
               retryCount: retryCount + 1,
@@ -172,7 +172,7 @@ export class MistralClient {
         throw new Error(`Mistral API error: ${response.status} - ${errorText}`);
       }
 
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       // Extract text from response
       const text = this.extractText(data);
@@ -216,8 +216,10 @@ export class MistralClient {
 
     // Strip surrounding quotes if present
     let text = response.text.trim();
-    if ((text.startsWith('"') && text.endsWith('"')) || 
-        (text.startsWith("'") && text.endsWith("'"))) {
+    if (
+      (text.startsWith('"') && text.endsWith('"')) ||
+      (text.startsWith("'") && text.endsWith("'"))
+    ) {
       text = text.slice(1, -1);
     }
 
@@ -243,7 +245,7 @@ export class MistralClient {
     try {
       if (data.choices && data.choices.length > 0) {
         const choice = data.choices[0];
-        
+
         // Check finish reason for issues
         if (choice.finish_reason) {
           if (choice.finish_reason === 'length') {
@@ -252,7 +254,7 @@ export class MistralClient {
             logger.warn(`Mistral stopped with reason: ${choice.finish_reason}`);
           }
         }
-        
+
         if (choice.message && choice.message.content) {
           const text = choice.message.content || '';
           if (!text) {

@@ -1,6 +1,6 @@
 /**
  * Adaptation Worker
- * 
+ *
  * Processes segments from Context Map using the intelligent translation adaptation engine.
  */
 
@@ -138,7 +138,9 @@ export class AdaptationWorker {
         validationConfig
       );
 
-      logger.info(`Using TTS-validated adaptation (±${validationConfig.tolerancePercent}% tolerance)`);
+      logger.info(
+        `Using TTS-validated adaptation (±${validationConfig.tolerancePercent}% tolerance)`
+      );
 
       // Update job progress
       await job.updateProgress(10);
@@ -152,8 +154,10 @@ export class AdaptationWorker {
       const results = [];
       for (let i = 0; i < segmentsToAdapt.length; i++) {
         const segment: any = segmentsToAdapt[i];
-        
-        logger.info(`\n📝 TTS-validating segment ${i}/${segmentsToAdapt.length}: "${segment.text?.substring(0, 50)}..." (${segment.duration?.toFixed(1)}s)`);
+
+        logger.info(
+          `\n📝 TTS-validating segment ${i}/${segmentsToAdapt.length}: "${segment.text?.substring(0, 50)}..." (${segment.duration?.toFixed(1)}s)`
+        );
 
         try {
           // Voice config (basic for now)
@@ -171,13 +175,17 @@ export class AdaptationWorker {
           results.push(result);
 
           if (result.status === 'success') {
-            logger.info(`   ✅ SUCCESS: "${result.adaptedText.substring(0, 50)}..." (${result.actualDuration.toFixed(2)}s, ${result.attempts} attempts)`);
+            logger.info(
+              `   ✅ SUCCESS: "${result.adaptedText.substring(0, 50)}..." (${result.actualDuration.toFixed(2)}s, ${result.attempts} attempts)`
+            );
           } else {
-            logger.warn(`   ⚠️  FAILED: Using best attempt "${result.adaptedText.substring(0, 50)}..." (${result.actualDuration.toFixed(2)}s, ${result.attempts} attempts)`);
+            logger.warn(
+              `   ⚠️  FAILED: Using best attempt "${result.adaptedText.substring(0, 50)}..." (${result.actualDuration.toFixed(2)}s, ${result.attempts} attempts)`
+            );
           }
 
           // Update progress
-          const progress = 10 + Math.floor((i + 1) / segmentsToAdapt.length * 70);
+          const progress = 10 + Math.floor(((i + 1) / segmentsToAdapt.length) * 70);
           await job.updateProgress(progress);
         } catch (error) {
           logger.error(`   ❌ ERROR in segment ${i}:`, error);
@@ -204,7 +212,9 @@ export class AdaptationWorker {
         const segment: any = segmentsToAdapt[i];
         const result = results[i];
 
-        logger.info(`   Updating segment ${segment.id}: "${result.adaptedText.substring(0, 50)}..."`);
+        logger.info(
+          `   Updating segment ${segment.id}: "${result.adaptedText.substring(0, 50)}..."`
+        );
 
         await contextMapClient.addAdaptedText(
           projectId,
@@ -220,10 +230,11 @@ export class AdaptationWorker {
           // Update segment with validated audio path
           const contextMap = await contextMapClient.get(projectId);
           if (contextMap && contextMap.content) {
-            const content = typeof contextMap.content === 'string' 
-              ? JSON.parse(contextMap.content) 
-              : contextMap.content;
-            
+            const content =
+              typeof contextMap.content === 'string'
+                ? JSON.parse(contextMap.content)
+                : contextMap.content;
+
             if (content.segments && Array.isArray(content.segments)) {
               const segmentToUpdate = content.segments.find((s: any) => s.id === segment.id);
               if (segmentToUpdate) {
@@ -240,7 +251,7 @@ export class AdaptationWorker {
       await job.updateProgress(90);
 
       // Wait a moment to ensure all database updates are committed
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       logger.info('✅ All Context Map updates committed');
 
       // Generate comprehensive report
@@ -248,8 +259,8 @@ export class AdaptationWorker {
       logger.info('\n' + report);
 
       // Calculate stats
-      const successful = results.filter(r => r.status === 'success').length;
-      const failed = results.filter(r => r.status === 'failed').length;
+      const successful = results.filter((r) => r.status === 'success').length;
+      const failed = results.filter((r) => r.status === 'failed').length;
       const successRate = (successful / results.length) * 100;
       const avgAttempts = results.reduce((sum, r) => sum + r.attempts, 0) / results.length;
       const totalTTSCalls = results.reduce((sum, r) => sum + r.attempts, 0);
@@ -272,16 +283,20 @@ export class AdaptationWorker {
 
       // Trigger TTS if adaptation was successful (66% threshold allows 2/3 segments)
       if (stats.successRate >= 66) {
-        logger.info(`\n🚀 TTS-validated adaptation complete (${stats.successRate.toFixed(1)}% success), triggering TTS assembly`);
+        logger.info(
+          `\n🚀 TTS-validated adaptation complete (${stats.successRate.toFixed(1)}% success), triggering TTS assembly`
+        );
         logger.info(`   📊 Total TTS validation calls: ${stats.totalTTSCalls}`);
         if (stats.successRate < 100) {
-          logger.warn(`   ⚠️  Some segments using best attempt (will be trimmed in final assembly)`);
+          logger.warn(
+            `   ⚠️  Some segments using best attempt (will be trimmed in final assembly)`
+          );
         }
         await this.triggerTTSStage(projectId, job.data.userId, targetLanguage);
       } else {
         logger.warn(
           `\n⚠️  TTS-validated adaptation success rate too low (${stats.successRate.toFixed(1)}%), not triggering TTS. ` +
-          `Manual review required.`
+            `Manual review required.`
         );
       }
 
@@ -297,8 +312,6 @@ export class AdaptationWorker {
       throw error;
     }
   }
-
-
 
   /**
    * Trigger TTS stage after successful adaptation
@@ -322,13 +335,9 @@ export class AdaptationWorker {
         targetLanguage,
       };
 
-      await this.ttsQueue.add(
-        `tts-${projectId}`,
-        ttsJobData,
-        {
-          priority: 1, // High priority
-        }
-      );
+      await this.ttsQueue.add(`tts-${projectId}`, ttsJobData, {
+        priority: 1, // High priority
+      });
 
       logger.info(`[Adaptation Worker] Enqueued TTS job for project ${projectId}`);
     } catch (error: any) {

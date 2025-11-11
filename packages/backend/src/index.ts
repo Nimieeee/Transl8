@@ -81,26 +81,28 @@ app.use(correlationIdMiddleware());
 
 // Security Middleware (applied in order)
 // 1. Helmet for security headers
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'"],
-      fontSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'"],
+        frameSrc: ["'none'"],
+      },
     },
-  },
-  hsts: {
-    maxAge: 31536000, // 1 year
-    includeSubDomains: true,
-    preload: true,
-  },
-}));
+    hsts: {
+      maxAge: 31536000, // 1 year
+      includeSubDomains: true,
+      preload: true,
+    },
+  })
+);
 
 // 2. Additional security headers
 app.use(securityHeaders);
@@ -134,7 +136,7 @@ app.get('/health', async (_req, res) => {
   const dbHealthy = await checkDatabaseConnection();
   const redisHealthy = await checkRedisConnection();
   const storageHealthy = await checkStorageConnection();
-  
+
   res.json({
     status: dbHealthy && redisHealthy && storageHealthy ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
@@ -148,12 +150,12 @@ app.get('/health', async (_req, res) => {
 app.get('/health/db', async (_req, res) => {
   try {
     const isConnected = await checkDatabaseConnection();
-    
+
     if (isConnected) {
       // Get some basic stats
       const userCount = await prisma.user.count();
       const projectCount = await prisma.project.count();
-      
+
       res.json({
         status: 'ok',
         connected: true,
@@ -270,7 +272,7 @@ async function startServer() {
     // Set failOnError to false in development to allow startup even if validation fails
     const failOnError = process.env.NODE_ENV === 'production';
     await runStartupValidation(failOnError);
-    
+
     // Start server
     server.listen(PORT, () => {
       logger.info(`Backend server running on port ${PORT}`);

@@ -73,8 +73,8 @@ export function CookieConsentBanner() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex-1">
             <p className="text-sm">
-              We use cookies to provide essential functionality and improve your experience. 
-              By continuing to use our platform, you consent to our use of cookies.{' '}
+              We use cookies to provide essential functionality and improve your experience. By
+              continuing to use our platform, you consent to our use of cookies.{' '}
               <a
                 href="/legal/cookie-policy"
                 className="underline hover:text-blue-400"

@@ -15,10 +15,7 @@ export async function hashPassword(password: string): Promise<string> {
 /**
  * Compare a plain text password with a hashed password
  */
-export async function comparePassword(
-  password: string,
-  hashedPassword: string
-): Promise<boolean> {
+export async function comparePassword(password: string, hashedPassword: string): Promise<boolean> {
   return bcrypt.compare(password, hashedPassword);
 }
 
@@ -26,17 +23,9 @@ export async function comparePassword(
  * Generate JWT access and refresh tokens
  */
 export function generateTokens(payload: TokenPayload): AuthTokens {
-  const accessToken = jwt.sign(
-    payload,
-    JWT_SECRET,
-    { expiresIn: '15m' }
-  );
+  const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '15m' });
 
-  const refreshToken = jwt.sign(
-    payload,
-    JWT_SECRET,
-    { expiresIn: '7d' }
-  );
+  const refreshToken = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
   return {
     accessToken,

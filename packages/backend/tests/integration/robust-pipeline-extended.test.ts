@@ -69,7 +69,7 @@ describe('Robust Pipeline Extended Tests', () => {
         });
 
         // Simulate vocal isolation with different music types
-        const updatedSegments = (contextMapData.segments as any[]).map(seg => ({
+        const updatedSegments = (contextMapData.segments as any[]).map((seg) => ({
           ...seg,
           clean_prompt_path: `/path/to/clean_${scenario.music_type}_${seg.id}.wav`,
           vocal_isolation_quality: {
@@ -137,7 +137,7 @@ describe('Robust Pipeline Extended Tests', () => {
               duration: 5.0,
               text: `Test with ${scenario.name}`,
               speaker: 'SPEAKER_00',
-              confidence: 0.90,
+              confidence: 0.9,
             },
           ],
         };
@@ -153,7 +153,7 @@ describe('Robust Pipeline Extended Tests', () => {
         });
 
         // Simulate noise reduction
-        const updatedSegments = (contextMapData.segments as any[]).map(seg => ({
+        const updatedSegments = (contextMapData.segments as any[]).map((seg) => ({
           ...seg,
           clean_prompt_path: `/path/to/clean_${scenario.noise_type}_${seg.id}.wav`,
           noise_reduction_quality: {
@@ -220,7 +220,7 @@ describe('Robust Pipeline Extended Tests', () => {
       });
 
       // Simulate vocal isolation and quality validation
-      const updatedSegments = (contextMapData.segments as any[]).map(seg => ({
+      const updatedSegments = (contextMapData.segments as any[]).map((seg) => ({
         ...seg,
         clean_prompt_path: `/path/to/clean_prompt_${seg.id}.wav`,
         voice_clone_suitability: {
@@ -298,7 +298,7 @@ describe('Robust Pipeline Extended Tests', () => {
       });
 
       // Simulate adaptation for very short segments
-      const adaptedSegments = (contextMapData.segments as any[]).map(seg => ({
+      const adaptedSegments = (contextMapData.segments as any[]).map((seg) => ({
         ...seg,
         adapted_text: seg.text, // Keep original for very short
         status: 'success',
@@ -336,7 +336,8 @@ describe('Robust Pipeline Extended Tests', () => {
     it('should test with very long segments (> 10 seconds)', async () => {
       const job = await createTestDubbingJob();
 
-      const longText = 'This is a very long segment that contains multiple sentences and ideas. ' +
+      const longText =
+        'This is a very long segment that contains multiple sentences and ideas. ' +
         'It discusses various topics in detail and requires careful adaptation to maintain timing.';
 
       const contextMapData = {
@@ -367,7 +368,7 @@ describe('Robust Pipeline Extended Tests', () => {
       });
 
       // Simulate adaptation for long segment with retry logic
-      const adaptedSegments = (contextMapData.segments as any[]).map(seg => {
+      const adaptedSegments = (contextMapData.segments as any[]).map((seg) => {
         const adaptedText = seg.text.substring(0, Math.floor(seg.text.length * 1.2));
         return {
           ...seg,
@@ -435,7 +436,7 @@ describe('Robust Pipeline Extended Tests', () => {
               duration: scenario.duration,
               text: scenario.text,
               speaker: 'SPEAKER_00',
-              confidence: 0.90,
+              confidence: 0.9,
               emotion: 'neutral',
             },
           ],
@@ -452,17 +453,23 @@ describe('Robust Pipeline Extended Tests', () => {
         });
 
         // Simulate retry logic
-        const adaptedSegments = (contextMapData.segments as any[]).map(seg => ({
+        const adaptedSegments = (contextMapData.segments as any[]).map((seg) => ({
           ...seg,
-          adapted_text: scenario.expected_status === 'success' 
-            ? `Adapted: ${seg.text.substring(0, 30)}...`
-            : seg.text,
+          adapted_text:
+            scenario.expected_status === 'success'
+              ? `Adapted: ${seg.text.substring(0, 30)}...`
+              : seg.text,
           status: scenario.expected_status,
           attempts: scenario.expected_attempts,
           validation: {
             retry_history: Array.from({ length: scenario.expected_attempts }, (_, i) => ({
               attempt: i + 1,
-              result: i < scenario.expected_attempts - 1 ? 'failed' : scenario.expected_status === 'success' ? 'passed' : 'failed',
+              result:
+                i < scenario.expected_attempts - 1
+                  ? 'failed'
+                  : scenario.expected_status === 'success'
+                    ? 'passed'
+                    : 'failed',
               reason: i < scenario.expected_attempts - 1 ? 'too_long' : 'final_attempt',
             })),
           },
@@ -542,7 +549,7 @@ describe('Robust Pipeline Extended Tests', () => {
             totalSegments: numSegments,
             maxDriftMs: 0,
             averageDriftMs: 0,
-            segmentAccuracy: segments.map(seg => ({ segment_id: seg.id, drift_ms: 0 })),
+            segmentAccuracy: segments.map((seg) => ({ segment_id: seg.id, drift_ms: 0 })),
             syncQualityScore: 1.0,
           },
         });
@@ -609,7 +616,7 @@ describe('Robust Pipeline Extended Tests', () => {
         data: {
           content: {
             ...initialContextMapData,
-            segments: initialContextMapData.segments.map(seg => ({
+            segments: initialContextMapData.segments.map((seg) => ({
               ...seg,
               clean_prompt_path: `/path/to/clean_${seg.id}.wav`,
             })),
@@ -629,7 +636,7 @@ describe('Robust Pipeline Extended Tests', () => {
         data: {
           content: {
             ...initialContextMapData,
-            segments: initialContextMapData.segments.map(seg => ({
+            segments: initialContextMapData.segments.map((seg) => ({
               ...seg,
               clean_prompt_path: `/path/to/clean_${seg.id}.wav`,
               emotion: 'neutral',
@@ -650,7 +657,7 @@ describe('Robust Pipeline Extended Tests', () => {
         data: {
           content: {
             ...initialContextMapData,
-            segments: initialContextMapData.segments.map(seg => ({
+            segments: initialContextMapData.segments.map((seg) => ({
               ...seg,
               clean_prompt_path: `/path/to/clean_${seg.id}.wav`,
               emotion: 'neutral',
@@ -675,7 +682,7 @@ describe('Robust Pipeline Extended Tests', () => {
         data: {
           content: {
             ...initialContextMapData,
-            segments: initialContextMapData.segments.map(seg => ({
+            segments: initialContextMapData.segments.map((seg) => ({
               ...seg,
               clean_prompt_path: `/path/to/clean_${seg.id}.wav`,
               emotion: 'neutral',
@@ -762,7 +769,7 @@ describe('Robust Pipeline Extended Tests', () => {
 
       const segment = (retrievedContextMap?.content as any).segments[0];
 
-      requiredFields.forEach(field => {
+      requiredFields.forEach((field) => {
         expect(segment).toHaveProperty(field);
         expect(segment[field]).toBeDefined();
       });

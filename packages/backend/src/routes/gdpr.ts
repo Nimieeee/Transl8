@@ -17,7 +17,7 @@ router.get('/export', authenticateToken, async (req, res) => {
     logger.info('GDPR data export requested', { userId });
 
     // Fetch all user data
-    const user = await prisma.user.findUnique({
+    const user = (await prisma.user.findUnique({
       where: { id: userId },
       include: {
         projects: {
@@ -30,7 +30,7 @@ router.get('/export', authenticateToken, async (req, res) => {
         voiceClones: true,
         feedback: true,
       },
-    }) as any;
+    })) as any;
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -114,13 +114,13 @@ router.delete('/delete-account', authenticateToken, async (req, res) => {
     logger.info('GDPR account deletion requested', { userId });
 
     // Fetch user with all related data
-    const user = await prisma.user.findUnique({
+    const user = (await prisma.user.findUnique({
       where: { id: userId },
       include: {
         projects: true,
         voiceClones: true,
       },
-    }) as any;
+    })) as any;
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -154,7 +154,7 @@ router.get('/consent', authenticateToken, async (req, res) => {
   try {
     const userId = req.user!.userId;
 
-    const user = await prisma.user.findUnique({
+    const user = (await prisma.user.findUnique({
       where: { id: userId },
       select: {
         gdprConsent: true,
@@ -162,7 +162,7 @@ router.get('/consent', authenticateToken, async (req, res) => {
         cookieConsent: true,
         cookieConsentDate: true,
       } as any,
-    }) as any;
+    })) as any;
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -196,7 +196,7 @@ router.post('/consent', authenticateToken, async (req, res) => {
       updateData.cookieConsentDate = new Date();
     }
 
-    const user = await prisma.user.update({
+    const user = (await prisma.user.update({
       where: { id: userId },
       data: updateData as any,
       select: {
@@ -205,7 +205,7 @@ router.post('/consent', authenticateToken, async (req, res) => {
         cookieConsent: true,
         cookieConsentDate: true,
       } as any,
-    }) as any;
+    })) as any;
 
     logger.info('GDPR consent updated', { userId, gdprConsent, cookieConsent });
 

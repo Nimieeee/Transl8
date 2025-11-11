@@ -22,11 +22,7 @@ export interface GlossaryAccuracyResult {
  * BLEU = BP * exp(sum(log(p_n)))
  * where p_n is n-gram precision and BP is brevity penalty
  */
-export function calculateBLEU(
-  reference: string,
-  hypothesis: string,
-  maxN: number = 4
-): BLEUResult {
+export function calculateBLEU(reference: string, hypothesis: string, maxN: number = 4): BLEUResult {
   const refTokens = tokenize(reference);
   const hypTokens = tokenize(hypothesis);
 
@@ -44,10 +40,7 @@ export function calculateBLEU(
   const brevityPenalty = lengthRatio >= 1 ? 1 : Math.exp(1 - 1 / lengthRatio);
 
   // Calculate BLEU score
-  const logPrecisionSum = precisions.reduce(
-    (sum, p) => sum + Math.log(p > 0 ? p : 1e-10),
-    0
-  );
+  const logPrecisionSum = precisions.reduce((sum, p) => sum + Math.log(p > 0 ? p : 1e-10), 0);
   const geometricMean = Math.exp(logPrecisionSum / maxN);
   const bleu = brevityPenalty * geometricMean;
 
@@ -62,11 +55,7 @@ export function calculateBLEU(
 /**
  * Calculate n-gram precision
  */
-function calculateNGramPrecision(
-  reference: string[],
-  hypothesis: string[],
-  n: number
-): number {
+function calculateNGramPrecision(reference: string[], hypothesis: string[], n: number): number {
   if (hypothesis.length < n) return 0;
 
   const refNGrams = getNGrams(reference, n);
@@ -152,8 +141,7 @@ export function calculateFluencyScore(text: string): number {
   // Penalize very short or very long sentences
   const sentences = text.split(/[.!?]+/).filter(Boolean);
   const avgSentenceLength =
-    sentences.reduce((sum, s) => sum + s.split(/\s+/).length, 0) /
-    sentences.length;
+    sentences.reduce((sum, s) => sum + s.split(/\s+/).length, 0) / sentences.length;
 
   if (avgSentenceLength < 5 || avgSentenceLength > 30) {
     score -= 0.5;

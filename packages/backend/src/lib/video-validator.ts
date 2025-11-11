@@ -24,10 +24,7 @@ const MAX_FILE_SIZE_MB = 500; // 500 MB
 /**
  * Validate video file format and duration
  */
-export async function validateVideo(
-  filePath: string,
-  fileSize: number
-): Promise<ValidationResult> {
+export async function validateVideo(filePath: string, fileSize: number): Promise<ValidationResult> {
   const errors: string[] = [];
 
   // Check file size
@@ -116,10 +113,7 @@ export async function getVideoMetadata(filePath: string): Promise<VideoMetadata>
 /**
  * Extract audio from video file
  */
-export async function extractAudio(
-  videoPath: string,
-  outputPath: string
-): Promise<void> {
+export async function extractAudio(videoPath: string, outputPath: string): Promise<void> {
   return new Promise((resolve, reject) => {
     ffmpeg(videoPath)
       .output(outputPath)

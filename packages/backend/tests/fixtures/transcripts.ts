@@ -33,7 +33,7 @@ export const mockTranscript = {
         { word: 'discuss', start: 4.8, end: 5.5, confidence: 0.93 },
         { word: 'AI', start: 5.6, end: 6.0, confidence: 0.89 },
         { word: 'video', start: 6.1, end: 6.6, confidence: 0.91 },
-        { word: 'dubbing', start: 6.7, end: 10.5, confidence: 0.90 },
+        { word: 'dubbing', start: 6.7, end: 10.5, confidence: 0.9 },
       ],
     },
   ],

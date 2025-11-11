@@ -5,7 +5,7 @@ let sessionId: string | null = null;
 // Generate or retrieve session ID
 function getSessionId(): string {
   if (sessionId) return sessionId;
-  
+
   // Try to get from sessionStorage
   if (typeof window !== 'undefined') {
     const stored = sessionStorage.getItem('analytics_session_id');
@@ -14,14 +14,14 @@ function getSessionId(): string {
       return sessionId;
     }
   }
-  
+
   // Generate new session ID
   sessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   if (typeof window !== 'undefined') {
     sessionStorage.setItem('analytics_session_id', sessionId);
   }
-  
+
   return sessionId;
 }
 
@@ -39,7 +39,7 @@ export const analytics = {
         eventName,
         eventData,
         pageUrl: pageUrl || (typeof window !== 'undefined' ? window.location.pathname : undefined),
-        sessionId: getSessionId()
+        sessionId: getSessionId(),
       });
     } catch (error) {
       // Silently fail - don't disrupt user experience
@@ -52,14 +52,14 @@ export const analytics = {
     const path = pagePath || (typeof window !== 'undefined' ? window.location.pathname : '/');
     await analytics.track({
       eventName: 'page_view',
-      pageUrl: path
+      pageUrl: path,
     });
   },
 
   // Track user registration
   userRegistered: async () => {
     await analytics.track({
-      eventName: 'user_registered'
+      eventName: 'user_registered',
     });
   },
 
@@ -70,8 +70,8 @@ export const analytics = {
       eventData: {
         projectId,
         sourceLanguage,
-        targetLanguage
-      }
+        targetLanguage,
+      },
     });
   },
 
@@ -82,8 +82,8 @@ export const analytics = {
       eventData: {
         projectId,
         duration,
-        fileSize
-      }
+        fileSize,
+      },
     });
   },
 
@@ -91,7 +91,7 @@ export const analytics = {
   transcriptEdited: async (projectId: string) => {
     await analytics.track({
       eventName: 'transcript_edited',
-      eventData: { projectId }
+      eventData: { projectId },
     });
   },
 
@@ -99,7 +99,7 @@ export const analytics = {
   translationEdited: async (projectId: string) => {
     await analytics.track({
       eventName: 'translation_edited',
-      eventData: { projectId }
+      eventData: { projectId },
     });
   },
 
@@ -109,8 +109,8 @@ export const analytics = {
       eventName: 'voice_clone_created',
       eventData: {
         voiceId,
-        language
-      }
+        language,
+      },
     });
   },
 
@@ -120,8 +120,8 @@ export const analytics = {
       eventName: 'project_completed',
       eventData: {
         projectId,
-        processingTime
-      }
+        processingTime,
+      },
     });
   },
 
@@ -131,8 +131,8 @@ export const analytics = {
       eventName: 'feature_used',
       eventData: {
         feature: featureName,
-        ...metadata
-      }
+        ...metadata,
+      },
     });
   },
 
@@ -143,8 +143,8 @@ export const analytics = {
       eventData: {
         errorType,
         errorMessage,
-        ...context
-      }
+        ...context,
+      },
     });
-  }
+  },
 };

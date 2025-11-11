@@ -69,45 +69,73 @@ export default function CookiePolicyPage() {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold mb-4">{policy.content.cookieTypes.title}</h2>
-              
+
               <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-2">{policy.content.cookieTypes.essential.title}</h3>
-                <p className="text-gray-700 mb-2">{policy.content.cookieTypes.essential.description}</p>
+                <h3 className="text-xl font-semibold mb-2">
+                  {policy.content.cookieTypes.essential.title}
+                </h3>
+                <p className="text-gray-700 mb-2">
+                  {policy.content.cookieTypes.essential.description}
+                </p>
                 <ul className="list-disc pl-6 space-y-1">
-                  {policy.content.cookieTypes.essential.examples.map((item: string, index: number) => (
-                    <li key={index} className="text-gray-700">{item}</li>
-                  ))}
+                  {policy.content.cookieTypes.essential.examples.map(
+                    (item: string, index: number) => (
+                      <li key={index} className="text-gray-700">
+                        {item}
+                      </li>
+                    )
+                  )}
                 </ul>
               </div>
 
               <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-2">{policy.content.cookieTypes.functional.title}</h3>
-                <p className="text-gray-700 mb-2">{policy.content.cookieTypes.functional.description}</p>
+                <h3 className="text-xl font-semibold mb-2">
+                  {policy.content.cookieTypes.functional.title}
+                </h3>
+                <p className="text-gray-700 mb-2">
+                  {policy.content.cookieTypes.functional.description}
+                </p>
                 <ul className="list-disc pl-6 space-y-1">
-                  {policy.content.cookieTypes.functional.examples.map((item: string, index: number) => (
-                    <li key={index} className="text-gray-700">{item}</li>
-                  ))}
+                  {policy.content.cookieTypes.functional.examples.map(
+                    (item: string, index: number) => (
+                      <li key={index} className="text-gray-700">
+                        {item}
+                      </li>
+                    )
+                  )}
                 </ul>
               </div>
 
               <div className="mb-6">
-                <h3 className="text-xl font-semibold mb-2">{policy.content.cookieTypes.analytics.title}</h3>
-                <p className="text-gray-700 mb-2">{policy.content.cookieTypes.analytics.description}</p>
+                <h3 className="text-xl font-semibold mb-2">
+                  {policy.content.cookieTypes.analytics.title}
+                </h3>
+                <p className="text-gray-700 mb-2">
+                  {policy.content.cookieTypes.analytics.description}
+                </p>
                 <ul className="list-disc pl-6 space-y-1">
-                  {policy.content.cookieTypes.analytics.examples.map((item: string, index: number) => (
-                    <li key={index} className="text-gray-700">{item}</li>
-                  ))}
+                  {policy.content.cookieTypes.analytics.examples.map(
+                    (item: string, index: number) => (
+                      <li key={index} className="text-gray-700">
+                        {item}
+                      </li>
+                    )
+                  )}
                 </ul>
               </div>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">{policy.content.managingCookies.title}</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                {policy.content.managingCookies.title}
+              </h2>
               <p className="text-gray-700">{policy.content.managingCookies.description}</p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">{policy.content.thirdPartyCookies.title}</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                {policy.content.thirdPartyCookies.title}
+              </h2>
               <p className="text-gray-700">{policy.content.thirdPartyCookies.description}</p>
             </section>
           </div>

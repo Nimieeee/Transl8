@@ -1,10 +1,10 @@
 /**
  * Model Adapter Types and Interfaces
- * 
+ *
  * This module defines the standardized interfaces for all AI model adapters
  * in the video dubbing pipeline. Each adapter implements a specific stage
  * of the processing pipeline (STT, MT, TTS, Lip-Sync).
- * 
+ *
  * Requirements: 14.1, 14.3
  */
 
@@ -153,7 +153,7 @@ export interface LipSyncResult {
 
 /**
  * Abstract base class for Speech-to-Text adapters
- * 
+ *
  * Implementations: WhisperPyannoteAdapter
  */
 export abstract class STTAdapter {
@@ -162,7 +162,7 @@ export abstract class STTAdapter {
 
   /**
    * Transcribe audio file with speaker diarization
-   * 
+   *
    * @param audioPath - Path to audio file (WAV, MP3, etc.)
    * @param language - Source language ISO 639-1 code (e.g., "en", "es")
    * @returns Transcript with speaker labels and timestamps
@@ -171,7 +171,7 @@ export abstract class STTAdapter {
 
   /**
    * Health check for the STT model
-   * 
+   *
    * @returns Health status and latency
    */
   abstract healthCheck(): Promise<HealthCheckResult>;
@@ -179,7 +179,7 @@ export abstract class STTAdapter {
 
 /**
  * Abstract base class for Machine Translation adapters
- * 
+ *
  * Implementations: MarianMTAdapter, LlamaMTAdapter
  */
 export abstract class MTAdapter {
@@ -188,7 +188,7 @@ export abstract class MTAdapter {
 
   /**
    * Translate text from source to target language
-   * 
+   *
    * @param text - Text to translate
    * @param sourceLanguage - Source language ISO 639-1 code
    * @param targetLanguage - Target language ISO 639-1 code
@@ -204,7 +204,7 @@ export abstract class MTAdapter {
 
   /**
    * Translate transcript segments while preserving timing and speaker info
-   * 
+   *
    * @param segments - Transcript segments to translate
    * @param sourceLanguage - Source language ISO 639-1 code
    * @param targetLanguage - Target language ISO 639-1 code
@@ -220,7 +220,7 @@ export abstract class MTAdapter {
 
   /**
    * Health check for the MT model
-   * 
+   *
    * @returns Health status and latency
    */
   abstract healthCheck(): Promise<HealthCheckResult>;
@@ -228,7 +228,7 @@ export abstract class MTAdapter {
 
 /**
  * Abstract base class for Text-to-Speech adapters
- * 
+ *
  * Implementations: StyleTTSAdapter, XTTSAdapter
  */
 export abstract class TTSAdapter {
@@ -237,7 +237,7 @@ export abstract class TTSAdapter {
 
   /**
    * Synthesize speech from text with specified voice
-   * 
+   *
    * @param text - Text to synthesize
    * @param voiceConfig - Voice configuration
    * @param timestamps - Optional timing constraints for segments
@@ -251,7 +251,7 @@ export abstract class TTSAdapter {
 
   /**
    * Synthesize speech for multiple segments with speaker-specific voices
-   * 
+   *
    * @param segments - Translation segments to synthesize
    * @param speakerVoiceMapping - Mapping of speakers to voice configs
    * @returns Complete audio with all segments
@@ -263,7 +263,7 @@ export abstract class TTSAdapter {
 
   /**
    * Create a voice clone from audio sample
-   * 
+   *
    * @param audioPath - Path to audio sample (min 6 seconds)
    * @param voiceName - Name for the voice clone
    * @returns Voice clone ID for future use
@@ -272,7 +272,7 @@ export abstract class TTSAdapter {
 
   /**
    * Health check for the TTS model
-   * 
+   *
    * @returns Health status and latency
    */
   abstract healthCheck(): Promise<HealthCheckResult>;
@@ -280,7 +280,7 @@ export abstract class TTSAdapter {
 
 /**
  * Abstract base class for Lip-Sync adapters
- * 
+ *
  * Implementations: Wav2LipAdapter
  */
 export abstract class LipSyncAdapter {
@@ -289,7 +289,7 @@ export abstract class LipSyncAdapter {
 
   /**
    * Synchronize lip movements with new audio
-   * 
+   *
    * @param videoPath - Path to input video file
    * @param audioPath - Path to new audio file
    * @param outputPath - Path for output video
@@ -305,7 +305,7 @@ export abstract class LipSyncAdapter {
 
   /**
    * Health check for the lip-sync model
-   * 
+   *
    * @returns Health status and latency
    */
   abstract healthCheck(): Promise<HealthCheckResult>;
@@ -321,7 +321,7 @@ export interface VocalIsolationResult {
 
 /**
  * Abstract base class for Vocal Isolation adapters
- * 
+ *
  * Implementations: DemucsAdapter
  */
 export abstract class VocalIsolationAdapter {
@@ -330,19 +330,16 @@ export abstract class VocalIsolationAdapter {
 
   /**
    * Separate vocals from background music and effects
-   * 
+   *
    * @param audioPath - Path to audio file with mixed content
    * @param outputPath - Path for isolated vocals output
    * @returns Path to isolated vocals file
    */
-  abstract separateVocals(
-    audioPath: string,
-    outputPath: string
-  ): Promise<VocalIsolationResult>;
+  abstract separateVocals(audioPath: string, outputPath: string): Promise<VocalIsolationResult>;
 
   /**
    * Health check for the vocal isolation model
-   * 
+   *
    * @returns Health status and latency
    */
   abstract healthCheck(): Promise<HealthCheckResult>;
@@ -359,7 +356,7 @@ export enum EmotionTag {
   EXCITED = 'excited',
   FEARFUL = 'fearful',
   DISGUSTED = 'disgusted',
-  SURPRISED = 'surprised'
+  SURPRISED = 'surprised',
 }
 
 /**
@@ -374,7 +371,7 @@ export interface EmotionAnalysisResult {
 
 /**
  * Abstract base class for Emotion Analysis adapters
- * 
+ *
  * Implementations: Wav2Vec2EmotionAdapter
  */
 export abstract class EmotionAnalysisAdapter {
@@ -383,7 +380,7 @@ export abstract class EmotionAnalysisAdapter {
 
   /**
    * Analyze emotion in audio segment
-   * 
+   *
    * @param audioPath - Path to audio file (clean vocals recommended)
    * @returns Detected emotion with confidence scores
    */
@@ -391,7 +388,7 @@ export abstract class EmotionAnalysisAdapter {
 
   /**
    * Analyze emotions for multiple audio segments in batch
-   * 
+   *
    * @param audioPaths - Array of audio file paths
    * @returns Array of emotion analysis results
    */
@@ -399,7 +396,7 @@ export abstract class EmotionAnalysisAdapter {
 
   /**
    * Health check for the emotion analysis model
-   * 
+   *
    * @returns Health status and latency
    */
   abstract healthCheck(): Promise<HealthCheckResult>;

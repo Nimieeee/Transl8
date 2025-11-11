@@ -1,8 +1,8 @@
 /**
  * Vocal Isolation Tests
- * 
+ *
  * Tests for vocal isolation service and quality validation.
- * 
+ *
  * Requirements: 22.1, 22.2
  */
 
@@ -44,14 +44,14 @@ describe('Vocal Isolation Service', () => {
       // This test requires a test audio file
       // Skip if test file doesn't exist
       const testAudioPath = path.join(testDir, 'test_audio.wav');
-      
+
       if (!fs.existsSync(testAudioPath)) {
         console.log('Skipping test: test audio file not found');
         return;
       }
 
       const outputPath = path.join(outputDir, 'extracted_segment.wav');
-      
+
       await vocalIsolationService.extractSegment(
         testAudioPath,
         1000, // Start at 1 second
@@ -71,28 +71,28 @@ describe('Vocal Isolation Service', () => {
   describe('Quality Validation', () => {
     it('should calculate SNR for audio file', async () => {
       const testAudioPath = path.join(testDir, 'clean_vocals.wav');
-      
+
       if (!fs.existsSync(testAudioPath)) {
         console.log('Skipping test: test audio file not found');
         return;
       }
 
       const snr = await qualityValidator.calculateSNR(testAudioPath);
-      
+
       expect(snr).toBeGreaterThan(0);
       expect(snr).toBeLessThan(100); // Reasonable upper bound
     }, 15000);
 
     it('should validate audio quality and provide metrics', async () => {
       const testAudioPath = path.join(testDir, 'clean_vocals.wav');
-      
+
       if (!fs.existsSync(testAudioPath)) {
         console.log('Skipping test: test audio file not found');
         return;
       }
 
       const metrics = await qualityValidator.validateQuality(testAudioPath);
-      
+
       expect(metrics).toHaveProperty('snr');
       expect(metrics).toHaveProperty('spectralPurity');
       expect(metrics).toHaveProperty('suitable');
@@ -110,7 +110,7 @@ describe('Vocal Isolation Service', () => {
       };
 
       const report = qualityValidator.generateReport(metrics);
-      
+
       expect(report).toContain('SNR: 25.5 dB');
       expect(report).toContain('Spectral Purity: 85.0%');
       expect(report).toContain('Music Energy Reduction: 75.2%');

@@ -147,8 +147,7 @@ function generateRecommendations(benchmarks: {
   // MT recommendations
   if (benchmarks.mt) {
     const avgBLEU = benchmarks.mt.aggregateMetrics.averageBLEU || 0;
-    const glossaryAccuracy =
-      benchmarks.mt.aggregateMetrics.averageGlossaryAccuracy || 0;
+    const glossaryAccuracy = benchmarks.mt.aggregateMetrics.averageGlossaryAccuracy || 0;
 
     if (avgBLEU < 35) {
       recommendations.push(
@@ -248,9 +247,7 @@ function generateCompetitorComparison(benchmarks: {
     sections.push(`| Microsoft Translator | 40.0 | ${(avgBLEU - 40.0).toFixed(2)} |\n`);
   }
 
-  sections.push(
-    '\n*Note: Competitor scores are approximate baselines from public benchmarks.*'
-  );
+  sections.push('\n*Note: Competitor scores are approximate baselines from public benchmarks.*');
 
   return sections.join('\n');
 }
@@ -438,19 +435,13 @@ async function main(): Promise<void> {
 
   // Save JSON report
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const jsonPath = path.join(
-    RESULTS_DIR,
-    `comprehensive_report_${timestamp}.json`
-  );
+  const jsonPath = path.join(RESULTS_DIR, `comprehensive_report_${timestamp}.json`);
   fs.writeFileSync(jsonPath, JSON.stringify(report, null, 2));
   console.log(`JSON report saved to: ${jsonPath}`);
 
   // Save Markdown report
   const markdownContent = generateMarkdownReport(report);
-  const mdPath = path.join(
-    RESULTS_DIR,
-    `comprehensive_report_${timestamp}.md`
-  );
+  const mdPath = path.join(RESULTS_DIR, `comprehensive_report_${timestamp}.md`);
   fs.writeFileSync(mdPath, markdownContent);
   console.log(`Markdown report saved to: ${mdPath}`);
 

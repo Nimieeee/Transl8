@@ -1,10 +1,10 @@
 /**
  * Vocal Isolation Worker - Processes vocal isolation jobs
- * 
+ *
  * Consumes jobs from the vocal isolation queue, extracts audio segments,
  * separates vocals from music/effects using Demucs, removes noise,
  * and stores clean style prompts in the Context Map.
- * 
+ *
  * Requirements: 16.4, 16.5
  */
 
@@ -83,9 +83,9 @@ export class VocalIsolationWorker {
         segments,
         outputDir
       );
-      
+
       const progressPerSegment = 60 / segments.length;
-      await job.updateProgress(20 + (cleanPromptPaths.size * progressPerSegment));
+      await job.updateProgress(20 + cleanPromptPaths.size * progressPerSegment);
 
       // Step 3: Update Context Map with clean prompt paths
       logger.info(`[Vocal Isolation Worker] Updating Context Map`);
@@ -195,23 +195,25 @@ export class VocalIsolationWorker {
   private async checkAndTriggerTTS(projectId: string): Promise<void> {
     try {
       const contextMap = await contextMapClient.get(projectId);
-      
+
       if (!contextMap || !contextMap.segments) {
         logger.info(`[Vocal Isolation Worker] Context Map not found for project ${projectId}`);
         return;
       }
 
       // Check if all segments have adapted text
-      const segmentsWithAdaptedText = contextMap.segments.filter(
-        (s: any) => s.adapted_text
-      );
+      const segmentsWithAdaptedText = contextMap.segments.filter((s: any) => s.adapted_text);
 
       if (segmentsWithAdaptedText.length !== contextMap.segments.length) {
-        logger.info(`[Vocal Isolation Worker] Adaptation not yet complete (${segmentsWithAdaptedText.length}/${contextMap.segments.length} segments)`);
+        logger.info(
+          `[Vocal Isolation Worker] Adaptation not yet complete (${segmentsWithAdaptedText.length}/${contextMap.segments.length} segments)`
+        );
         return;
       }
 
-      logger.info(`[Vocal Isolation Worker] Both vocal isolation and adaptation complete, triggering TTS`);
+      logger.info(
+        `[Vocal Isolation Worker] Both vocal isolation and adaptation complete, triggering TTS`
+      );
 
       // Enqueue TTS job
       const ttsJobData: TTSJobData = {
@@ -223,13 +225,9 @@ export class VocalIsolationWorker {
         targetLanguage: contextMap.target_language || 'es',
       };
 
-      await this.ttsQueue.add(
-        `tts-${projectId}`,
-        ttsJobData,
-        {
-          priority: 1,
-        }
-      );
+      await this.ttsQueue.add(`tts-${projectId}`, ttsJobData, {
+        priority: 1,
+      });
 
       logger.info(`[Vocal Isolation Worker] Enqueued TTS job for project ${projectId}`);
     } catch (error: any) {

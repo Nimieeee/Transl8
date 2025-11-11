@@ -34,10 +34,10 @@ export class FewShotLoader {
     try {
       const fileContent = fs.readFileSync(this.examplesPath, 'utf-8');
       this.examples = JSON.parse(fileContent);
-      
+
       // Validate structure
       this.validate(this.examples!);
-      
+
       logger.info(`Loaded few-shot examples from ${this.examplesPath}`);
       return this.examples!;
     } catch (error) {
@@ -69,7 +69,14 @@ export class FewShotLoader {
    * Validate few-shot examples structure
    */
   private validate(examples: FewShotExamples): void {
-    const requiredFields = ['source', 'target', 'duration', 'emotion', 'source_char_count', 'target_char_count'];
+    const requiredFields = [
+      'source',
+      'target',
+      'duration',
+      'emotion',
+      'source_char_count',
+      'target_char_count',
+    ];
 
     for (const [languagePair, exampleList] of Object.entries(examples)) {
       if (!Array.isArray(exampleList)) {
@@ -77,7 +84,9 @@ export class FewShotLoader {
       }
 
       if (exampleList.length < 3) {
-        throw new Error(`Language pair ${languagePair} must have at least 3 examples, found ${exampleList.length}`);
+        throw new Error(
+          `Language pair ${languagePair} must have at least 3 examples, found ${exampleList.length}`
+        );
       }
 
       for (const example of exampleList) {
@@ -100,7 +109,10 @@ export class FewShotLoader {
           throw new Error('Emotion must be a string');
         }
 
-        if (typeof example.source_char_count !== 'number' || typeof example.target_char_count !== 'number') {
+        if (
+          typeof example.source_char_count !== 'number' ||
+          typeof example.target_char_count !== 'number'
+        ) {
           throw new Error('Character counts must be numbers');
         }
       }

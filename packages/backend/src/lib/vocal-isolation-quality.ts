@@ -1,9 +1,9 @@
 /**
  * Vocal Isolation Quality Validation
- * 
+ *
  * Utilities for measuring and validating the quality of vocal isolation.
  * Includes SNR calculation, spectral analysis, and quality metrics.
- * 
+ *
  * Requirements: 22.1, 22.2
  */
 
@@ -25,7 +25,7 @@ export interface QualityMetrics {
 export class VocalIsolationQualityValidator {
   /**
    * Calculate Signal-to-Noise Ratio using FFmpeg
-   * 
+   *
    * @param audioPath - Path to audio file
    * @returns SNR in dB
    */
@@ -33,9 +33,9 @@ export class VocalIsolationQualityValidator {
     try {
       // Use FFmpeg astats filter to get audio statistics
       const cmd = `ffmpeg -i "${audioPath}" -af "astats=metadata=1:reset=1" -f null - 2>&1 | grep "RMS level dB"`;
-      
+
       const { stdout } = await execAsync(cmd);
-      
+
       // Parse RMS level from output
       const match = stdout.match(/RMS level dB:\s*(-?\d+\.?\d*)/);
       if (match) {
@@ -45,7 +45,7 @@ export class VocalIsolationQualityValidator {
         const snr = Math.abs(rmsDb) + 20; // Rough estimate
         return snr;
       }
-      
+
       return 0;
     } catch (error: any) {
       logger.error(`SNR calculation error: ${error.message}`);
@@ -55,7 +55,7 @@ export class VocalIsolationQualityValidator {
 
   /**
    * Measure music energy in specific frequency bands
-   * 
+   *
    * @param audioPath - Path to audio file
    * @returns Music energy level (0-1 scale)
    */
@@ -64,9 +64,9 @@ export class VocalIsolationQualityValidator {
       // Use FFmpeg to analyze frequency spectrum
       // Focus on music-heavy frequency bands (bass: 60-250Hz, treble: 8-16kHz)
       const cmd = `ffmpeg -i "${audioPath}" -af "highpass=f=60,lowpass=f=250,astats" -f null - 2>&1 | grep "RMS level"`;
-      
+
       const { stdout } = await execAsync(cmd);
-      
+
       // Parse RMS level
       const match = stdout.match(/RMS level:\s*(-?\d+\.?\d*)/);
       if (match) {
@@ -75,7 +75,7 @@ export class VocalIsolationQualityValidator {
         const normalized = Math.max(0, Math.min(1, (rmsLevel + 60) / 60));
         return normalized;
       }
-      
+
       return 0.5; // Default middle value
     } catch (error: any) {
       logger.error(`Music energy measurement error: ${error.message}`);
@@ -85,7 +85,7 @@ export class VocalIsolationQualityValidator {
 
   /**
    * Calculate spectral purity (how clean the vocals are)
-   * 
+   *
    * @param audioPath - Path to audio file
    * @returns Spectral purity score (0-1 scale)
    */
@@ -94,9 +94,9 @@ export class VocalIsolationQualityValidator {
       // Use FFmpeg to analyze spectral flatness
       // Lower flatness = more tonal (better for vocals)
       const cmd = `ffmpeg -i "${audioPath}" -af "aspectralstats" -f null - 2>&1 | grep "flatness"`;
-      
+
       const { stdout } = await execAsync(cmd);
-      
+
       // Parse flatness value
       const match = stdout.match(/flatness:\s*(\d+\.?\d*)/);
       if (match) {
@@ -105,7 +105,7 @@ export class VocalIsolationQualityValidator {
         const purity = 1 - Math.min(1, flatness);
         return purity;
       }
-      
+
       return 0.7; // Default good value
     } catch (error: any) {
       logger.error(`Spectral purity calculation error: ${error.message}`);
@@ -115,19 +115,16 @@ export class VocalIsolationQualityValidator {
 
   /**
    * Compare audio before and after vocal isolation
-   * 
+   *
    * @param originalPath - Path to original audio with music
    * @param isolatedPath - Path to isolated vocals
    * @returns Music energy reduction percentage
    */
-  async compareMusicReduction(
-    originalPath: string,
-    isolatedPath: string
-  ): Promise<number> {
+  async compareMusicReduction(originalPath: string, isolatedPath: string): Promise<number> {
     try {
       const originalEnergy = await this.measureMusicEnergy(originalPath);
       const isolatedEnergy = await this.measureMusicEnergy(isolatedPath);
-      
+
       // Calculate reduction percentage
       const reduction = ((originalEnergy - isolatedEnergy) / originalEnergy) * 100;
       return Math.max(0, reduction);
@@ -139,15 +136,12 @@ export class VocalIsolationQualityValidator {
 
   /**
    * Validate if isolated vocals are suitable for voice cloning
-   * 
+   *
    * @param audioPath - Path to isolated vocals
    * @param originalPath - Optional path to original audio for comparison
    * @returns Quality metrics and suitability assessment
    */
-  async validateQuality(
-    audioPath: string,
-    originalPath?: string
-  ): Promise<QualityMetrics> {
+  async validateQuality(audioPath: string, originalPath?: string): Promise<QualityMetrics> {
     const warnings: string[] = [];
 
     try {
@@ -173,17 +167,23 @@ export class VocalIsolationQualityValidator {
 
       if (spectralPurity < 0.6) {
         suitable = false;
-        warnings.push(`Low spectral purity (${(spectralPurity * 100).toFixed(1)}%). Minimum recommended: 60%`);
+        warnings.push(
+          `Low spectral purity (${(spectralPurity * 100).toFixed(1)}%). Minimum recommended: 60%`
+        );
       }
 
       if (originalPath && musicEnergyReduction < 50) {
-        warnings.push(`Music energy reduction below 50% (${musicEnergyReduction.toFixed(1)}%). Consider re-processing.`);
+        warnings.push(
+          `Music energy reduction below 50% (${musicEnergyReduction.toFixed(1)}%). Consider re-processing.`
+        );
       }
 
       // Check audio duration (should be at least 1 second for meaningful analysis)
       const duration = await this.getAudioDuration(audioPath);
       if (duration < 1.0) {
-        warnings.push(`Audio segment too short (${duration.toFixed(2)}s). May not be suitable for voice cloning.`);
+        warnings.push(
+          `Audio segment too short (${duration.toFixed(2)}s). May not be suitable for voice cloning.`
+        );
       }
 
       return {
@@ -207,7 +207,7 @@ export class VocalIsolationQualityValidator {
 
   /**
    * Get audio duration in seconds
-   * 
+   *
    * @param audioPath - Path to audio file
    * @returns Duration in seconds
    */
@@ -224,13 +224,11 @@ export class VocalIsolationQualityValidator {
 
   /**
    * Batch validate multiple audio files
-   * 
+   *
    * @param audioPaths - Array of audio file paths
    * @returns Map of file paths to quality metrics
    */
-  async batchValidate(
-    audioPaths: string[]
-  ): Promise<Map<string, QualityMetrics>> {
+  async batchValidate(audioPaths: string[]): Promise<Map<string, QualityMetrics>> {
     const results = new Map<string, QualityMetrics>();
 
     for (const audioPath of audioPaths) {
@@ -247,30 +245,30 @@ export class VocalIsolationQualityValidator {
 
   /**
    * Generate quality report summary
-   * 
+   *
    * @param metrics - Quality metrics
    * @returns Human-readable quality report
    */
   generateReport(metrics: QualityMetrics): string {
     const lines: string[] = [];
-    
+
     lines.push('=== Vocal Isolation Quality Report ===');
     lines.push(`SNR: ${metrics.snr.toFixed(1)} dB`);
     lines.push(`Spectral Purity: ${(metrics.spectralPurity * 100).toFixed(1)}%`);
-    
+
     if (metrics.musicEnergyReduction > 0) {
       lines.push(`Music Energy Reduction: ${metrics.musicEnergyReduction.toFixed(1)}%`);
     }
-    
+
     lines.push(`Suitable for Voice Cloning: ${metrics.suitable ? 'YES' : 'NO'}`);
-    
+
     if (metrics.warnings.length > 0) {
       lines.push('\nWarnings:');
-      metrics.warnings.forEach(warning => {
+      metrics.warnings.forEach((warning) => {
         lines.push(`  - ${warning}`);
       });
     }
-    
+
     return lines.join('\n');
   }
 }

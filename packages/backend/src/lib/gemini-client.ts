@@ -1,6 +1,6 @@
 /**
  * Gemini API Client
- * 
+ *
  * Wrapper for Google's Gemini API for translation and validation tasks.
  */
 
@@ -8,7 +8,14 @@ import { logger } from './logger';
 
 export interface GeminiConfig {
   apiKey: string;
-  model?: 'gemini-2.5-pro' | 'gemini-2.0-flash-exp' | 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-pro' | 'gemini-pro-latest' | 'gemini-flash-latest';
+  model?:
+    | 'gemini-2.5-pro'
+    | 'gemini-2.0-flash-exp'
+    | 'gemini-1.5-pro'
+    | 'gemini-1.5-flash'
+    | 'gemini-pro'
+    | 'gemini-pro-latest'
+    | 'gemini-flash-latest';
   temperature?: number;
   maxTokens?: number;
 }
@@ -46,7 +53,14 @@ export class GeminiClient {
   async generate(
     prompt: string,
     options?: {
-      model?: 'gemini-2.5-pro' | 'gemini-2.0-flash-exp' | 'gemini-1.5-pro' | 'gemini-1.5-flash' | 'gemini-pro' | 'gemini-pro-latest' | 'gemini-flash-latest';
+      model?:
+        | 'gemini-2.5-pro'
+        | 'gemini-2.0-flash-exp'
+        | 'gemini-1.5-pro'
+        | 'gemini-1.5-flash'
+        | 'gemini-pro'
+        | 'gemini-pro-latest'
+        | 'gemini-flash-latest';
       temperature?: number;
       maxTokens?: number;
     }
@@ -100,7 +114,7 @@ export class GeminiClient {
         throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
       }
 
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       // Extract text from response
       const text = this.extractText(data);
@@ -162,7 +176,7 @@ export class GeminiClient {
     try {
       if (data.candidates && data.candidates.length > 0) {
         const candidate = data.candidates[0];
-        
+
         // Check finish reason for issues
         if (candidate.finishReason) {
           if (candidate.finishReason === 'SAFETY') {
@@ -172,7 +186,7 @@ export class GeminiClient {
             logger.warn(`Gemini stopped with reason: ${candidate.finishReason}`);
           }
         }
-        
+
         if (candidate.content && candidate.content.parts && candidate.content.parts.length > 0) {
           const text = candidate.content.parts[0].text || '';
           if (!text) {

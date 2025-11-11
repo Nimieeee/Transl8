@@ -1,7 +1,7 @@
 // @ts-nocheck
 /**
  * Context Map Service
- * 
+ *
  * Manages the Context Map data structure that flows through the robust pipeline.
  * The Context Map contains all segment metadata including timing, emotion, clean audio paths,
  * and translation status.
@@ -10,7 +10,12 @@
 import { prisma } from './prisma';
 import { logger } from './logger';
 import { storage } from './storage';
-import { ContextMap, ContextMapSegment, EmotionTag, SegmentStatus } from '../../../shared/src/types';
+import {
+  ContextMap,
+  ContextMapSegment,
+  EmotionTag,
+  SegmentStatus,
+} from '../../../shared/src/types';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 
@@ -43,7 +48,7 @@ export class ContextMapService {
 
     // Adjust segment timestamps based on audio activity detection
     const audioStartOffset = audioActivity?.audioStartMs || 0;
-    
+
     if (audioStartOffset > 0) {
       logger.info(`Adjusting segment timestamps by +${audioStartOffset}ms (audio activity start)`);
     }
@@ -51,20 +56,21 @@ export class ContextMapService {
     // Convert transcript segments to Context Map segments
     const segments: ContextMapSegment[] = transcript.segments.map((seg, index) => {
       const previousLine = index > 0 ? transcript.segments[index - 1].text : null;
-      const nextLine = index < transcript.segments.length - 1 ? transcript.segments[index + 1].text : null;
+      const nextLine =
+        index < transcript.segments.length - 1 ? transcript.segments[index + 1].text : null;
 
       // Use word-level timestamps for more accurate timing
       // The first word's start time is when speech actually begins
       let actualStartMs = Math.round(seg.start * 1000);
       let actualEndMs = Math.round(seg.end * 1000);
-      
+
       if (seg.words && seg.words.length > 0) {
         actualStartMs = Math.round(seg.words[0].start * 1000);
         actualEndMs = Math.round(seg.words[seg.words.length - 1].end * 1000);
         logger.info(
           `Segment ${seg.id}: Using word timestamps ` +
-          `(${actualStartMs}ms - ${actualEndMs}ms) instead of segment timestamps ` +
-          `(${Math.round(seg.start * 1000)}ms - ${Math.round(seg.end * 1000)}ms)`
+            `(${actualStartMs}ms - ${actualEndMs}ms) instead of segment timestamps ` +
+            `(${Math.round(seg.start * 1000)}ms - ${Math.round(seg.end * 1000)}ms)`
         );
       }
 
@@ -85,16 +91,19 @@ export class ContextMapService {
 
     const contextMap: ContextMap = {
       project_id: projectId,
-      original_duration_ms: audioActivity?.totalDurationMs || Math.round(transcript.duration * 1000),
+      original_duration_ms:
+        audioActivity?.totalDurationMs || Math.round(transcript.duration * 1000),
       source_language: sourceLanguage,
       target_language: targetLanguage,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       segments,
-      audio_activity: audioActivity ? {
-        start_ms: audioActivity.audioStartMs,
-        end_ms: audioActivity.audioEndMs,
-      } : undefined,
+      audio_activity: audioActivity
+        ? {
+            start_ms: audioActivity.audioStartMs,
+            end_ms: audioActivity.audioEndMs,
+          }
+        : undefined,
     };
 
     // Store in database
@@ -143,7 +152,7 @@ export class ContextMapService {
       throw new Error(`Context Map not found for project ${projectId}`);
     }
 
-    const segmentIndex = contextMap.segments.findIndex(s => s.id === segmentId);
+    const segmentIndex = contextMap.segments.findIndex((s) => s.id === segmentId);
     if (segmentIndex === -1) {
       throw new Error(`Segment ${segmentId} not found in Context Map`);
     }
@@ -186,7 +195,7 @@ export class ContextMapService {
 
     // Apply all updates
     for (const update of updates) {
-      const segmentIndex = contextMap.segments.findIndex(s => s.id === update.segmentId);
+      const segmentIndex = contextMap.segments.findIndex((s) => s.id === update.segmentId);
       if (segmentIndex !== -1) {
         contextMap.segments[segmentIndex] = {
           ...contextMap.segments[segmentIndex],
@@ -288,12 +297,12 @@ export class ContextMapService {
     }
 
     const totalSegments = contextMap.segments.length;
-    const successfulSegments = contextMap.segments.filter(s => s.status === 'success').length;
+    const successfulSegments = contextMap.segments.filter((s) => s.status === 'success').length;
     const failedSegments = contextMap.segments.filter(
-      s => s.status && s.status.startsWith('failed_')
+      (s) => s.status && s.status.startsWith('failed_')
     ).length;
     const pendingSegments = contextMap.segments.filter(
-      s => !s.status || s.status === 'pending'
+      (s) => !s.status || s.status === 'pending'
     ).length;
 
     const totalAttempts = contextMap.segments.reduce((sum, s) => sum + (s.attempts || 0), 0);

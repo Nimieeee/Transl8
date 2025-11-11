@@ -12,7 +12,7 @@ router.post('/events', async (req, res) => {
     const { eventName, eventData, pageUrl, sessionId } = req.body;
     const userId = req.user?.userId || null;
     const userAgent = req.headers['user-agent'] || null;
-    const ipAddress = req.ip || req.headers['x-forwarded-for'] as string || null;
+    const ipAddress = req.ip || (req.headers['x-forwarded-for'] as string) || null;
 
     if (!eventName) {
       return res.status(400).json({ error: 'Event name is required' });
@@ -25,8 +25,8 @@ router.post('/events', async (req, res) => {
         eventName,
         pageUrl,
         userAgent,
-        ipAddress
-      }
+        ipAddress,
+      },
     });
 
     res.status(201).json({ message: 'Event tracked successfully' });
@@ -56,8 +56,8 @@ router.get('/users/:userId/events', authenticateToken, async (req, res) => {
         id: true,
         eventName: true,
         pageUrl: true,
-        createdAt: true
-      }
+        createdAt: true,
+      },
     });
 
     res.json({ events });
@@ -82,24 +82,21 @@ router.get('/stats', authenticateToken, async (req, res) => {
       where.eventName = eventName;
     }
 
-    const [
-      totalEvents,
-      uniqueUsers,
-      eventsByName,
-      eventsByDay
-    ] = await Promise.all([
+    const [totalEvents, uniqueUsers, eventsByName, eventsByDay] = await Promise.all([
       prisma.analyticsEvent.count({ where }),
-      prisma.analyticsEvent.findMany({
-        where: { ...where, userId: { not: null } },
-        distinct: ['userId'],
-        select: { userId: true }
-      }).then(users => users.length),
+      prisma.analyticsEvent
+        .findMany({
+          where: { ...where, userId: { not: null } },
+          distinct: ['userId'],
+          select: { userId: true },
+        })
+        .then((users) => users.length),
       prisma.analyticsEvent.groupBy({
         by: ['eventName'],
         where,
         _count: true,
         orderBy: { _count: { eventName: 'desc' } },
-        take: 20
+        take: 20,
       }),
       prisma.$queryRaw`
         SELECT DATE(created_at) as date, COUNT(*) as count
@@ -108,14 +105,14 @@ router.get('/stats', authenticateToken, async (req, res) => {
         GROUP BY DATE(created_at)
         ORDER BY date DESC
         LIMIT 30
-      `
+      `,
     ]);
 
     res.json({
       totalEvents,
       uniqueUsers,
       eventsByName,
-      eventsByDay
+      eventsByDay,
     });
   } catch (error) {
     logger.error('Error fetching analytics stats:', error);
@@ -142,26 +139,28 @@ router.get('/adoption', authenticateToken, async (req, res) => {
       'transcript_edited',
       'translation_edited',
       'voice_clone_created',
-      'project_completed'
+      'project_completed',
     ];
 
     const adoption = await Promise.all(
       featureEvents.map(async (eventName) => {
         const [totalEvents, uniqueUsers] = await Promise.all([
           prisma.analyticsEvent.count({
-            where: { ...where, eventName }
+            where: { ...where, eventName },
           }),
-          prisma.analyticsEvent.findMany({
-            where: { ...where, eventName, userId: { not: null } },
-            distinct: ['userId'],
-            select: { userId: true }
-          }).then(users => users.length)
+          prisma.analyticsEvent
+            .findMany({
+              where: { ...where, eventName, userId: { not: null } },
+              distinct: ['userId'],
+              select: { userId: true },
+            })
+            .then((users) => users.length),
         ]);
 
         return {
           feature: eventName,
           totalEvents,
-          uniqueUsers
+          uniqueUsers,
         };
       })
     );
@@ -191,20 +190,22 @@ router.get('/funnel', authenticateToken, async (req, res) => {
       { name: 'Created Project', event: 'project_created' },
       { name: 'Uploaded Video', event: 'video_uploaded' },
       { name: 'Edited Transcript', event: 'transcript_edited' },
-      { name: 'Completed Project', event: 'project_completed' }
+      { name: 'Completed Project', event: 'project_completed' },
     ];
 
     const funnel = await Promise.all(
       stages.map(async (stage) => {
-        const uniqueUsers = await prisma.analyticsEvent.findMany({
-          where: { ...where, eventName: stage.event, userId: { not: null } },
-          distinct: ['userId'],
-          select: { userId: true }
-        }).then(users => users.length);
+        const uniqueUsers = await prisma.analyticsEvent
+          .findMany({
+            where: { ...where, eventName: stage.event, userId: { not: null } },
+            distinct: ['userId'],
+            select: { userId: true },
+          })
+          .then((users) => users.length);
 
         return {
           stage: stage.name,
-          users: uniqueUsers
+          users: uniqueUsers,
         };
       })
     );

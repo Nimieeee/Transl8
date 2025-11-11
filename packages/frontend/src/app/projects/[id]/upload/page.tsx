@@ -38,10 +38,7 @@ export default function UploadPage() {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">Project not found</h2>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="btn-primary mt-4"
-            >
+            <button onClick={() => router.push('/dashboard')} className="btn-primary mt-4">
               Back to Dashboard
             </button>
           </div>
@@ -61,10 +58,7 @@ export default function UploadPage() {
                 <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
                 <p className="text-sm text-gray-600 mt-1">Upload your video</p>
               </div>
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="btn-secondary"
-              >
+              <button onClick={() => router.push('/dashboard')} className="btn-secondary">
                 Cancel
               </button>
             </div>
@@ -144,9 +138,7 @@ export default function UploadPage() {
 
           {/* Upload Component */}
           <div className="card">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">
-              Upload Video File
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Upload Video File</h2>
             <VideoUpload
               projectId={projectId}
               onUploadComplete={handleUploadComplete}
@@ -171,9 +163,7 @@ export default function UploadPage() {
                 />
               </svg>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800">
-                  Upload Requirements
-                </h3>
+                <h3 className="text-sm font-medium text-blue-800">Upload Requirements</h3>
                 <div className="mt-2 text-sm text-blue-700">
                   <ul className="list-disc list-inside space-y-1">
                     <li>Supported formats: MP4, MOV</li>

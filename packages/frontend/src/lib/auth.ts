@@ -20,11 +20,11 @@ export const authService = {
       email,
       password,
     });
-    
+
     // Store tokens from MVP response format
     localStorage.setItem('accessToken', response.data.tokens.accessToken);
     localStorage.setItem('refreshToken', response.data.tokens.refreshToken);
-    
+
     return response.data;
   },
 
@@ -33,11 +33,11 @@ export const authService = {
       email,
       password,
     });
-    
+
     // Store tokens from MVP response format
     localStorage.setItem('accessToken', response.data.tokens.accessToken);
     localStorage.setItem('refreshToken', response.data.tokens.refreshToken);
-    
+
     return response.data;
   },
 

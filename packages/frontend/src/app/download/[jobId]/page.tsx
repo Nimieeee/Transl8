@@ -40,9 +40,7 @@ export default function DownloadPage() {
         setError('');
       } catch (err: any) {
         console.error('Status fetch error:', err);
-        setError(
-          err.response?.data?.error?.message || 'Failed to fetch job status'
-        );
+        setError(err.response?.data?.error?.message || 'Failed to fetch job status');
       } finally {
         setIsLoading(false);
       }
@@ -69,9 +67,7 @@ export default function DownloadPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          errorData.error?.message || 'Failed to download video'
-        );
+        throw new Error(errorData.error?.message || 'Failed to download video');
       }
 
       // Get the blob from response
@@ -128,23 +124,15 @@ export default function DownloadPage() {
                 />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Your Video is Ready!
-            </h1>
-            <p className="text-gray-600">
-              Your video has been successfully dubbed to Spanish.
-            </p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Your Video is Ready!</h1>
+            <p className="text-gray-600">Your video has been successfully dubbed to Spanish.</p>
           </div>
 
           {error && (
             <div className="mb-6 rounded-md bg-red-50 p-4">
               <div className="flex">
                 <div className="flex-shrink-0">
-                  <svg
-                    className="h-5 w-5 text-red-400"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                  >
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                     <path
                       fillRule="evenodd"
                       d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -244,15 +232,11 @@ export default function DownloadPage() {
 
               {/* Job Details */}
               <div className="border-t border-gray-200 pt-6">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  Job Details
-                </h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Job Details</h3>
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Job ID</dt>
-                    <dd className="mt-1 text-sm text-gray-900 font-mono">
-                      {jobStatus.jobId}
-                    </dd>
+                    <dd className="mt-1 text-sm text-gray-900 font-mono">{jobStatus.jobId}</dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Status</dt>
@@ -263,18 +247,14 @@ export default function DownloadPage() {
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">
-                      Started At
-                    </dt>
+                    <dt className="text-sm font-medium text-gray-500">Started At</dt>
                     <dd className="mt-1 text-sm text-gray-900">
                       {new Date(jobStatus.createdAt).toLocaleString()}
                     </dd>
                   </div>
                   {jobStatus.completedAt && (
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">
-                        Completed At
-                      </dt>
+                      <dt className="text-sm font-medium text-gray-500">Completed At</dt>
                       <dd className="mt-1 text-sm text-gray-900">
                         {new Date(jobStatus.completedAt).toLocaleString()}
                       </dd>

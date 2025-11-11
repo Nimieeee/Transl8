@@ -13,17 +13,15 @@ export function initSentry(): void {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: process.env.NODE_ENV || 'development',
-    
+
     // Performance Monitoring
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-    
+
     // Profiling
     profilesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-    
-    integrations: [
-      new ProfilingIntegration(),
-    ],
-    
+
+    integrations: [new ProfilingIntegration()],
+
     // Filter out sensitive data
     beforeSend(event, hint) {
       return event;

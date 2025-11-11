@@ -26,10 +26,7 @@ export interface PerformanceMetrics {
  * Calculate lip-sync accuracy
  * Measures how well lip movements match audio
  */
-export function calculateSyncAccuracy(
-  videoPath: string,
-  audioPath: string
-): SyncAccuracyResult {
+export function calculateSyncAccuracy(videoPath: string, audioPath: string): SyncAccuracyResult {
   // Placeholder implementation
   // In production, this would:
   // 1. Extract lip movements from video frames
@@ -39,7 +36,7 @@ export function calculateSyncAccuracy(
 
   // For now, return mock scores
   const syncConfidence = 0.88 + Math.random() * 0.1; // 0.88-0.98
-  const temporalAlignment = 0.90 + Math.random() * 0.08; // 0.90-0.98
+  const temporalAlignment = 0.9 + Math.random() * 0.08; // 0.90-0.98
   const lipMovementAccuracy = 0.85 + Math.random() * 0.12; // 0.85-0.97
 
   return {
@@ -68,7 +65,7 @@ export function calculateFaceQuality(
   const psnr = 32 + Math.random() * 6; // 32-38 dB
   const ssim = 0.92 + Math.random() * 0.06; // 0.92-0.98
   const faceSharpness = 0.85 + Math.random() * 0.1; // 0.85-0.95
-  const artifactScore = 0.90 + Math.random() * 0.08; // 0.90-0.98 (higher is better)
+  const artifactScore = 0.9 + Math.random() * 0.08; // 0.90-0.98 (higher is better)
 
   return {
     psnr: Math.round(psnr * 100) / 100,
@@ -115,8 +112,7 @@ export function calculateQualityPerformanceTradeoff(
   const normalizedQuality = (syncAccuracy + faceQuality) / 2;
   const normalizedSpeed = Math.min(processingSpeed / 30, 1.0); // Normalize to 30 FPS
 
-  const tradeoffScore =
-    normalizedQuality * qualityWeight + normalizedSpeed * speedWeight;
+  const tradeoffScore = normalizedQuality * qualityWeight + normalizedSpeed * speedWeight;
 
   return {
     tradeoffScore: Math.round(tradeoffScore * 10000) / 10000,

@@ -20,14 +20,14 @@
             "thresholds": {
               "mode": "absolute",
               "steps": [
-                {"value": 0, "color": "red"},
-                {"value": 95, "color": "yellow"},
-                {"value": 99, "color": "green"}
+                { "value": 0, "color": "red" },
+                { "value": 95, "color": "yellow" },
+                { "value": 99, "color": "green" }
               ]
             }
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 }
       },
       {
         "id": 2,
@@ -42,12 +42,12 @@
         "fieldConfig": {
           "defaults": {
             "mappings": [
-              {"value": 0, "text": "Down", "color": "red"},
-              {"value": 1, "text": "Up", "color": "green"}
+              { "value": 0, "text": "Down", "color": "red" },
+              { "value": 1, "text": "Up", "color": "green" }
             ]
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 4, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }
       },
       {
         "id": 3,
@@ -62,12 +62,12 @@
         "fieldConfig": {
           "defaults": {
             "mappings": [
-              {"value": 0, "text": "Down", "color": "red"},
-              {"value": 1, "text": "Up", "color": "green"}
+              { "value": 0, "text": "Down", "color": "red" },
+              { "value": 1, "text": "Up", "color": "green" }
             ]
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 }
       },
       {
         "id": 4,
@@ -82,12 +82,12 @@
         "fieldConfig": {
           "defaults": {
             "mappings": [
-              {"value": 0, "text": "Down", "color": "red"},
-              {"value": 1, "text": "Up", "color": "green"}
+              { "value": 0, "text": "Down", "color": "red" },
+              { "value": 1, "text": "Up", "color": "green" }
             ]
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 }
       },
       {
         "id": 5,
@@ -99,7 +99,7 @@
             "legendFormat": "Connections"
           }
         ],
-        "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 }
       },
       {
         "id": 6,
@@ -111,10 +111,8 @@
             "legendFormat": "{{method}}"
           }
         ],
-        "yaxes": [
-          {"format": "reqps", "label": "Requests/sec"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+        "yaxes": [{ "format": "reqps", "label": "Requests/sec" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
       },
       {
         "id": 7,
@@ -126,10 +124,8 @@
             "legendFormat": "{{path}}"
           }
         ],
-        "yaxes": [
-          {"format": "ms", "label": "Response Time"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+        "yaxes": [{ "format": "ms", "label": "Response Time" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 }
       },
       {
         "id": 8,
@@ -141,10 +137,8 @@
             "legendFormat": "{{path}} ({{status}})"
           }
         ],
-        "yaxes": [
-          {"format": "reqps", "label": "Errors/sec"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}
+        "yaxes": [{ "format": "reqps", "label": "Errors/sec" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
       },
       {
         "id": 9,
@@ -160,7 +154,7 @@
             "legendFormat": "Max Connections"
           }
         ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
       },
       {
         "id": 10,
@@ -172,10 +166,8 @@
             "legendFormat": "Memory Usage %"
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
       },
       {
         "id": 11,
@@ -187,10 +179,8 @@
             "legendFormat": "{{container}}"
           }
         ],
-        "yaxes": [
-          {"format": "percent"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+        "yaxes": [{ "format": "percent" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
       },
       {
         "id": 12,
@@ -202,10 +192,8 @@
             "legendFormat": "{{container}}"
           }
         ],
-        "yaxes": [
-          {"format": "decmbytes", "label": "Memory (MB)"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28}
+        "yaxes": [{ "format": "decmbytes", "label": "Memory (MB)" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 }
       },
       {
         "id": 13,
@@ -217,10 +205,8 @@
             "legendFormat": "{{mountpoint}}"
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28}
+        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 }
       }
     ],
     "refresh": "30s",

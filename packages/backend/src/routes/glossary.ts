@@ -1,10 +1,10 @@
 /**
  * Glossary Management Routes
- * 
+ *
  * API endpoints for managing custom translation glossary terms.
  * Users can define custom translations for specific terms that will be
  * applied during the MT stage.
- * 
+ *
  * Requirements: 3.2
  */
 
@@ -17,7 +17,7 @@ const prisma = new PrismaClient();
 
 /**
  * GET /api/glossary
- * 
+ *
  * Get all glossary terms for the authenticated user
  * Optional filters: sourceLanguage, targetLanguage
  */
@@ -38,11 +38,7 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
 
     const glossaryTerms = await prisma.glossary.findMany({
       where,
-      orderBy: [
-        { sourceLanguage: 'asc' },
-        { targetLanguage: 'asc' },
-        { sourceTerm: 'asc' },
-      ],
+      orderBy: [{ sourceLanguage: 'asc' }, { targetLanguage: 'asc' }, { sourceTerm: 'asc' }],
     });
 
     res.json({
@@ -57,7 +53,7 @@ router.get('/', authenticateToken, async (req: Request, res: Response) => {
 
 /**
  * GET /api/glossary/:id
- * 
+ *
  * Get a specific glossary term by ID
  */
 router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
@@ -85,9 +81,9 @@ router.get('/:id', authenticateToken, async (req: Request, res: Response) => {
 
 /**
  * POST /api/glossary
- * 
+ *
  * Create a new glossary term
- * 
+ *
  * Body:
  * {
  *   "sourceLanguage": "en",
@@ -159,9 +155,9 @@ router.post('/', authenticateToken, async (req: Request, res: Response) => {
 
 /**
  * PUT /api/glossary/:id
- * 
+ *
  * Update an existing glossary term
- * 
+ *
  * Body:
  * {
  *   "targetTerm": "Nueva traducción"
@@ -209,7 +205,7 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
 
 /**
  * DELETE /api/glossary/:id
- * 
+ *
  * Delete a glossary term
  */
 router.delete('/:id', authenticateToken, async (req: Request, res: Response) => {
@@ -243,9 +239,9 @@ router.delete('/:id', authenticateToken, async (req: Request, res: Response) => 
 
 /**
  * POST /api/glossary/batch
- * 
+ *
  * Create multiple glossary terms at once
- * 
+ *
  * Body:
  * {
  *   "terms": [
@@ -319,9 +315,9 @@ router.post('/batch', authenticateToken, async (req: Request, res: Response) => 
 
 /**
  * DELETE /api/glossary/batch
- * 
+ *
  * Delete multiple glossary terms at once
- * 
+ *
  * Body:
  * {
  *   "ids": ["uuid1", "uuid2", ...]

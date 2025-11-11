@@ -8,34 +8,28 @@ export const corsOptions: CorsOptions = {
   // Allow requests from frontend origin
   origin: (origin, callback) => {
     const allowedOrigins = getAllowedOrigins();
-    
+
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) {
       return callback(null, true);
     }
-    
+
     if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
     }
   },
-  
+
   // Allow credentials (cookies, authorization headers)
   credentials: true,
-  
+
   // Allowed HTTP methods
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  
+
   // Allowed headers
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Requested-With',
-    'Accept',
-    'Origin',
-  ],
-  
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+
   // Exposed headers (accessible to the client)
   exposedHeaders: [
     'Content-Length',
@@ -45,10 +39,10 @@ export const corsOptions: CorsOptions = {
     'RateLimit-Remaining',
     'RateLimit-Reset',
   ],
-  
+
   // Preflight cache duration (in seconds)
   maxAge: 86400, // 24 hours
-  
+
   // Success status for preflight requests
   optionsSuccessStatus: 204,
 };
@@ -58,13 +52,13 @@ export const corsOptions: CorsOptions = {
  */
 function getAllowedOrigins(): string[] {
   const env = process.env.NODE_ENV || 'development';
-  
+
   // Production: Only allow specific domains
   if (env === 'production') {
     const origins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-    return origins.map(origin => origin.trim());
+    return origins.map((origin) => origin.trim());
   }
-  
+
   // Staging: Allow staging domains
   if (env === 'staging') {
     return [
@@ -72,7 +66,7 @@ function getAllowedOrigins(): string[] {
       'https://staging-admin.example.com',
     ];
   }
-  
+
   // Development: Allow localhost and local network
   return [
     'http://localhost:3000',
@@ -80,10 +74,7 @@ function getAllowedOrigins(): string[] {
     'http://127.0.0.1:3000',
     'http://127.0.0.1:3001',
     // Allow local network access for mobile testing
-    ...(process.env.LOCAL_NETWORK_IP 
-      ? [`http://${process.env.LOCAL_NETWORK_IP}:3000`] 
-      : []
-    ),
+    ...(process.env.LOCAL_NETWORK_IP ? [`http://${process.env.LOCAL_NETWORK_IP}:3000`] : []),
   ];
 }
 

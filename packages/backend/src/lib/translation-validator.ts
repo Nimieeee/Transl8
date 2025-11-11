@@ -1,6 +1,6 @@
 /**
  * Translation Validator
- * 
+ *
  * Validates translations using heuristic checks and LLM-as-Judge.
  */
 
@@ -187,7 +187,7 @@ export class TranslationValidator {
     passRate: number;
   } {
     const total = results.length;
-    const passed = results.filter(r => r.isValid).length;
+    const passed = results.filter((r) => r.isValid).length;
     const failed = total - passed;
     const passRate = total > 0 ? (passed / total) * 100 : 0;
 

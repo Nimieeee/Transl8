@@ -40,11 +40,7 @@ interface TTSBenchmarkResult extends BenchmarkResult {
 /**
  * Run TTS inference on a test case
  */
-async function runTTSInference(
-  text: string,
-  language: string,
-  voiceConfig: any
-): Promise<string> {
+async function runTTSInference(text: string, language: string, voiceConfig: any): Promise<string> {
   try {
     const response = await axios.post(
       `${API_BASE_URL}/api/models/tts/synthesize`,
@@ -60,10 +56,7 @@ async function runTTSInference(
     );
 
     // Save audio to temp file
-    const tempPath = path.join(
-      RESULTS_DIR,
-      `temp_${Date.now()}_${Math.random()}.wav`
-    );
+    const tempPath = path.join(RESULTS_DIR, `temp_${Date.now()}_${Math.random()}.wav`);
     fs.writeFileSync(tempPath, response.data);
 
     return tempPath;
@@ -88,35 +81,21 @@ async function benchmarkTestCase(testCase: any): Promise<TTSBenchmarkResult> {
       : { type: 'preset', voiceId: 'default' };
 
     // Run TTS inference
-    const generatedAudioPath = await runTTSInference(
-      testCase.text,
-      testCase.language,
-      voiceConfig
-    );
+    const generatedAudioPath = await runTTSInference(testCase.text, testCase.language, voiceConfig);
 
     const processingTime = (Date.now() - startTime) / 1000;
 
     // Calculate MOS
-    const mosResult = calculateMOS(
-      generatedAudioPath,
-      testCase.text,
-      testCase.expectedDuration
-    );
+    const mosResult = calculateMOS(generatedAudioPath, testCase.text, testCase.expectedDuration);
 
     // Calculate voice similarity if voice clone
     let similarityResult: SimilarityResult | undefined;
     if (testCase.voiceCloneSamplePath && testCase.referenceAudioPath) {
-      similarityResult = calculateVoiceSimilarity(
-        generatedAudioPath,
-        testCase.referenceAudioPath
-      );
+      similarityResult = calculateVoiceSimilarity(generatedAudioPath, testCase.referenceAudioPath);
     }
 
     // Calculate emotion accuracy
-    const emotionResult = calculateEmotionAccuracy(
-      generatedAudioPath,
-      testCase.emotionalTone
-    );
+    const emotionResult = calculateEmotionAccuracy(generatedAudioPath, testCase.emotionalTone);
 
     // Calculate audio quality
     const audioQuality = calculateAudioQuality(generatedAudioPath);
@@ -183,9 +162,7 @@ async function benchmarkTestCase(testCase: any): Promise<TTSBenchmarkResult> {
 /**
  * Calculate aggregate metrics
  */
-function calculateAggregateMetrics(
-  results: TTSBenchmarkResult[]
-): Record<string, number> {
+function calculateAggregateMetrics(results: TTSBenchmarkResult[]): Record<string, number> {
   const successfulResults = results.filter((r) => r.success);
 
   if (successfulResults.length === 0) {
@@ -194,35 +171,28 @@ function calculateAggregateMetrics(
 
   // Average MOS
   const avgMOS =
-    successfulResults.reduce((sum, r) => sum + (r.metrics.mos || 0), 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.mos || 0), 0) / successfulResults.length;
 
   // Average voice similarity (for clones)
   const cloneResults = successfulResults.filter((r) => r.isVoiceClone);
   const avgSimilarity =
     cloneResults.length > 0
-      ? cloneResults.reduce((sum, r) => sum + (r.metrics.similarity || 0), 0) /
-        cloneResults.length
+      ? cloneResults.reduce((sum, r) => sum + (r.metrics.similarity || 0), 0) / cloneResults.length
       : 0;
 
   // Average emotion accuracy
   const avgEmotionAccuracy =
-    successfulResults.reduce(
-      (sum, r) => sum + (r.metrics.emotionAccuracy || 0),
-      0
-    ) / successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.emotionAccuracy || 0), 0) /
+    successfulResults.length;
 
   // Average pronunciation accuracy
   const avgPronunciation =
-    successfulResults.reduce(
-      (sum, r) => sum + (r.metrics.pronunciationAccuracy || 0),
-      0
-    ) / successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.pronunciationAccuracy || 0), 0) /
+    successfulResults.length;
 
   // Average audio quality
   const avgSNR =
-    successfulResults.reduce((sum, r) => sum + (r.metrics.snr || 0), 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.snr || 0), 0) / successfulResults.length;
 
   // MOS by language
   const languages = [...new Set(successfulResults.map((r) => r.language))];
@@ -231,8 +201,7 @@ function calculateAggregateMetrics(
   languages.forEach((lang) => {
     const langResults = successfulResults.filter((r) => r.language === lang);
     mosByLanguage[lang] =
-      langResults.reduce((sum, r) => sum + (r.metrics.mos || 0), 0) /
-      langResults.length;
+      langResults.reduce((sum, r) => sum + (r.metrics.mos || 0), 0) / langResults.length;
   });
 
   // MOS by emotional tone
@@ -242,14 +211,12 @@ function calculateAggregateMetrics(
   tones.forEach((tone) => {
     const toneResults = successfulResults.filter((r) => r.emotionalTone === tone);
     mosByTone[tone] =
-      toneResults.reduce((sum, r) => sum + (r.metrics.mos || 0), 0) /
-      toneResults.length;
+      toneResults.reduce((sum, r) => sum + (r.metrics.mos || 0), 0) / toneResults.length;
   });
 
   // Average processing time
   const avgProcessingTime =
-    successfulResults.reduce((sum, r) => sum + r.processingTime, 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + r.processingTime, 0) / successfulResults.length;
 
   return {
     averageMOS: Math.round(avgMOS * 100) / 100,
@@ -258,30 +225,20 @@ function calculateAggregateMetrics(
     averagePronunciation: Math.round(avgPronunciation * 100) / 100,
     averageSNR: Math.round(avgSNR * 100) / 100,
     ...Object.fromEntries(
-      Object.entries(mosByLanguage).map(([k, v]) => [
-        `mos_${k}`,
-        Math.round(v * 100) / 100,
-      ])
+      Object.entries(mosByLanguage).map(([k, v]) => [`mos_${k}`, Math.round(v * 100) / 100])
     ),
     ...Object.fromEntries(
-      Object.entries(mosByTone).map(([k, v]) => [
-        `mos_${k}`,
-        Math.round(v * 100) / 100,
-      ])
+      Object.entries(mosByTone).map(([k, v]) => [`mos_${k}`, Math.round(v * 100) / 100])
     ),
     averageProcessingTime: Math.round(avgProcessingTime * 100) / 100,
-    successRate:
-      Math.round((successfulResults.length / results.length) * 10000) / 100,
+    successRate: Math.round((successfulResults.length / results.length) * 10000) / 100,
   };
 }
 
 /**
  * Generate summary with commercial comparison
  */
-function generateSummary(
-  aggregateMetrics: Record<string, number>,
-  totalCases: number
-): string {
+function generateSummary(aggregateMetrics: Record<string, number>, totalCases: number): string {
   const languageMetrics = Object.entries(aggregateMetrics)
     .filter(([k]) => k.startsWith('mos_') && k.length === 6) // Language codes
     .map(([k, v]) => `  - ${k.replace('mos_', '')}: ${v}/5.0`)
@@ -301,8 +258,7 @@ function generateSummary(
 
   const comparisonText = commercialComparisons
     .map(
-      (c) =>
-        `  - ${c.service}: ${c.theirMOS}/5.0 (${c.difference >= 0 ? '+' : ''}${c.difference})`
+      (c) => `  - ${c.service}: ${c.theirMOS}/5.0 (${c.difference >= 0 ? '+' : ''}${c.difference})`
     )
     .join('\n');
 

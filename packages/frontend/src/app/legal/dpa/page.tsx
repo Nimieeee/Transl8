@@ -65,38 +65,46 @@ export default function DPAPage() {
 
             {Object.entries(dpa.content).map(([key, section]: [string, any]) => {
               if (key === 'introduction') return null;
-              
+
               return (
                 <section key={key} className="mb-8">
                   <h2 className="text-2xl font-semibold mb-4">{section.title}</h2>
-                  
+
                   {section.description && (
                     <p className="text-gray-700 mb-4">{section.description}</p>
                   )}
-                  
+
                   {section.items && Array.isArray(section.items) && (
                     <ul className="list-disc pl-6 space-y-2">
                       {section.items.map((item: string, index: number) => (
-                        <li key={index} className="text-gray-700">{item}</li>
+                        <li key={index} className="text-gray-700">
+                          {item}
+                        </li>
                       ))}
                     </ul>
                   )}
-                  
-                  {section.items && typeof section.items === 'object' && !Array.isArray(section.items) && (
-                    <div className="space-y-4">
-                      {Object.entries(section.items).map(([itemKey, itemValue]: [string, any]) => (
-                        <div key={itemKey} className="ml-4">
-                          <strong className="text-gray-900">{itemKey}:</strong>
-                          <span className="text-gray-700"> {itemValue}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  
+
+                  {section.items &&
+                    typeof section.items === 'object' &&
+                    !Array.isArray(section.items) && (
+                      <div className="space-y-4">
+                        {Object.entries(section.items).map(
+                          ([itemKey, itemValue]: [string, any]) => (
+                            <div key={itemKey} className="ml-4">
+                              <strong className="text-gray-900">{itemKey}:</strong>
+                              <span className="text-gray-700"> {itemValue}</span>
+                            </div>
+                          )
+                        )}
+                      </div>
+                    )}
+
                   {section.list && (
                     <ul className="list-disc pl-6 space-y-2 mt-4">
                       {section.list.map((item: string, index: number) => (
-                        <li key={index} className="text-gray-700">{item}</li>
+                        <li key={index} className="text-gray-700">
+                          {item}
+                        </li>
                       ))}
                     </ul>
                   )}

@@ -20,7 +20,7 @@
             "decimals": 0
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 0, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 0, "y": 0 }
       },
       {
         "id": 2,
@@ -38,7 +38,7 @@
             "decimals": 0
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 4, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 4, "y": 0 }
       },
       {
         "id": 3,
@@ -56,7 +56,7 @@
             "decimals": 0
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 8, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 8, "y": 0 }
       },
       {
         "id": 4,
@@ -74,7 +74,7 @@
             "decimals": 0
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 12, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 }
       },
       {
         "id": 5,
@@ -93,14 +93,14 @@
             "thresholds": {
               "mode": "absolute",
               "steps": [
-                {"value": 0, "color": "red"},
-                {"value": 5, "color": "yellow"},
-                {"value": 10, "color": "green"}
+                { "value": 0, "color": "red" },
+                { "value": 5, "color": "yellow" },
+                { "value": 10, "color": "green" }
               ]
             }
           }
         },
-        "gridPos": {"h": 4, "w": 4, "x": 16, "y": 0}
+        "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 }
       },
       {
         "id": 6,
@@ -112,10 +112,8 @@
             "legendFormat": "DAU"
           }
         ],
-        "yaxes": [
-          {"format": "short", "label": "Users"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 4}
+        "yaxes": [{ "format": "short", "label": "Users" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 }
       },
       {
         "id": 7,
@@ -127,10 +125,8 @@
             "legendFormat": "Projects"
           }
         ],
-        "yaxes": [
-          {"format": "short", "label": "Projects"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 4}
+        "yaxes": [{ "format": "short", "label": "Projects" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 }
       },
       {
         "id": 8,
@@ -142,7 +138,7 @@
             "legendFormat": "{{tier}}"
           }
         ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 12}
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 12 }
       },
       {
         "id": 9,
@@ -154,10 +150,8 @@
             "legendFormat": "{{tier}}"
           }
         ],
-        "yaxes": [
-          {"format": "short", "label": "Minutes/hour"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 12}
+        "yaxes": [{ "format": "short", "label": "Minutes/hour" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 12 }
       },
       {
         "id": 10,
@@ -169,10 +163,8 @@
             "legendFormat": "{{from_tier}} → {{to_tier}}"
           }
         ],
-        "yaxes": [
-          {"format": "short", "label": "Conversions"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 20}
+        "yaxes": [{ "format": "short", "label": "Conversions" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 20 }
       },
       {
         "id": 11,
@@ -184,10 +176,8 @@
             "legendFormat": "{{tier}}"
           }
         ],
-        "yaxes": [
-          {"format": "short", "label": "Cancellations"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 20}
+        "yaxes": [{ "format": "short", "label": "Cancellations" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 20 }
       },
       {
         "id": 12,
@@ -199,10 +189,8 @@
             "legendFormat": "Voice Clones"
           }
         ],
-        "yaxes": [
-          {"format": "short", "label": "Clones"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 28}
+        "yaxes": [{ "format": "short", "label": "Clones" }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 }
       },
       {
         "id": 13,
@@ -214,10 +202,8 @@
             "legendFormat": "{{path}}"
           }
         ],
-        "yaxes": [
-          {"format": "reqps", "label": "Requests/sec"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 28}
+        "yaxes": [{ "format": "reqps", "label": "Requests/sec" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 28 }
       },
       {
         "id": 14,
@@ -229,10 +215,8 @@
             "legendFormat": "Retention %"
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 36}
+        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 36 }
       },
       {
         "id": 15,
@@ -244,10 +228,8 @@
             "legendFormat": "Avg Time"
           }
         ],
-        "yaxes": [
-          {"format": "s", "label": "Duration"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 36}
+        "yaxes": [{ "format": "s", "label": "Duration" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 36 }
       }
     ],
     "refresh": "1m",

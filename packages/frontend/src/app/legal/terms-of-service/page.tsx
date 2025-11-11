@@ -65,35 +65,49 @@ export default function TermsOfServicePage() {
             <p className="text-gray-700 mb-6">{terms.content.introduction}</p>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">{terms.content.serviceDescription.title}</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                {terms.content.serviceDescription.title}
+              </h2>
               <p className="text-gray-700">{terms.content.serviceDescription.description}</p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">{terms.content.userResponsibilities.title}</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                {terms.content.userResponsibilities.title}
+              </h2>
               <ul className="list-disc pl-6 space-y-2">
                 {terms.content.userResponsibilities.items.map((item: string, index: number) => (
-                  <li key={index} className="text-gray-700">{item}</li>
+                  <li key={index} className="text-gray-700">
+                    {item}
+                  </li>
                 ))}
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">{terms.content.contentOwnership.title}</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                {terms.content.contentOwnership.title}
+              </h2>
               <p className="text-gray-700">{terms.content.contentOwnership.description}</p>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">{terms.content.subscriptionTerms.title}</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                {terms.content.subscriptionTerms.title}
+              </h2>
               <ul className="list-disc pl-6 space-y-2">
                 {terms.content.subscriptionTerms.items.map((item: string, index: number) => (
-                  <li key={index} className="text-gray-700">{item}</li>
+                  <li key={index} className="text-gray-700">
+                    {item}
+                  </li>
                 ))}
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold mb-4">{terms.content.serviceAvailability.title}</h2>
+              <h2 className="text-2xl font-semibold mb-4">
+                {terms.content.serviceAvailability.title}
+              </h2>
               <p className="text-gray-700">{terms.content.serviceAvailability.description}</p>
             </section>
 
@@ -106,7 +120,9 @@ export default function TermsOfServicePage() {
               <h2 className="text-2xl font-semibold mb-4">{terms.content.disclaimers.title}</h2>
               <ul className="list-disc pl-6 space-y-2">
                 {terms.content.disclaimers.items.map((item: string, index: number) => (
-                  <li key={index} className="text-gray-700">{item}</li>
+                  <li key={index} className="text-gray-700">
+                    {item}
+                  </li>
                 ))}
               </ul>
             </section>

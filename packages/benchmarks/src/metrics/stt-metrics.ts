@@ -58,10 +58,7 @@ export function calculateDER(
   hypothesisSegments: Array<{ start: number; end: number; speaker: string }>
 ): DERResult {
   // Calculate total speech time from reference
-  const totalSpeechTime = referenceSegments.reduce(
-    (sum, seg) => sum + (seg.end - seg.start),
-    0
-  );
+  const totalSpeechTime = referenceSegments.reduce((sum, seg) => sum + (seg.end - seg.start), 0);
 
   let missedSpeech = 0;
   let falseAlarm = 0;
@@ -91,9 +88,7 @@ export function calculateDER(
   }
 
   const der =
-    totalSpeechTime > 0
-      ? (missedSpeech + falseAlarm + speakerError) / totalSpeechTime
-      : 0;
+    totalSpeechTime > 0 ? (missedSpeech + falseAlarm + speakerError) / totalSpeechTime : 0;
 
   return {
     der: Math.round(der * 10000) / 100, // Percentage
@@ -107,12 +102,8 @@ export function calculateDER(
 /**
  * Calculate average confidence score
  */
-export function calculateAverageConfidence(
-  segments: Array<{ confidence?: number }>
-): number {
-  const confidences = segments
-    .map((s) => s.confidence)
-    .filter((c): c is number => c !== undefined);
+export function calculateAverageConfidence(segments: Array<{ confidence?: number }>): number {
+  const confidences = segments.map((s) => s.confidence).filter((c): c is number => c !== undefined);
 
   if (confidences.length === 0) return 0;
 

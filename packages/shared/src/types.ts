@@ -81,8 +81,21 @@ export interface VoiceConfig {
 }
 
 // Context Map types
-export type EmotionTag = 'neutral' | 'happy' | 'sad' | 'angry' | 'excited' | 'fearful' | 'surprised' | 'disgusted';
-export type SegmentStatus = 'pending' | 'success' | 'failed_adaptation' | 'failed_tts' | 'failed_vocal_isolation';
+export type EmotionTag =
+  | 'neutral'
+  | 'happy'
+  | 'sad'
+  | 'angry'
+  | 'excited'
+  | 'fearful'
+  | 'surprised'
+  | 'disgusted';
+export type SegmentStatus =
+  | 'pending'
+  | 'success'
+  | 'failed_adaptation'
+  | 'failed_tts'
+  | 'failed_vocal_isolation';
 
 export interface ContextMapSegment {
   id: number;

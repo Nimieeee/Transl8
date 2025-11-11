@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
     cb(null, UPLOADS_DIR);
   },
   filename: (_req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
     cb(null, `${uniqueSuffix}-${file.originalname}`);
   },
 });
@@ -34,14 +34,14 @@ const upload = multer({
     // Accept MP4, MOV, MKV, and AVI files
     const allowedMimeTypes = [
       'video/mp4',
-      'video/quicktime',      // .mov
-      'video/x-matroska',     // .mkv
-      'video/x-msvideo',      // .avi
+      'video/quicktime', // .mov
+      'video/x-matroska', // .mkv
+      'video/x-msvideo', // .avi
     ];
-    
+
     const allowedExtensions = ['.mp4', '.mov', '.mkv', '.avi'];
     const fileExtension = path.extname(file.originalname).toLowerCase();
-    
+
     if (allowedMimeTypes.includes(file.mimetype) || allowedExtensions.includes(fileExtension)) {
       cb(null, true);
     } else {
@@ -96,7 +96,7 @@ router.post('/upload', upload.single('video'), async (req: Request, res: Respons
     if (sourceLanguage !== 'en' || !supportedTargets.includes(targetLanguage)) {
       // Clean up uploaded file
       fs.unlinkSync(req.file.path);
-      
+
       res.status(400).json({
         error: {
           code: 'INVALID_LANGUAGE',
@@ -137,7 +137,7 @@ router.post('/upload', upload.single('video'), async (req: Request, res: Respons
     });
   } catch (error) {
     console.error('Upload error:', error);
-    
+
     // Clean up uploaded file if it exists
     if (req.file && fs.existsSync(req.file.path)) {
       try {
@@ -281,19 +281,19 @@ router.get('/download/:jobId', async (req: Request, res: Response) => {
 
     // Resolve output file path (workers store in their temp directory)
     let outputFilePath = job.outputFile;
-    
+
     // If path is relative, check both backend and workers temp directories
     if (!path.isAbsolute(outputFilePath)) {
       const backendPath = path.join(process.cwd(), outputFilePath);
       const workersPath = path.join(process.cwd(), '..', 'workers', outputFilePath);
-      
+
       if (fs.existsSync(backendPath)) {
         outputFilePath = backendPath;
       } else if (fs.existsSync(workersPath)) {
         outputFilePath = workersPath;
       }
     }
-    
+
     // Check if output file exists on filesystem
     if (!fs.existsSync(outputFilePath)) {
       res.status(404).json({
@@ -318,7 +318,7 @@ router.get('/download/:jobId', async (req: Request, res: Response) => {
 
     // Stream video file to client
     const fileStream = fs.createReadStream(outputFilePath);
-    
+
     fileStream.on('error', (error) => {
       console.error('File stream error:', error);
       if (!res.headersSent) {

@@ -3,12 +3,12 @@
  * These extend Prisma types with application-specific types
  */
 
-import { 
-  User, 
-  Project, 
-  Transcript, 
-  Translation, 
-  VoiceClone, 
+import {
+  User,
+  Project,
+  Transcript,
+  Translation,
+  VoiceClone,
   Job,
   Glossary,
   SubscriptionTier,
@@ -198,13 +198,16 @@ export interface CreateGlossaryData {
 }
 
 // Subscription tier limits
-export const SUBSCRIPTION_LIMITS: Record<SubscriptionTier, {
-  processingMinutes: number;
-  voiceCloneSlots: number;
-  hasWatermark: boolean;
-  hasLipSync: boolean;
-  priority: number;
-}> = {
+export const SUBSCRIPTION_LIMITS: Record<
+  SubscriptionTier,
+  {
+    processingMinutes: number;
+    voiceCloneSlots: number;
+    hasWatermark: boolean;
+    hasLipSync: boolean;
+    priority: number;
+  }
+> = {
   FREE: {
     processingMinutes: 10,
     voiceCloneSlots: 0,
@@ -236,13 +239,7 @@ export const SUBSCRIPTION_LIMITS: Record<SubscriptionTier, {
 };
 
 // Pipeline stage order
-export const PIPELINE_STAGES: JobStage[] = [
-  'STT',
-  'MT',
-  'TTS',
-  'MUXING',
-  'LIPSYNC',
-];
+export const PIPELINE_STAGES: JobStage[] = ['STT', 'MT', 'TTS', 'MUXING', 'LIPSYNC'];
 
 // Helper function to get next stage
 export function getNextStage(currentStage: JobStage): JobStage | null {

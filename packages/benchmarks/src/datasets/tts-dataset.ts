@@ -52,13 +52,7 @@ export class TTSDatasetBuilder {
     }>
   ): void {
     cases.forEach((tc) => {
-      this.addTestCase(
-        tc.text,
-        tc.language,
-        'neutral',
-        tc.referencePath,
-        tc.samplePath
-      );
+      this.addTestCase(tc.text, tc.language, 'neutral', tc.referencePath, tc.samplePath);
     });
   }
 
@@ -138,11 +132,7 @@ export function createSampleTTSDataset(): BenchmarkDataset<TTSTestCase> {
     'neutral'
   );
 
-  builder.addTestCase(
-    'The quick brown fox jumps over the lazy dog.',
-    'en',
-    'neutral'
-  );
+  builder.addTestCase('The quick brown fox jumps over the lazy dog.', 'en', 'neutral');
 
   builder.addTestCase(
     'Artificial intelligence is revolutionizing content creation.',
@@ -190,17 +180,9 @@ export function createSampleTTSDataset(): BenchmarkDataset<TTSTestCase> {
   );
 
   // Multi-language cases
-  builder.addTestCase(
-    'Bienvenido a nuestra plataforma de doblaje de video.',
-    'es',
-    'neutral'
-  );
+  builder.addTestCase('Bienvenido a nuestra plataforma de doblaje de video.', 'es', 'neutral');
 
-  builder.addTestCase(
-    'Bienvenue sur notre plateforme de doublage vidéo.',
-    'fr',
-    'neutral'
-  );
+  builder.addTestCase('Bienvenue sur notre plateforme de doublage vidéo.', 'fr', 'neutral');
 
   return builder.build();
 }

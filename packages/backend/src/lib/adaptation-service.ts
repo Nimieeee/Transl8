@@ -1,6 +1,6 @@
 /**
  * Adaptation Service
- * 
+ *
  * Orchestrates the intelligent translation adaptation process with retry logic.
  */
 
@@ -74,16 +74,12 @@ export class AdaptationService {
         }
 
         // Validation failed
-        logger.debug(
-          `Validation failed for segment ${segment.id}: ${validationResult.feedback}`
-        );
+        logger.debug(`Validation failed for segment ${segment.id}: ${validationResult.feedback}`);
         previousFeedback = validationResult.feedback;
 
         // If this was the last attempt, return failure
         if (attempt === maxRetries) {
-          logger.warn(
-            `Segment ${segment.id} failed adaptation after ${maxRetries + 1} attempts`
-          );
+          logger.warn(`Segment ${segment.id} failed adaptation after ${maxRetries + 1} attempts`);
 
           return {
             adaptedText: finalTranslation,
@@ -198,7 +194,7 @@ export class AdaptationService {
     averageAttempts: number;
   } {
     const total = results.length;
-    const successful = results.filter(r => r.status === 'success').length;
+    const successful = results.filter((r) => r.status === 'success').length;
     const failed = total - successful;
     const successRate = total > 0 ? (successful / total) * 100 : 0;
 

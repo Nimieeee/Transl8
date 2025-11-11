@@ -1,9 +1,9 @@
 /**
  * OpenAI Whisper API Adapter
- * 
+ *
  * Uses OpenAI's Whisper API for speech-to-text transcription
  * instead of running a local Whisper model.
- * 
+ *
  * Note: OpenAI Whisper API does not support speaker diarization.
  * All segments will be labeled as SPEAKER_00.
  */
@@ -114,7 +114,7 @@ export class OpenAIWhisperAdapter extends STTAdapter {
         const rawSegments: any[] = [];
         for (let i = 0; i < response.segments.length; i++) {
           const segment: any = response.segments[i];
-          
+
           // Process word timings if available
           const words: WordTiming[] | undefined = segment.words?.map((word: any) => ({
             word: word.word,
@@ -186,7 +186,7 @@ export class OpenAIWhisperAdapter extends STTAdapter {
     try {
       // Simple check to see if we can access the API
       await this.client.models.retrieve('whisper-1');
-      
+
       return {
         healthy: true,
         latency: Date.now() - startTime,

@@ -1,7 +1,11 @@
 import { prisma } from '../../setup';
 import { createTestUser } from '../../fixtures/users';
 import { createTestProject } from '../../fixtures/projects';
-import { MockWhisperPyannoteAdapter, FailingSTTAdapter, LowConfidenceSTTAdapter } from '../../mocks/adapters';
+import {
+  MockWhisperPyannoteAdapter,
+  FailingSTTAdapter,
+  LowConfidenceSTTAdapter,
+} from '../../mocks/adapters';
 
 describe('STT Worker Unit Tests', () => {
   describe('Transcription with Mock Adapter', () => {
@@ -42,9 +46,9 @@ describe('STT Worker Unit Tests', () => {
     it('should handle STT service failure', async () => {
       const adapter = new FailingSTTAdapter();
 
-      await expect(
-        adapter.transcribe('/tmp/test-audio.wav', 'en')
-      ).rejects.toThrow('STT service unavailable');
+      await expect(adapter.transcribe('/tmp/test-audio.wav', 'en')).rejects.toThrow(
+        'STT service unavailable'
+      );
     });
 
     it('should report unhealthy status on failure', async () => {
@@ -60,10 +64,9 @@ describe('STT Worker Unit Tests', () => {
       const adapter = new LowConfidenceSTTAdapter();
       const result = await adapter.transcribe('/tmp/low-quality.wav', 'en');
 
-      const avgConfidence = result.segments.reduce(
-        (sum: number, s: any) => sum + s.confidence,
-        0
-      ) / result.segments.length;
+      const avgConfidence =
+        result.segments.reduce((sum: number, s: any) => sum + s.confidence, 0) /
+        result.segments.length;
 
       expect(avgConfidence).toBeLessThan(0.7);
     });
@@ -72,9 +75,7 @@ describe('STT Worker Unit Tests', () => {
       const adapter = new LowConfidenceSTTAdapter();
       const result = await adapter.transcribe('/tmp/low-quality.wav', 'en');
 
-      const lowConfidenceSegments = result.segments.filter(
-        (s: any) => s.confidence < 0.7
-      );
+      const lowConfidenceSegments = result.segments.filter((s: any) => s.confidence < 0.7);
 
       expect(lowConfidenceSegments.length).toBeGreaterThan(0);
     });

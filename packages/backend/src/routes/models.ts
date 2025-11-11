@@ -1,8 +1,8 @@
 /**
  * Model Management API Routes
- * 
+ *
  * Endpoints for model health checks, configuration, and monitoring
- * 
+ *
  * Requirements: 14.2, 14.4
  */
 
@@ -19,7 +19,7 @@ const router = Router();
 router.get('/health', async (_req: Request, res: Response) => {
   try {
     const healthMap = await modelRegistry.checkAllHealth();
-    
+
     const response: Record<string, any> = {};
     for (const [stage, health] of healthMap.entries()) {
       response[stage] = health;
@@ -47,7 +47,7 @@ router.get('/health', async (_req: Request, res: Response) => {
 router.get('/health/:stage', async (req: Request, res: Response) => {
   try {
     const stage = req.params.stage as PipelineStage;
-    
+
     if (!['stt', 'mt', 'tts', 'lipsync'].includes(stage)) {
       return res.status(400).json({
         success: false,
@@ -84,7 +84,7 @@ router.get('/health/:stage/:name', async (req: Request, res: Response) => {
   try {
     const stage = req.params.stage as PipelineStage;
     const name = req.params.name;
-    
+
     if (!['stt', 'mt', 'tts', 'lipsync'].includes(stage)) {
       return res.status(400).json({
         success: false,
@@ -140,7 +140,7 @@ router.get('/summary', (_req: Request, res: Response) => {
 router.get('/:stage', (req: Request, res: Response) => {
   try {
     const stage = req.params.stage as PipelineStage;
-    
+
     if (!['stt', 'mt', 'tts', 'lipsync'].includes(stage)) {
       return res.status(400).json({
         success: false,
@@ -152,8 +152,8 @@ router.get('/:stage', (req: Request, res: Response) => {
     const configs = modelRegistry.getConfigs(stage);
     const health = modelRegistry.getStageHealth(stage);
 
-    const models = configs.map(config => {
-      const modelHealth = health.find(h => h.modelName === config.name);
+    const models = configs.map((config) => {
+      const modelHealth = health.find((h) => h.modelName === config.name);
       return {
         ...config,
         health: modelHealth?.status || 'unknown',
@@ -187,7 +187,7 @@ router.get('/:stage/:name', (req: Request, res: Response) => {
   try {
     const stage = req.params.stage as PipelineStage;
     const name = req.params.name;
-    
+
     if (!['stt', 'mt', 'tts', 'lipsync'].includes(stage)) {
       return res.status(400).json({
         success: false,
@@ -197,7 +197,7 @@ router.get('/:stage/:name', (req: Request, res: Response) => {
     }
 
     const config = modelRegistry.getConfig(stage, name);
-    
+
     if (!config) {
       return res.status(404).json({
         success: false,
@@ -236,7 +236,7 @@ router.put('/:stage/:name/enable', authenticateToken, (req: Request, res: Respon
     const stage = req.params.stage as PipelineStage;
     const name = req.params.name;
     const { enabled } = req.body;
-    
+
     if (!['stt', 'mt', 'tts', 'lipsync'].includes(stage)) {
       return res.status(400).json({
         success: false,
@@ -278,7 +278,7 @@ router.put('/:stage/:name/priority', authenticateToken, (req: Request, res: Resp
     const stage = req.params.stage as PipelineStage;
     const name = req.params.name;
     const { priority } = req.body;
-    
+
     if (!['stt', 'mt', 'tts', 'lipsync'].includes(stage)) {
       return res.status(400).json({
         success: false,

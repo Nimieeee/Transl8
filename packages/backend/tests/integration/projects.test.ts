@@ -139,9 +139,7 @@ describe('Projects API', () => {
     });
 
     it('should require authentication', async () => {
-      await request(app)
-        .get('/api/projects')
-        .expect(401);
+      await request(app).get('/api/projects').expect(401);
     });
   });
 

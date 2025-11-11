@@ -75,9 +75,7 @@ export default function ForgotPasswordPage() {
                 />
               </svg>
             </div>
-            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
-              Check your email
-            </h2>
+            <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Check your email</h2>
             <p className="mt-2 text-sm text-gray-600">
               We've sent a password reset link to <strong>{formData.email}</strong>
             </p>
@@ -135,9 +133,7 @@ export default function ForgotPasswordPage() {
               value={formData.email}
               onChange={handleChange}
             />
-            {errors.email && (
-              <p className="mt-1 text-sm text-error-600">{errors.email}</p>
-            )}
+            {errors.email && <p className="mt-1 text-sm text-error-600">{errors.email}</p>}
           </div>
 
           <div>
@@ -151,10 +147,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           <div className="text-center">
-            <Link
-              href="/login"
-              className="font-medium text-primary-600 hover:text-primary-500"
-            >
+            <Link href="/login" className="font-medium text-primary-600 hover:text-primary-500">
               Back to login
             </Link>
           </div>

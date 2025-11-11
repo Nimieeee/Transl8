@@ -28,7 +28,7 @@ export default function ConfigurePage() {
   const params = useParams();
   const projectId = params.id as string;
   const { project, updateProject, isUpdating } = useProject(projectId);
-  
+
   const [currentStep, setCurrentStep] = useState<Step>('language');
   const [sourceLanguage, setSourceLanguage] = useState(project?.sourceLanguage || 'en');
   const [targetLanguage, setTargetLanguage] = useState(project?.targetLanguage || 'es');
@@ -108,10 +108,7 @@ export default function ConfigurePage() {
                 <h1 className="text-2xl font-bold text-gray-900">{project.name}</h1>
                 <p className="text-sm text-gray-600 mt-1">Configure your dubbing project</p>
               </div>
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="btn-secondary"
-              >
+              <button onClick={() => router.push('/dashboard')} className="btn-secondary">
                 Cancel
               </button>
             </div>
@@ -127,8 +124,18 @@ export default function ConfigurePage() {
                 <li className="relative pr-8 sm:pr-20">
                   <div className="flex items-center">
                     <div className="flex items-center justify-center w-10 h-10 bg-success-600 rounded-full">
-                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      <svg
+                        className="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
                       </svg>
                     </div>
                     <span className="ml-4 text-sm font-medium text-gray-900">Upload</span>
@@ -136,9 +143,11 @@ export default function ConfigurePage() {
                 </li>
                 <li className="relative pr-8 sm:pr-20">
                   <div className="flex items-center">
-                    <div className={`flex items-center justify-center w-10 h-10 rounded-full ${
-                      currentStep !== 'language' ? 'bg-primary-600' : 'bg-primary-600'
-                    }`}>
+                    <div
+                      className={`flex items-center justify-center w-10 h-10 rounded-full ${
+                        currentStep !== 'language' ? 'bg-primary-600' : 'bg-primary-600'
+                      }`}
+                    >
                       <span className="text-white font-medium">2</span>
                     </div>
                     <span className="ml-4 text-sm font-medium text-gray-900">Configure</span>
@@ -162,7 +171,7 @@ export default function ConfigurePage() {
             {currentStep === 'language' && (
               <div className="space-y-6">
                 <h2 className="text-lg font-semibold text-gray-900">Select Languages</h2>
-                
+
                 <div>
                   <label className="label">Source Language</label>
                   <select
@@ -176,9 +185,7 @@ export default function ConfigurePage() {
                       </option>
                     ))}
                   </select>
-                  <p className="mt-1 text-sm text-gray-500">
-                    The language spoken in your video
-                  </p>
+                  <p className="mt-1 text-sm text-gray-500">The language spoken in your video</p>
                 </div>
 
                 <div>
@@ -194,9 +201,7 @@ export default function ConfigurePage() {
                       </option>
                     ))}
                   </select>
-                  <p className="mt-1 text-sm text-gray-500">
-                    The language you want to dub into
-                  </p>
+                  <p className="mt-1 text-sm text-gray-500">The language you want to dub into</p>
                 </div>
 
                 <div className="flex justify-end">
@@ -277,9 +282,24 @@ export default function ConfigurePage() {
                                   }}
                                   className="text-primary-600 hover:text-primary-700"
                                 >
-                                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  <svg
+                                    className="w-6 h-6"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                                    />
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                    />
                                   </svg>
                                 </button>
                               )}
@@ -301,10 +321,7 @@ export default function ConfigurePage() {
                     ) : clones.length === 0 ? (
                       <div className="text-center py-8">
                         <p className="text-gray-500 mb-4">No voice clones yet</p>
-                        <button
-                          onClick={() => router.push('/voices')}
-                          className="btn-primary"
-                        >
+                        <button onClick={() => router.push('/voices')} className="btn-primary">
                           Create Voice Clone
                         </button>
                       </div>
@@ -380,12 +397,23 @@ export default function ConfigurePage() {
 
                 <div className="bg-blue-50 rounded-lg p-4">
                   <div className="flex">
-                    <svg className="h-5 w-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="h-5 w-5 text-blue-400"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     <div className="ml-3">
                       <p className="text-sm text-blue-700">
-                        Processing will begin immediately. You'll be able to review and edit the transcript and translation before final rendering.
+                        Processing will begin immediately. You'll be able to review and edit the
+                        transcript and translation before final rendering.
                       </p>
                     </div>
                   </div>

@@ -1,6 +1,6 @@
 /**
  * Application Metrics Collection
- * 
+ *
  * This module provides in-memory metrics collection for monitoring
  * API performance, job queue metrics, and system health.
  */
@@ -52,12 +52,12 @@ class MetricsCollector {
     const key = this.buildKey(name, tags);
     const values = this.histograms.get(key) || [];
     values.push(value);
-    
+
     // Keep only last 1000 values to prevent memory issues
     if (values.length > 1000) {
       values.shift();
     }
-    
+
     this.histograms.set(key, values);
   }
 
@@ -92,13 +92,13 @@ class MetricsCollector {
     uptime: number;
   } {
     const histogramMetrics: Record<string, MetricValue> = {};
-    
+
     this.histograms.forEach((values, key) => {
       if (values.length === 0) return;
-      
+
       const sorted = [...values].sort((a, b) => a - b);
       const sum = values.reduce((a, b) => a + b, 0);
-      
+
       histogramMetrics[key] = {
         count: values.length,
         sum,
@@ -135,12 +135,12 @@ class MetricsCollector {
     if (!tags || Object.keys(tags).length === 0) {
       return name;
     }
-    
+
     const tagString = Object.entries(tags)
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([k, v]) => `${k}:${v}`)
       .join(',');
-    
+
     return `${name}{${tagString}}`;
   }
 
@@ -162,7 +162,7 @@ export const metrics = new MetricsCollector();
 export function metricsMiddleware() {
   return (req: any, res: any, next: any) => {
     const start = Date.now();
-    
+
     // Track request
     metrics.incrementCounter('http.requests.total', 1, {
       method: req.method,
@@ -172,13 +172,13 @@ export function metricsMiddleware() {
     // Track response
     res.on('finish', () => {
       const duration = Date.now() - start;
-      
+
       metrics.recordHistogram('http.request.duration', duration, {
         method: req.method,
         path: req.route?.path || req.path,
         status: res.statusCode.toString(),
       });
-      
+
       if (res.statusCode >= 400) {
         metrics.incrementCounter('http.errors.total', 1, {
           method: req.method,
@@ -252,7 +252,7 @@ export class DatabaseMetrics {
       operation,
       status: success ? 'success' : 'error',
     });
-    
+
     if (!success) {
       metrics.incrementCounter('database.errors.total', 1, { operation });
     }
@@ -278,11 +278,11 @@ export class ModelMetrics {
       model,
       status: success ? 'success' : 'error',
     });
-    
+
     if (inputSize) {
       metrics.recordHistogram('model.input.size', inputSize, { model });
     }
-    
+
     if (!success) {
       metrics.incrementCounter('model.errors.total', 1, { model });
     }
@@ -351,7 +351,7 @@ function parseMetricKey(key: string): { name: string; tags: Record<string, strin
   const tags: Record<string, string> = {};
 
   if (tagsString) {
-    tagsString.split(',').forEach(tag => {
+    tagsString.split(',').forEach((tag) => {
       const [k, v] = tag.split(':');
       tags[k] = v;
     });
@@ -362,10 +362,10 @@ function parseMetricKey(key: string): { name: string; tags: Record<string, strin
 
 function formatPrometheusLabels(tags: Record<string, string>): string {
   if (Object.keys(tags).length === 0) return '';
-  
+
   const labels = Object.entries(tags)
     .map(([k, v]) => `${k}="${v}"`)
     .join(',');
-  
+
   return `{${labels}}`;
 }

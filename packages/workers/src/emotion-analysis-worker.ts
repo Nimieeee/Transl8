@@ -1,9 +1,9 @@
 /**
  * Emotion Analysis Worker - Processes emotion analysis jobs
- * 
+ *
  * Consumes jobs from the emotion analysis queue, analyzes emotions in
  * clean vocal prompts, and stores emotion tags in the Context Map.
- * 
+ *
  * Requirements: 17.3, 17.4
  */
 
@@ -61,7 +61,9 @@ export class EmotionAnalysisWorker {
       await job.updateProgress(10);
 
       // Step 1: Handle edge cases (silence, very short segments)
-      logger.info(`[Emotion Analysis Worker] Checking for edge cases in ${segments.length} segments`);
+      logger.info(
+        `[Emotion Analysis Worker] Checking for edge cases in ${segments.length} segments`
+      );
       const edgeCaseResults = new Map<number, any>();
       const segmentsToAnalyze: EmotionSegmentInfo[] = [];
 
@@ -81,13 +83,15 @@ export class EmotionAnalysisWorker {
 
       // Step 2: Analyze emotions for remaining segments
       let emotionResults = new Map<number, any>();
-      
+
       if (segmentsToAnalyze.length > 0) {
-        logger.info(`[Emotion Analysis Worker] Analyzing emotions for ${segmentsToAnalyze.length} segments`);
+        logger.info(
+          `[Emotion Analysis Worker] Analyzing emotions for ${segmentsToAnalyze.length} segments`
+        );
         emotionResults = await this.emotionService.analyzeSegments(segmentsToAnalyze);
-        
+
         const progressPerSegment = 60 / segmentsToAnalyze.length;
-        await job.updateProgress(20 + (emotionResults.size * progressPerSegment));
+        await job.updateProgress(20 + emotionResults.size * progressPerSegment);
       }
 
       // Combine edge case results with analyzed results

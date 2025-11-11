@@ -5,19 +5,19 @@ const prisma = new PrismaClient();
 
 async function generateInviteCodes(count: number) {
   console.log(`Generating ${count} beta invite codes...`);
-  
+
   const codes: string[] = [];
   for (let i = 0; i < count; i++) {
     const code = crypto.randomBytes(8).toString('hex').toUpperCase();
     codes.push(code);
   }
-  
+
   console.log('\nGenerated Invite Codes:');
   console.log('========================');
   codes.forEach((code, index) => {
     console.log(`${index + 1}. ${code}`);
   });
-  
+
   return codes;
 }
 
@@ -34,16 +34,16 @@ async function listBetaTesters() {
         select: {
           projects: true,
           feedback: true,
-          supportTickets: true
-        }
-      }
+          supportTickets: true,
+        },
+      },
     },
-    orderBy: { betaOnboardedAt: 'desc' }
+    orderBy: { betaOnboardedAt: 'desc' },
   });
 
   console.log(`\nTotal Beta Testers: ${testers.length}`);
   console.log('========================\n');
-  
+
   testers.forEach((tester, index) => {
     console.log(`${index + 1}. ${tester.email}`);
     console.log(`   ID: ${tester.id}`);
@@ -58,39 +58,37 @@ async function listBetaTesters() {
 }
 
 async function getBetaStats() {
-  const [
-    totalTesters,
-    activeTesters,
-    totalProjects,
-    totalFeedback,
-    totalTickets,
-    avgRating
-  ] = await Promise.all([
-    prisma.user.count({ where: { isBetaTester: true } }),
-    prisma.user.count({
-      where: {
-        isBetaTester: true,
-        projects: { some: {} }
-      }
-    }),
-    prisma.project.count({
-      where: { user: { isBetaTester: true } }
-    }),
-    prisma.feedback.count(),
-    prisma.supportTicket.count(),
-    prisma.feedback.aggregate({
-      where: { rating: { not: null } },
-      _avg: { rating: true }
-    })
-  ]);
+  const [totalTesters, activeTesters, totalProjects, totalFeedback, totalTickets, avgRating] =
+    await Promise.all([
+      prisma.user.count({ where: { isBetaTester: true } }),
+      prisma.user.count({
+        where: {
+          isBetaTester: true,
+          projects: { some: {} },
+        },
+      }),
+      prisma.project.count({
+        where: { user: { isBetaTester: true } },
+      }),
+      prisma.feedback.count(),
+      prisma.supportTicket.count(),
+      prisma.feedback.aggregate({
+        where: { rating: { not: null } },
+        _avg: { rating: true },
+      }),
+    ]);
 
   console.log('\nBeta Program Statistics');
   console.log('========================');
   console.log(`Total Beta Testers: ${totalTesters}`);
   console.log(`Active Testers (created projects): ${activeTesters}`);
-  console.log(`Activation Rate: ${totalTesters > 0 ? ((activeTesters / totalTesters) * 100).toFixed(1) : 0}%`);
+  console.log(
+    `Activation Rate: ${totalTesters > 0 ? ((activeTesters / totalTesters) * 100).toFixed(1) : 0}%`
+  );
   console.log(`Total Projects Created: ${totalProjects}`);
-  console.log(`Projects per Active User: ${activeTesters > 0 ? (totalProjects / activeTesters).toFixed(1) : 0}`);
+  console.log(
+    `Projects per Active User: ${activeTesters > 0 ? (totalProjects / activeTesters).toFixed(1) : 0}`
+  );
   console.log(`Total Feedback Submissions: ${totalFeedback}`);
   console.log(`Total Support Tickets: ${totalTickets}`);
   console.log(`Average Feedback Rating: ${avgRating._avg.rating?.toFixed(1) || 'N/A'}`);
@@ -99,7 +97,7 @@ async function getBetaStats() {
 async function revokeBetaAccess(email: string) {
   const user = await prisma.user.findUnique({
     where: { email },
-    select: { id: true, email: true, isBetaTester: true }
+    select: { id: true, email: true, isBetaTester: true },
   });
 
   if (!user) {
@@ -117,8 +115,8 @@ async function revokeBetaAccess(email: string) {
     data: {
       isBetaTester: false,
       subscriptionTier: 'FREE',
-      processingMinutesLimit: 10
-    }
+      processingMinutesLimit: 10,
+    },
   });
 
   console.log(`Beta access revoked for: ${email}`);
@@ -133,15 +131,15 @@ async function main() {
       const count = parseInt(arg) || 10;
       await generateInviteCodes(count);
       break;
-    
+
     case 'list':
       await listBetaTesters();
       break;
-    
+
     case 'stats':
       await getBetaStats();
       break;
-    
+
     case 'revoke':
       if (!arg) {
         console.log('Usage: npm run manage-beta revoke <email>');
@@ -149,7 +147,7 @@ async function main() {
       }
       await revokeBetaAccess(arg);
       break;
-    
+
     default:
       console.log('Beta Tester Management Tool');
       console.log('===========================\n');

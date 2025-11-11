@@ -49,11 +49,14 @@ interface BetaMetrics {
     commonIssues: Array<{ category: string; count: number }>;
   };
   usagePatterns: {
-    byTier: Record<string, {
-      users: number;
-      projects: number;
-      avgMinutesProcessed: number;
-    }>;
+    byTier: Record<
+      string,
+      {
+        users: number;
+        projects: number;
+        avgMinutesProcessed: number;
+      }
+    >;
     byLanguagePair: Array<{
       source: string;
       target: string;
@@ -72,20 +75,21 @@ async function getActivationMetrics() {
     },
   });
 
-  const totalActivated = betaUsers.filter(u => u.betaOnboardedAt).length;
-  
+  const totalActivated = betaUsers.filter((u) => u.betaOnboardedAt).length;
+
   // Calculate average time to activation
   const activationTimes = betaUsers
-    .filter(u => u.betaOnboardedAt)
-    .map(u => {
+    .filter((u) => u.betaOnboardedAt)
+    .map((u) => {
       const created = new Date(u.createdAt).getTime();
       const activated = new Date(u.betaOnboardedAt!).getTime();
       return (activated - created) / (1000 * 60 * 60); // hours
     });
 
-  const avgTimeToActivation = activationTimes.length > 0
-    ? activationTimes.reduce((a, b) => a + b, 0) / activationTimes.length
-    : 0;
+  const avgTimeToActivation =
+    activationTimes.length > 0
+      ? activationTimes.reduce((a, b) => a + b, 0) / activationTimes.length
+      : 0;
 
   return {
     totalInvited: betaUsers.length,
@@ -101,7 +105,7 @@ async function getFeatureAdoptionMetrics() {
     select: { id: true },
   });
 
-  const userIds = betaUserIds.map(u => u.id);
+  const userIds = betaUserIds.map((u) => u.id);
 
   const [
     projectsCreated,
@@ -143,7 +147,7 @@ async function getProjectCompletionMetrics() {
     select: { id: true },
   });
 
-  const userIds = betaUserIds.map(u => u.id);
+  const userIds = betaUserIds.map((u) => u.id);
 
   const projects = await prisma.project.findMany({
     where: { userId: { in: userIds } },
@@ -155,28 +159,29 @@ async function getProjectCompletionMetrics() {
   });
 
   const totalProjects = projects.length;
-  const completedProjects = projects.filter(p => p.status === 'COMPLETED').length;
-  
+  const completedProjects = projects.filter((p) => p.status === 'COMPLETED').length;
+
   // Calculate average completion time for completed projects
   const completionTimes = projects
-    .filter(p => p.status === 'COMPLETED')
-    .map(p => {
+    .filter((p) => p.status === 'COMPLETED')
+    .map((p) => {
       const created = new Date(p.createdAt).getTime();
       const completed = new Date(p.updatedAt).getTime();
       return (completed - created) / (1000 * 60); // minutes
     });
 
-  const avgCompletionTime = completionTimes.length > 0
-    ? completionTimes.reduce((a, b) => a + b, 0) / completionTimes.length
-    : 0;
+  const avgCompletionTime =
+    completionTimes.length > 0
+      ? completionTimes.reduce((a, b) => a + b, 0) / completionTimes.length
+      : 0;
 
   // Count drop-off points by status
   const dropOffPoints = {
-    upload: projects.filter(p => p.status === 'CREATED').length,
-    transcription: projects.filter(p => p.status === 'TRANSCRIBING').length,
-    translation: projects.filter(p => p.status === 'TRANSLATING').length,
-    voiceGeneration: projects.filter(p => p.status === 'GENERATING_VOICE').length,
-    lipSync: projects.filter(p => p.status === 'LIP_SYNCING').length,
+    upload: projects.filter((p) => p.status === 'CREATED').length,
+    transcription: projects.filter((p) => p.status === 'TRANSCRIBING').length,
+    translation: projects.filter((p) => p.status === 'TRANSLATING').length,
+    voiceGeneration: projects.filter((p) => p.status === 'GENERATING_VOICE').length,
+    lipSync: projects.filter((p) => p.status === 'LIP_SYNCING').length,
   };
 
   return {
@@ -201,19 +206,18 @@ async function getQualitySatisfactionMetrics() {
   });
 
   const totalFeedback = feedback.length;
-  const avgFeedbackRating = totalFeedback > 0
-    ? feedback.reduce((sum, f) => sum + (f.rating || 0), 0) / totalFeedback
-    : 0;
+  const avgFeedbackRating =
+    totalFeedback > 0 ? feedback.reduce((sum, f) => sum + (f.rating || 0), 0) / totalFeedback : 0;
 
   // Rating distribution
   const ratingDistribution: Record<number, number> = {};
   for (let i = 1; i <= 10; i++) {
-    ratingDistribution[i] = feedback.filter(f => f.rating === i).length;
+    ratingDistribution[i] = feedback.filter((f) => f.rating === i).length;
   }
 
   // Quality by feature (based on feedback category)
   const categoryRatings: Record<string, number[]> = {};
-  feedback.forEach(f => {
+  feedback.forEach((f) => {
     if (f.category && f.rating) {
       if (!categoryRatings[f.category]) {
         categoryRatings[f.category] = [];
@@ -224,13 +228,16 @@ async function getQualitySatisfactionMetrics() {
 
   const qualityByFeature = {
     transcription: categoryRatings['transcription']
-      ? categoryRatings['transcription'].reduce((a, b) => a + b, 0) / categoryRatings['transcription'].length
+      ? categoryRatings['transcription'].reduce((a, b) => a + b, 0) /
+        categoryRatings['transcription'].length
       : 0,
     translation: categoryRatings['translation']
-      ? categoryRatings['translation'].reduce((a, b) => a + b, 0) / categoryRatings['translation'].length
+      ? categoryRatings['translation'].reduce((a, b) => a + b, 0) /
+        categoryRatings['translation'].length
       : 0,
     voiceQuality: categoryRatings['voice_quality']
-      ? categoryRatings['voice_quality'].reduce((a, b) => a + b, 0) / categoryRatings['voice_quality'].length
+      ? categoryRatings['voice_quality'].reduce((a, b) => a + b, 0) /
+        categoryRatings['voice_quality'].length
       : 0,
     lipSync: categoryRatings['lip_sync']
       ? categoryRatings['lip_sync'].reduce((a, b) => a + b, 0) / categoryRatings['lip_sync'].length
@@ -257,37 +264,39 @@ async function getSupportMetrics() {
   });
 
   const totalTickets = tickets.length;
-  const openTickets = tickets.filter(t => t.status === 'OPEN' || t.status === 'IN_PROGRESS').length;
+  const openTickets = tickets.filter(
+    (t) => t.status === 'OPEN' || t.status === 'IN_PROGRESS'
+  ).length;
 
   // Calculate average response time (time to first response)
   const responseTimes = tickets
-    .filter(t => t.messages.length > 1)
-    .map(t => {
+    .filter((t) => t.messages.length > 1)
+    .map((t) => {
       const created = new Date(t.createdAt).getTime();
       const firstResponse = new Date(t.messages[1].createdAt).getTime();
       return (firstResponse - created) / (1000 * 60 * 60); // hours
     });
 
-  const avgResponseTime = responseTimes.length > 0
-    ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length
-    : 0;
+  const avgResponseTime =
+    responseTimes.length > 0 ? responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length : 0;
 
   // Calculate average resolution time
   const resolutionTimes = tickets
-    .filter(t => t.status === 'RESOLVED' || t.status === 'CLOSED')
-    .map(t => {
+    .filter((t) => t.status === 'RESOLVED' || t.status === 'CLOSED')
+    .map((t) => {
       const created = new Date(t.createdAt).getTime();
       const resolved = new Date(t.updatedAt).getTime();
       return (resolved - created) / (1000 * 60 * 60); // hours
     });
 
-  const avgResolutionTime = resolutionTimes.length > 0
-    ? resolutionTimes.reduce((a, b) => a + b, 0) / resolutionTimes.length
-    : 0;
+  const avgResolutionTime =
+    resolutionTimes.length > 0
+      ? resolutionTimes.reduce((a, b) => a + b, 0) / resolutionTimes.length
+      : 0;
 
   // Common issues by category
   const categoryCount: Record<string, number> = {};
-  tickets.forEach(t => {
+  tickets.forEach((t) => {
     if (t.category) {
       categoryCount[t.category] = (categoryCount[t.category] || 0) + 1;
     }
@@ -322,9 +331,10 @@ async function getUsagePatterns() {
   });
 
   // Usage by tier
-  const byTier: Record<string, { users: number; projects: number; avgMinutesProcessed: number }> = {};
-  
-  betaUsers.forEach(user => {
+  const byTier: Record<string, { users: number; projects: number; avgMinutesProcessed: number }> =
+    {};
+
+  betaUsers.forEach((user) => {
     const tier = user.subscriptionTier;
     if (!byTier[tier]) {
       byTier[tier] = { users: 0, projects: 0, avgMinutesProcessed: 0 };
@@ -335,8 +345,8 @@ async function getUsagePatterns() {
 
   // Usage by language pair
   const languagePairCount: Record<string, number> = {};
-  betaUsers.forEach(user => {
-    user.projects.forEach(project => {
+  betaUsers.forEach((user) => {
+    user.projects.forEach((project) => {
       const pair = `${project.sourceLanguage}-${project.targetLanguage}`;
       languagePairCount[pair] = (languagePairCount[pair] || 0) + 1;
     });
@@ -352,8 +362,8 @@ async function getUsagePatterns() {
 
   // Peak usage hours
   const hourCount: Record<number, number> = {};
-  betaUsers.forEach(user => {
-    user.projects.forEach(project => {
+  betaUsers.forEach((user) => {
+    user.projects.forEach((project) => {
       const hour = new Date(project.createdAt).getHours();
       hourCount[hour] = (hourCount[hour] || 0) + 1;
     });
@@ -412,7 +422,9 @@ function displayMetrics(metrics: BetaMetrics) {
   console.log(`Total Invited:           ${metrics.activation.totalInvited}`);
   console.log(`Total Activated:         ${metrics.activation.totalActivated}`);
   console.log(`Activation Rate:         ${metrics.activation.activationRate.toFixed(1)}%`);
-  console.log(`Avg Time to Activation:  ${metrics.activation.avgTimeToActivation.toFixed(1)} hours`);
+  console.log(
+    `Avg Time to Activation:  ${metrics.activation.avgTimeToActivation.toFixed(1)} hours`
+  );
   console.log();
 
   // Feature Adoption
@@ -432,27 +444,41 @@ function displayMetrics(metrics: BetaMetrics) {
   console.log(`Total Projects:          ${metrics.projectCompletion.totalProjects}`);
   console.log(`Completed Projects:      ${metrics.projectCompletion.completedProjects}`);
   console.log(`Completion Rate:         ${metrics.projectCompletion.completionRate.toFixed(1)}%`);
-  console.log(`Avg Completion Time:     ${metrics.projectCompletion.avgCompletionTime.toFixed(1)} minutes`);
+  console.log(
+    `Avg Completion Time:     ${metrics.projectCompletion.avgCompletionTime.toFixed(1)} minutes`
+  );
   console.log();
   console.log('Drop-off Points:');
   console.log(`  Upload:                ${metrics.projectCompletion.dropOffPoints.upload}`);
   console.log(`  Transcription:         ${metrics.projectCompletion.dropOffPoints.transcription}`);
   console.log(`  Translation:           ${metrics.projectCompletion.dropOffPoints.translation}`);
-  console.log(`  Voice Generation:      ${metrics.projectCompletion.dropOffPoints.voiceGeneration}`);
+  console.log(
+    `  Voice Generation:      ${metrics.projectCompletion.dropOffPoints.voiceGeneration}`
+  );
   console.log(`  Lip Sync:              ${metrics.projectCompletion.dropOffPoints.lipSync}`);
   console.log();
 
   // Quality Satisfaction
   console.log('⭐ QUALITY & SATISFACTION');
   console.log('-'.repeat(80));
-  console.log(`Avg Feedback Rating:     ${metrics.qualitySatisfaction.avgFeedbackRating.toFixed(1)}/10`);
+  console.log(
+    `Avg Feedback Rating:     ${metrics.qualitySatisfaction.avgFeedbackRating.toFixed(1)}/10`
+  );
   console.log(`Total Feedback:          ${metrics.qualitySatisfaction.totalFeedback}`);
   console.log();
   console.log('Quality by Feature:');
-  console.log(`  Transcription:         ${metrics.qualitySatisfaction.qualityByFeature.transcription.toFixed(1)}/10`);
-  console.log(`  Translation:           ${metrics.qualitySatisfaction.qualityByFeature.translation.toFixed(1)}/10`);
-  console.log(`  Voice Quality:         ${metrics.qualitySatisfaction.qualityByFeature.voiceQuality.toFixed(1)}/10`);
-  console.log(`  Lip Sync:              ${metrics.qualitySatisfaction.qualityByFeature.lipSync.toFixed(1)}/10`);
+  console.log(
+    `  Transcription:         ${metrics.qualitySatisfaction.qualityByFeature.transcription.toFixed(1)}/10`
+  );
+  console.log(
+    `  Translation:           ${metrics.qualitySatisfaction.qualityByFeature.translation.toFixed(1)}/10`
+  );
+  console.log(
+    `  Voice Quality:         ${metrics.qualitySatisfaction.qualityByFeature.voiceQuality.toFixed(1)}/10`
+  );
+  console.log(
+    `  Lip Sync:              ${metrics.qualitySatisfaction.qualityByFeature.lipSync.toFixed(1)}/10`
+  );
   console.log();
 
   // Support Metrics
@@ -495,7 +521,7 @@ function displayMetrics(metrics: BetaMetrics) {
 async function exportMetricsToJSON(metrics: BetaMetrics, filename: string) {
   const fs = require('fs');
   const path = require('path');
-  
+
   const outputPath = path.join(process.cwd(), filename);
   fs.writeFileSync(outputPath, JSON.stringify(metrics, null, 2));
   console.log(`\n✅ Metrics exported to: ${outputPath}`);

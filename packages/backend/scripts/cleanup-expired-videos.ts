@@ -1,10 +1,10 @@
 #!/usr/bin/env ts-node
 /**
  * Cleanup Script for Expired Videos
- * 
+ *
  * This script removes expired dubbing jobs and their associated files.
  * Should be run periodically (e.g., via cron job) to free up disk space.
- * 
+ *
  * Requirements: 5.3
  */
 
@@ -50,7 +50,7 @@ async function deleteTempDirectory(jobId: string): Promise<number> {
     if (fs.existsSync(tempDir)) {
       // Get all files in directory
       const files = fs.readdirSync(tempDir);
-      
+
       for (const file of files) {
         const filePath = path.join(tempDir, file);
         const stats = fs.statSync(filePath);
@@ -60,7 +60,9 @@ async function deleteTempDirectory(jobId: string): Promise<number> {
 
       // Remove directory
       fs.rmdirSync(tempDir);
-      console.log(`  Deleted temp directory: ${tempDir} (${(bytesFreed / 1024 / 1024).toFixed(2)} MB)`);
+      console.log(
+        `  Deleted temp directory: ${tempDir} (${(bytesFreed / 1024 / 1024).toFixed(2)} MB)`
+      );
     }
   } catch (error) {
     console.error(`  Error deleting temp directory ${tempDir}:`, error);
@@ -262,7 +264,9 @@ async function main() {
     console.log('\n=== Total Cleanup Summary ===');
     console.log(`Total jobs deleted: ${expiredStats.jobsDeleted + failedStats.jobsDeleted}`);
     console.log(`Total files deleted: ${expiredStats.filesDeleted + failedStats.filesDeleted}`);
-    console.log(`Total space freed: ${((expiredStats.bytesFreed + failedStats.bytesFreed) / 1024 / 1024).toFixed(2)} MB`);
+    console.log(
+      `Total space freed: ${((expiredStats.bytesFreed + failedStats.bytesFreed) / 1024 / 1024).toFixed(2)} MB`
+    );
     console.log(`Total errors: ${expiredStats.errors + failedStats.errors}`);
 
     console.log('\nCleanup completed successfully!');

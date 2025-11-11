@@ -1,11 +1,11 @@
 /**
  * DataDog APM Configuration (Optional)
- * 
+ *
  * To enable DataDog APM:
  * 1. Install: npm install dd-trace
  * 2. Set DD_API_KEY environment variable
  * 3. Import this file at the very top of index.ts (before any other imports)
- * 
+ *
  * Note: This file is optional and only used if DataDog APM is desired.
  * Sentry already provides performance monitoring capabilities.
  */
@@ -21,24 +21,24 @@ export function initDataDog(): void {
   try {
     // Dynamic import to avoid errors if dd-trace is not installed
     tracer = require('dd-trace');
-    
+
     tracer.init({
       service: 'dubbing-backend',
       env: process.env.NODE_ENV || 'development',
       version: process.env.APP_VERSION || '1.0.0',
-      
+
       // Enable log injection for correlation
       logInjection: true,
-      
+
       // Sampling rate
       sampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-      
+
       // Enable profiling
       profiling: true,
-      
+
       // Enable runtime metrics
       runtimeMetrics: true,
-      
+
       // Tags
       tags: {
         team: 'platform',
@@ -61,7 +61,7 @@ export function getTracer() {
  */
 export function createSpan(name: string, options?: any) {
   if (!tracer) return null;
-  
+
   return tracer.trace(name, options, (span: any) => {
     return span;
   });
@@ -72,7 +72,7 @@ export function createSpan(name: string, options?: any) {
  */
 export function addSpanTags(tags: Record<string, any>) {
   if (!tracer) return;
-  
+
   const span = tracer.scope().active();
   if (span) {
     Object.entries(tags).forEach(([key, value]) => {

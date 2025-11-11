@@ -41,7 +41,12 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
   const [selectedSegment, setSelectedSegment] = useState<ContextMapSegment | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
 
-  const { data: contextMap, isLoading, error, refetch } = useQuery<ContextMap>({
+  const {
+    data: contextMap,
+    isLoading,
+    error,
+    refetch,
+  } = useQuery<ContextMap>({
     queryKey: ['context-map', projectId],
     queryFn: async () => {
       const response = await apiClient.get(`/api/projects/${projectId}/context-map`);
@@ -88,7 +93,7 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
     return status;
   };
 
-  const filteredSegments = contextMap.segments.filter(segment => {
+  const filteredSegments = contextMap.segments.filter((segment) => {
     if (filterStatus === 'all') return true;
     if (filterStatus === 'success') return segment.status === 'success';
     if (filterStatus === 'failed') return segment.status?.startsWith('failed_');
@@ -98,9 +103,9 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
 
   const stats = {
     total: contextMap.segments.length,
-    success: contextMap.segments.filter(s => s.status === 'success').length,
-    failed: contextMap.segments.filter(s => s.status?.startsWith('failed_')).length,
-    pending: contextMap.segments.filter(s => !s.status || s.status === 'pending').length,
+    success: contextMap.segments.filter((s) => s.status === 'success').length,
+    failed: contextMap.segments.filter((s) => s.status?.startsWith('failed_')).length,
+    pending: contextMap.segments.filter((s) => !s.status || s.status === 'pending').length,
   };
 
   const completionRate = stats.total > 0 ? (stats.success / stats.total) * 100 : 0;
@@ -147,19 +152,27 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
         <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
             <span className="text-gray-600">Duration:</span>
-            <span className="ml-2 font-medium">{(contextMap.original_duration_ms / 1000).toFixed(1)}s</span>
+            <span className="ml-2 font-medium">
+              {(contextMap.original_duration_ms / 1000).toFixed(1)}s
+            </span>
           </div>
           <div>
             <span className="text-gray-600">Languages:</span>
-            <span className="ml-2 font-medium">{contextMap.source_language} → {contextMap.target_language}</span>
+            <span className="ml-2 font-medium">
+              {contextMap.source_language} → {contextMap.target_language}
+            </span>
           </div>
           <div>
             <span className="text-gray-600">Created:</span>
-            <span className="ml-2 font-medium">{new Date(contextMap.created_at).toLocaleString()}</span>
+            <span className="ml-2 font-medium">
+              {new Date(contextMap.created_at).toLocaleString()}
+            </span>
           </div>
           <div>
             <span className="text-gray-600">Updated:</span>
-            <span className="ml-2 font-medium">{new Date(contextMap.updated_at).toLocaleString()}</span>
+            <span className="ml-2 font-medium">
+              {new Date(contextMap.updated_at).toLocaleString()}
+            </span>
           </div>
         </div>
       </div>
@@ -210,8 +223,9 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
           <div className="h-12 bg-gray-100 rounded-lg relative overflow-hidden">
             {filteredSegments.map((segment) => {
               const left = (segment.start_ms / contextMap.original_duration_ms) * 100;
-              const width = ((segment.end_ms - segment.start_ms) / contextMap.original_duration_ms) * 100;
-              
+              const width =
+                ((segment.end_ms - segment.start_ms) / contextMap.original_duration_ms) * 100;
+
               return (
                 <div
                   key={segment.id}
@@ -233,7 +247,9 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
       {/* Segment List */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Segments ({filteredSegments.length})</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Segments ({filteredSegments.length})
+          </h3>
         </div>
         <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
           {filteredSegments.map((segment) => (
@@ -248,15 +264,16 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
                 <div className="flex-1">
                   <div className="flex items-center space-x-3 mb-2">
                     <span className="text-sm font-medium text-gray-900">Segment {segment.id}</span>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(segment.status)} text-white`}>
+                    <span
+                      className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(segment.status)} text-white`}
+                    >
                       {getStatusLabel(segment.status)}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {(segment.start_ms / 1000).toFixed(2)}s - {(segment.end_ms / 1000).toFixed(2)}s
+                      {(segment.start_ms / 1000).toFixed(2)}s - {(segment.end_ms / 1000).toFixed(2)}
+                      s
                     </span>
-                    <span className="text-xs text-gray-500">
-                      {segment.speaker}
-                    </span>
+                    <span className="text-xs text-gray-500">{segment.speaker}</span>
                     {segment.emotion && (
                       <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">
                         {segment.emotion}
@@ -270,16 +287,32 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
                   <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
                     {segment.clean_prompt_path && (
                       <span className="flex items-center">
-                        <svg className="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <svg
+                          className="w-4 h-4 mr-1 text-green-500"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                         Clean Prompt
                       </span>
                     )}
                     {segment.generated_audio_path && (
                       <span className="flex items-center">
-                        <svg className="w-4 h-4 mr-1 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        <svg
+                          className="w-4 h-4 mr-1 text-green-500"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                            clipRule="evenodd"
+                          />
                         </svg>
                         Audio Generated
                       </span>
@@ -299,13 +332,20 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
       {selectedSegment && (
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Segment {selectedSegment.id} Details</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Segment {selectedSegment.id} Details
+            </h3>
             <button
               onClick={() => setSelectedSegment(null)}
               className="text-gray-400 hover:text-gray-600"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -314,13 +354,20 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600">Timing</p>
-                <p className="font-medium">{(selectedSegment.start_ms / 1000).toFixed(3)}s - {(selectedSegment.end_ms / 1000).toFixed(3)}s</p>
-                <p className="text-sm text-gray-500">Duration: {selectedSegment.duration.toFixed(3)}s</p>
+                <p className="font-medium">
+                  {(selectedSegment.start_ms / 1000).toFixed(3)}s -{' '}
+                  {(selectedSegment.end_ms / 1000).toFixed(3)}s
+                </p>
+                <p className="text-sm text-gray-500">
+                  Duration: {selectedSegment.duration.toFixed(3)}s
+                </p>
               </div>
               <div>
                 <p className="text-sm text-gray-600">Speaker</p>
                 <p className="font-medium">{selectedSegment.speaker}</p>
-                <p className="text-sm text-gray-500">Confidence: {(selectedSegment.confidence * 100).toFixed(1)}%</p>
+                <p className="text-sm text-gray-500">
+                  Confidence: {(selectedSegment.confidence * 100).toFixed(1)}%
+                </p>
               </div>
             </div>
 
@@ -348,7 +395,9 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
             {selectedSegment.status && (
               <div>
                 <p className="text-sm text-gray-600 mb-1">Status</p>
-                <span className={`inline-block px-3 py-1 rounded-lg font-medium ${getStatusColor(selectedSegment.status)} text-white`}>
+                <span
+                  className={`inline-block px-3 py-1 rounded-lg font-medium ${getStatusColor(selectedSegment.status)} text-white`}
+                >
                   {getStatusLabel(selectedSegment.status)}
                 </span>
                 {selectedSegment.attempts && selectedSegment.attempts > 0 && (
@@ -362,7 +411,9 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
             {selectedSegment.validation_feedback && (
               <div>
                 <p className="text-sm text-gray-600 mb-1">Validation Feedback</p>
-                <p className="p-3 bg-yellow-50 text-yellow-900 rounded-lg text-sm">{selectedSegment.validation_feedback}</p>
+                <p className="p-3 bg-yellow-50 text-yellow-900 rounded-lg text-sm">
+                  {selectedSegment.validation_feedback}
+                </p>
               </div>
             )}
 
@@ -384,14 +435,18 @@ export function ContextMapVisualizer({ projectId }: ContextMapVisualizerProps) {
             {selectedSegment.previous_line && (
               <div>
                 <p className="text-sm text-gray-600 mb-1">Previous Line (Context)</p>
-                <p className="text-sm text-gray-500 italic p-2 bg-gray-50 rounded">{selectedSegment.previous_line}</p>
+                <p className="text-sm text-gray-500 italic p-2 bg-gray-50 rounded">
+                  {selectedSegment.previous_line}
+                </p>
               </div>
             )}
 
             {selectedSegment.next_line && (
               <div>
                 <p className="text-sm text-gray-600 mb-1">Next Line (Context)</p>
-                <p className="text-sm text-gray-500 italic p-2 bg-gray-50 rounded">{selectedSegment.next_line}</p>
+                <p className="text-sm text-gray-500 italic p-2 bg-gray-50 rounded">
+                  {selectedSegment.next_line}
+                </p>
               </div>
             )}
           </div>

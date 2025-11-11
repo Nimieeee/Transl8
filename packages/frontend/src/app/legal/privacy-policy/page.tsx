@@ -68,7 +68,9 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-2xl font-semibold mb-4">{policy.content.dataCollection.title}</h2>
               <ul className="list-disc pl-6 space-y-2">
                 {policy.content.dataCollection.items.map((item: string, index: number) => (
-                  <li key={index} className="text-gray-700">{item}</li>
+                  <li key={index} className="text-gray-700">
+                    {item}
+                  </li>
                 ))}
               </ul>
             </section>
@@ -77,7 +79,9 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-2xl font-semibold mb-4">{policy.content.dataUsage.title}</h2>
               <ul className="list-disc pl-6 space-y-2">
                 {policy.content.dataUsage.items.map((item: string, index: number) => (
-                  <li key={index} className="text-gray-700">{item}</li>
+                  <li key={index} className="text-gray-700">
+                    {item}
+                  </li>
                 ))}
               </ul>
             </section>
@@ -96,7 +100,9 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-2xl font-semibold mb-4">{policy.content.userRights.title}</h2>
               <ul className="list-disc pl-6 space-y-2">
                 {policy.content.userRights.items.map((item: string, index: number) => (
-                  <li key={index} className="text-gray-700">{item}</li>
+                  <li key={index} className="text-gray-700">
+                    {item}
+                  </li>
                 ))}
               </ul>
             </section>

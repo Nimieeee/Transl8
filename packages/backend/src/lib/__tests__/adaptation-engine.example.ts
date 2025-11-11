@@ -1,6 +1,6 @@
 /**
  * Adaptation Engine - Example Usage
- * 
+ *
  * This file demonstrates how to use the adaptation engine.
  * Run with: ts-node packages/backend/src/lib/__tests__/adaptation-engine.example.ts
  */
@@ -17,13 +17,13 @@ async function main() {
     start_ms: 0,
     end_ms: 3500,
     duration: 3.5,
-    text: "Hello everyone, welcome to my channel.",
-    speaker: "SPEAKER_00",
+    text: 'Hello everyone, welcome to my channel.',
+    speaker: 'SPEAKER_00',
     confidence: 0.95,
-    emotion: "happy",
+    emotion: 'happy',
     previous_line: null,
     next_line: "Today we're going to talk about AI dubbing.",
-    status: "pending",
+    status: 'pending',
     attempts: 0,
   };
 
@@ -40,7 +40,7 @@ async function main() {
     targetLanguage: 'es',
     maxRetries: 2,
     glossary: {
-      'AI': 'IA',
+      AI: 'IA',
       'machine learning': 'aprendizaje automático',
     },
   });
@@ -48,13 +48,13 @@ async function main() {
   // Test API connection
   console.log('Testing Gemini API connection...');
   const isConnected = await service.testConnection();
-  
+
   if (!isConnected) {
     console.error('✗ Failed to connect to Gemini API');
     console.error('Please set GEMINI_API_KEY in your .env file');
     process.exit(1);
   }
-  
+
   console.log('✓ Connected to Gemini API\n');
 
   // Adapt the segment
@@ -75,13 +75,13 @@ async function main() {
       start_ms: 0,
       end_ms: 3500,
       duration: 3.5,
-      text: "Hello everyone, welcome to my channel.",
-      speaker: "SPEAKER_00",
+      text: 'Hello everyone, welcome to my channel.',
+      speaker: 'SPEAKER_00',
       confidence: 0.95,
-      emotion: "happy",
+      emotion: 'happy',
       previous_line: null,
       next_line: "Today we're going to talk about AI dubbing.",
-      status: "pending",
+      status: 'pending',
       attempts: 0,
     },
     {
@@ -90,12 +90,12 @@ async function main() {
       end_ms: 7200,
       duration: 3.7,
       text: "Today we're going to talk about AI dubbing.",
-      speaker: "SPEAKER_00",
+      speaker: 'SPEAKER_00',
       confidence: 0.92,
-      emotion: "neutral",
-      previous_line: "Hello everyone, welcome to my channel.",
-      next_line: "This technology is amazing.",
-      status: "pending",
+      emotion: 'neutral',
+      previous_line: 'Hello everyone, welcome to my channel.',
+      next_line: 'This technology is amazing.',
+      status: 'pending',
       attempts: 0,
     },
     {
@@ -103,13 +103,13 @@ async function main() {
       start_ms: 7200,
       end_ms: 9400,
       duration: 2.2,
-      text: "This technology is amazing.",
-      speaker: "SPEAKER_00",
+      text: 'This technology is amazing.',
+      speaker: 'SPEAKER_00',
       confidence: 0.94,
-      emotion: "excited",
+      emotion: 'excited',
       previous_line: "Today we're going to talk about AI dubbing.",
       next_line: null,
-      status: "pending",
+      status: 'pending',
       attempts: 0,
     },
   ];

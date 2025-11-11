@@ -1,6 +1,6 @@
 /**
  * Context Map Client for Workers
- * 
+ *
  * Provides utilities for workers to interact with the Context Map service
  */
 

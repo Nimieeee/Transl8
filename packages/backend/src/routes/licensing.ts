@@ -16,7 +16,7 @@ router.get('/terms', (_req, res) => {
     title: 'Licensing and Copyright Terms',
     content: {
       introduction: `These terms govern the use of AI-generated content and voice clones created through our platform.`,
-      
+
       contentOwnership: {
         title: 'Content Ownership',
         items: [
@@ -26,7 +26,7 @@ router.get('/terms', (_req, res) => {
           'Voice clones created from your voice samples are owned by you',
         ],
       },
-      
+
       voiceCloneLicensing: {
         title: 'Voice Clone Usage Rights',
         description: 'By creating a voice clone, you represent and warrant that:',
@@ -38,7 +38,7 @@ router.get('/terms', (_req, res) => {
           'You understand that unauthorized voice cloning may violate personality rights and privacy laws',
         ],
       },
-      
+
       commercialUse: {
         title: 'Commercial Use Rights',
         free: {
@@ -79,7 +79,7 @@ router.get('/terms', (_req, res) => {
           ],
         },
       },
-      
+
       attribution: {
         title: 'Attribution Requirements',
         description: 'For AI-generated content, you must:',
@@ -90,7 +90,7 @@ router.get('/terms', (_req, res) => {
           'Include appropriate disclaimers for synthetic media when required',
         ],
       },
-      
+
       copyrightCompliance: {
         title: 'Copyright Compliance',
         items: [
@@ -101,7 +101,7 @@ router.get('/terms', (_req, res) => {
           'Repeat copyright violations may result in account termination',
         ],
       },
-      
+
       watermarkPolicy: {
         title: 'Watermark Policy',
         description: 'Free tier videos include a watermark to:',
@@ -112,7 +112,7 @@ router.get('/terms', (_req, res) => {
           'Removing watermarks without upgrading violates our terms',
         ],
       },
-      
+
       liabilityLimitations: {
         title: 'Liability Limitations',
         items: [
@@ -122,7 +122,7 @@ router.get('/terms', (_req, res) => {
           'You indemnify us against claims arising from your use of the platform',
         ],
       },
-      
+
       enforcement: {
         title: 'Enforcement',
         description: 'Violations of these licensing terms may result in:',
@@ -178,7 +178,7 @@ router.get('/status', authenticateToken, async (req, res) => {
   try {
     const userId = req.user!.userId;
 
-    const user = await prisma.user.findUnique({
+    const user = (await prisma.user.findUnique({
       where: { id: userId },
       select: {
         licensingTermsAccepted: true,
@@ -186,7 +186,7 @@ router.get('/status', authenticateToken, async (req, res) => {
         licensingTermsAcceptedAt: true,
         subscriptionTier: true,
       } as any, // Type will be correct after prisma generate
-    }) as any;
+    })) as any;
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -218,8 +218,9 @@ router.get('/voice-clone-consent', (_req, res) => {
   const consentForm = {
     title: 'Voice Clone Consent and Acknowledgment',
     content: {
-      introduction: 'Before creating a voice clone, you must acknowledge and agree to the following:',
-      
+      introduction:
+        'Before creating a voice clone, you must acknowledge and agree to the following:',
+
       legalRepresentation: {
         title: 'Legal Representation',
         text: 'I represent and warrant that:',
@@ -230,7 +231,7 @@ router.get('/voice-clone-consent', (_req, res) => {
           'I am not cloning the voice of a public figure without authorization',
         ],
       },
-      
+
       usageRestrictions: {
         title: 'Usage Restrictions',
         text: 'I agree that I will NOT:',
@@ -242,7 +243,7 @@ router.get('/voice-clone-consent', (_req, res) => {
           'Share or sell the voice clone to third parties without permission',
         ],
       },
-      
+
       liabilityAcknowledgment: {
         title: 'Liability Acknowledgment',
         text: 'I understand and acknowledge that:',
@@ -253,7 +254,7 @@ router.get('/voice-clone-consent', (_req, res) => {
           'My account may be terminated for violating these terms',
         ],
       },
-      
+
       consent: {
         title: 'Consent',
         text: 'By checking the box below, I confirm that I have read, understood, and agree to these terms.',

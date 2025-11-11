@@ -7,10 +7,7 @@
 export { STTDatasetBuilder, createSampleSTTDataset } from './datasets/stt-dataset';
 export { MTDatasetBuilder, createSampleMTDataset } from './datasets/mt-dataset';
 export { TTSDatasetBuilder, createSampleTTSDataset } from './datasets/tts-dataset';
-export {
-  LipSyncDatasetBuilder,
-  createSampleLipSyncDataset,
-} from './datasets/lipsync-dataset';
+export { LipSyncDatasetBuilder, createSampleLipSyncDataset } from './datasets/lipsync-dataset';
 
 // Types
 export * from './datasets/types';

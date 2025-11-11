@@ -119,9 +119,7 @@ export default function ResetPasswordPage() {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Set new password
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Enter your new password below
-          </p>
+          <p className="mt-2 text-center text-sm text-gray-600">Enter your new password below</p>
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -148,9 +146,7 @@ export default function ResetPasswordPage() {
                 onChange={handleChange}
                 disabled={!token}
               />
-              {errors.password && (
-                <p className="mt-1 text-sm text-error-600">{errors.password}</p>
-              )}
+              {errors.password && <p className="mt-1 text-sm text-error-600">{errors.password}</p>}
               <p className="mt-1 text-xs text-gray-500">
                 Must be at least 8 characters with uppercase, lowercase, and number
               </p>
@@ -189,10 +185,7 @@ export default function ResetPasswordPage() {
           </div>
 
           <div className="text-center">
-            <Link
-              href="/login"
-              className="font-medium text-primary-600 hover:text-primary-500"
-            >
+            <Link href="/login" className="font-medium text-primary-600 hover:text-primary-500">
               Back to login
             </Link>
           </div>

@@ -66,7 +66,7 @@ export function SyncValidationDashboard() {
     return 'bg-red-50';
   };
 
-  const totalDistribution = 
+  const totalDistribution =
     data.driftDistribution.excellent +
     data.driftDistribution.good +
     data.driftDistribution.acceptable +
@@ -84,15 +84,23 @@ export function SyncValidationDashboard() {
             <p className="text-sm text-blue-600">Total Projects</p>
             <p className="text-2xl font-bold text-blue-900">{data.overallMetrics.totalProjects}</p>
           </div>
-          <div className={getQualityBgColor(data.overallMetrics.averageSyncQuality) + ' rounded-lg p-4'}>
+          <div
+            className={
+              getQualityBgColor(data.overallMetrics.averageSyncQuality) + ' rounded-lg p-4'
+            }
+          >
             <p className="text-sm text-gray-600">Average Sync Quality</p>
-            <p className={`text-2xl font-bold ${getQualityColor(data.overallMetrics.averageSyncQuality)}`}>
+            <p
+              className={`text-2xl font-bold ${getQualityColor(data.overallMetrics.averageSyncQuality)}`}
+            >
               {data.overallMetrics.averageSyncQuality.toFixed(1)}%
             </p>
           </div>
           <div className="bg-red-50 rounded-lg p-4">
             <p className="text-sm text-red-600">Projects with Issues</p>
-            <p className="text-2xl font-bold text-red-900">{data.overallMetrics.projectsWithIssues}</p>
+            <p className="text-2xl font-bold text-red-900">
+              {data.overallMetrics.projectsWithIssues}
+            </p>
           </div>
         </div>
       </div>
@@ -105,13 +113,19 @@ export function SyncValidationDashboard() {
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-green-700">Excellent (&lt; 10ms)</span>
               <span className="text-sm text-gray-600">
-                {data.driftDistribution.excellent} ({totalDistribution > 0 ? ((data.driftDistribution.excellent / totalDistribution) * 100).toFixed(1) : 0}%)
+                {data.driftDistribution.excellent} (
+                {totalDistribution > 0
+                  ? ((data.driftDistribution.excellent / totalDistribution) * 100).toFixed(1)
+                  : 0}
+                %)
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
                 className="bg-green-500 h-3 rounded-full"
-                style={{ width: `${totalDistribution > 0 ? (data.driftDistribution.excellent / totalDistribution) * 100 : 0}%` }}
+                style={{
+                  width: `${totalDistribution > 0 ? (data.driftDistribution.excellent / totalDistribution) * 100 : 0}%`,
+                }}
               />
             </div>
           </div>
@@ -120,13 +134,19 @@ export function SyncValidationDashboard() {
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-blue-700">Good (10-50ms)</span>
               <span className="text-sm text-gray-600">
-                {data.driftDistribution.good} ({totalDistribution > 0 ? ((data.driftDistribution.good / totalDistribution) * 100).toFixed(1) : 0}%)
+                {data.driftDistribution.good} (
+                {totalDistribution > 0
+                  ? ((data.driftDistribution.good / totalDistribution) * 100).toFixed(1)
+                  : 0}
+                %)
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
                 className="bg-blue-500 h-3 rounded-full"
-                style={{ width: `${totalDistribution > 0 ? (data.driftDistribution.good / totalDistribution) * 100 : 0}%` }}
+                style={{
+                  width: `${totalDistribution > 0 ? (data.driftDistribution.good / totalDistribution) * 100 : 0}%`,
+                }}
               />
             </div>
           </div>
@@ -135,13 +155,19 @@ export function SyncValidationDashboard() {
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-yellow-700">Acceptable (50-100ms)</span>
               <span className="text-sm text-gray-600">
-                {data.driftDistribution.acceptable} ({totalDistribution > 0 ? ((data.driftDistribution.acceptable / totalDistribution) * 100).toFixed(1) : 0}%)
+                {data.driftDistribution.acceptable} (
+                {totalDistribution > 0
+                  ? ((data.driftDistribution.acceptable / totalDistribution) * 100).toFixed(1)
+                  : 0}
+                %)
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
                 className="bg-yellow-500 h-3 rounded-full"
-                style={{ width: `${totalDistribution > 0 ? (data.driftDistribution.acceptable / totalDistribution) * 100 : 0}%` }}
+                style={{
+                  width: `${totalDistribution > 0 ? (data.driftDistribution.acceptable / totalDistribution) * 100 : 0}%`,
+                }}
               />
             </div>
           </div>
@@ -150,13 +176,19 @@ export function SyncValidationDashboard() {
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-red-700">Poor (&gt; 100ms)</span>
               <span className="text-sm text-gray-600">
-                {data.driftDistribution.poor} ({totalDistribution > 0 ? ((data.driftDistribution.poor / totalDistribution) * 100).toFixed(1) : 0}%)
+                {data.driftDistribution.poor} (
+                {totalDistribution > 0
+                  ? ((data.driftDistribution.poor / totalDistribution) * 100).toFixed(1)
+                  : 0}
+                %)
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
                 className="bg-red-500 h-3 rounded-full"
-                style={{ width: `${totalDistribution > 0 ? (data.driftDistribution.poor / totalDistribution) * 100 : 0}%` }}
+                style={{
+                  width: `${totalDistribution > 0 ? (data.driftDistribution.poor / totalDistribution) * 100 : 0}%`,
+                }}
               />
             </div>
           </div>
@@ -196,14 +228,19 @@ export function SyncValidationDashboard() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <span className={`text-sm font-semibold ${getQualityColor(report.syncQualityScore)}`}>
+                      <span
+                        className={`text-sm font-semibold ${getQualityColor(report.syncQualityScore)}`}
+                      >
                         {report.syncQualityScore.toFixed(1)}%
                       </span>
                       <div className="ml-3 w-24 bg-gray-200 rounded-full h-2">
                         <div
                           className={`h-2 rounded-full ${
-                            report.syncQualityScore >= 90 ? 'bg-green-500' :
-                            report.syncQualityScore >= 70 ? 'bg-yellow-500' : 'bg-red-500'
+                            report.syncQualityScore >= 90
+                              ? 'bg-green-500'
+                              : report.syncQualityScore >= 70
+                                ? 'bg-yellow-500'
+                                : 'bg-red-500'
                           }`}
                           style={{ width: `${report.syncQualityScore}%` }}
                         />
@@ -211,11 +248,17 @@ export function SyncValidationDashboard() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`text-sm ${
-                      report.maxDriftMs < 10 ? 'text-green-600' :
-                      report.maxDriftMs < 50 ? 'text-blue-600' :
-                      report.maxDriftMs < 100 ? 'text-yellow-600' : 'text-red-600'
-                    }`}>
+                    <span
+                      className={`text-sm ${
+                        report.maxDriftMs < 10
+                          ? 'text-green-600'
+                          : report.maxDriftMs < 50
+                            ? 'text-blue-600'
+                            : report.maxDriftMs < 100
+                              ? 'text-yellow-600'
+                              : 'text-red-600'
+                      }`}
+                    >
                       {report.maxDriftMs.toFixed(2)}ms
                     </span>
                   </td>

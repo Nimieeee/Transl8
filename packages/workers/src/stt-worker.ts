@@ -1,10 +1,10 @@
 /**
  * STT Worker - Processes speech-to-text jobs
- * 
+ *
  * Consumes jobs from the STT queue, downloads audio from storage,
  * runs transcription with speaker diarization, stores results in database,
  * and triggers the next pipeline stage.
- * 
+ *
  * Requirements: 2.5, 6.3
  */
 
@@ -34,7 +34,7 @@ export class STTWorker {
 
   constructor(redisConnection: any) {
     this.redisConnection = redisConnection;
-    
+
     // Use OpenAI Whisper API adapter
     logger.info('[STT Worker] Using OpenAI Whisper API adapter');
     this.adapter = new OpenAIWhisperAdapter();
@@ -122,7 +122,12 @@ export class STTWorker {
       // Step 5: Trigger adaptation stage for translation
       logger.info(`[STT Worker] Triggering adaptation stage`);
       const userId = job.data.userId || 'system'; // Use 'system' for MVP without auth
-      await this.triggerAdaptationStage(projectId, userId, dubbingJob.sourceLanguage, dubbingJob.targetLanguage || 'en');
+      await this.triggerAdaptationStage(
+        projectId,
+        userId,
+        dubbingJob.sourceLanguage,
+        dubbingJob.targetLanguage || 'en'
+      );
       await job.updateProgress(90);
 
       // Step 7: Clean up temporary audio file
@@ -205,12 +210,12 @@ export class STTWorker {
       // Parse silence detection output
       const silenceStarts: number[] = [];
       const silenceEnds: number[] = [];
-      
+
       const silenceStartMatches = stderr.matchAll(/silence_start: ([\d.]+)/g);
       for (const match of silenceStartMatches) {
         silenceStarts.push(parseFloat(match[1]) * 1000);
       }
-      
+
       const silenceEndMatches = stderr.matchAll(/silence_end: ([\d.]+)/g);
       for (const match of silenceEndMatches) {
         silenceEnds.push(parseFloat(match[1]) * 1000);
@@ -234,10 +239,9 @@ export class STTWorker {
         // Find the last significant silence period
         for (let i = silenceStarts.length - 1; i >= 0; i--) {
           const silenceStart = silenceStarts[i];
-          const silenceDuration = (i < silenceEnds.length) 
-            ? silenceEnds[i] - silenceStart 
-            : totalDurationMs - silenceStart;
-          
+          const silenceDuration =
+            i < silenceEnds.length ? silenceEnds[i] - silenceStart : totalDurationMs - silenceStart;
+
           // If this silence is >1 second and in the last 25% of the video
           if (silenceDuration > 1000 && silenceStart > totalDurationMs * 0.75) {
             audioEndMs = silenceStart;
@@ -248,7 +252,7 @@ export class STTWorker {
 
       logger.info(
         `[STT Worker] Audio activity detected: ${audioStartMs}ms - ${audioEndMs}ms ` +
-        `(total: ${totalDurationMs}ms)`
+          `(total: ${totalDurationMs}ms)`
       );
 
       return {
@@ -313,8 +317,6 @@ export class STTWorker {
     });
   }
 
-
-
   /**
    * Trigger adaptation stage for translation
    */
@@ -334,13 +336,9 @@ export class STTWorker {
         targetLanguage,
       };
 
-      await this.adaptationQueue.add(
-        `adaptation-${projectId}`,
-        adaptationJobData,
-        {
-          priority: 1, // High priority
-        }
-      );
+      await this.adaptationQueue.add(`adaptation-${projectId}`, adaptationJobData, {
+        priority: 1, // High priority
+      });
 
       logger.info(`[STT Worker] Enqueued adaptation job for project ${projectId}`);
     } catch (error: any) {
@@ -390,14 +388,14 @@ export class STTWorker {
    */
   async start() {
     logger.info('[STT Worker] Starting STT worker...');
-    
+
     // Check adapter health
     const health = await this.adapter.healthCheck();
     if (!health.healthy) {
       logger.error('[STT Worker] Adapter health check failed:', health.error);
       throw new Error('STT adapter is not healthy');
     }
-    
+
     logger.info('[STT Worker] STT worker started successfully');
   }
 

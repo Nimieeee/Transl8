@@ -1,6 +1,6 @@
 /**
  * Final Assembly Worker
- * 
+ *
  * Orchestrates the absolute synchronization assembly process to create
  * the final dubbed audio track with perfect synchronization.
  */
@@ -85,7 +85,7 @@ export class FinalAssemblyWorker {
 
       // Step 2: Check for local TTS files (for development without cloud storage)
       const ttsOutputDir = path.join(process.cwd(), 'temp', projectId, 'tts-output');
-      
+
       // Check if local TTS files exist
       let useLocalFiles = false;
       try {
@@ -101,7 +101,7 @@ export class FinalAssemblyWorker {
         for (let i = 0; i < contextMap.segments.length; i++) {
           const segment = contextMap.segments[i];
           const localPath = path.join(ttsOutputDir, `segment_${String(i).padStart(4, '0')}.wav`);
-          
+
           try {
             await fs.access(localPath);
             segment.generated_audio_path = localPath;
@@ -124,7 +124,7 @@ export class FinalAssemblyWorker {
 
       logger.info(
         `Context Map loaded: ${contextMap.segments.length} total segments, ` +
-        `${segmentsWithAudio.length} with generated audio`
+          `${segmentsWithAudio.length} with generated audio`
       );
 
       await job.updateProgress(30);
@@ -152,17 +152,19 @@ export class FinalAssemblyWorker {
       // CRITICAL: Trim each segment to its exact duration to prevent overlaps
       const inputs: string[] = [];
       const filterParts: string[] = [];
-      
+
       sortedSegments.forEach((segment: any, index: number) => {
         inputs.push(`-i "${segment.generated_audio_path}"`);
-        
+
         // Calculate delay in milliseconds and target duration in seconds
         const delayMs = segment.start_ms;
         const targetDurationSec = segment.duration;
-        
+
         // IMPORTANT: Trim audio to exact duration, then add delay
         // This prevents overlaps when TTS audio is longer than the target
-        filterParts.push(`[${index}:a]atrim=0:${targetDurationSec},adelay=${delayMs}|${delayMs}[a${index}]`);
+        filterParts.push(
+          `[${index}:a]atrim=0:${targetDurationSec},adelay=${delayMs}|${delayMs}[a${index}]`
+        );
       });
 
       // Mix all delayed audio streams
@@ -176,7 +178,7 @@ export class FinalAssemblyWorker {
           where: { id: projectId },
           select: { originalFile: true },
         });
-        
+
         if (project?.originalFile) {
           const { stdout } = await execAsync(
             `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${project.originalFile}"`
@@ -189,30 +191,34 @@ export class FinalAssemblyWorker {
       }
 
       // Use video duration if available, otherwise use Context Map duration
-      const totalDurationMs = videoDurationSec > 0 
-        ? videoDurationSec * 1000 
-        : (contextMap.original_duration_ms || Math.max(...sortedSegments.map((s: any) => s.end_ms)));
+      const totalDurationMs =
+        videoDurationSec > 0
+          ? videoDurationSec * 1000
+          : contextMap.original_duration_ms ||
+            Math.max(...sortedSegments.map((s: any) => s.end_ms));
       const totalDurationSec = totalDurationMs / 1000;
 
       // Build and execute ffmpeg command with padding to match video duration
       const ffmpegCmd = `ffmpeg ${inputs.join(' ')} -filter_complex "${filterComplex};[out]apad=whole_dur=${totalDurationSec}s[padded]" -map "[padded]" -t ${totalDurationSec} -y "${outputPath}"`;
-      
-      logger.info(`Executing ffmpeg with timing: ${sortedSegments.length} segments over ${totalDurationSec}s (padded to match video)`);
-      
+
+      logger.info(
+        `Executing ffmpeg with timing: ${sortedSegments.length} segments over ${totalDurationSec}s (padded to match video)`
+      );
+
       try {
         await execAsync(ffmpegCmd);
         logger.info(`Audio assembled successfully with proper timing: ${outputPath}`);
       } catch (error: any) {
         logger.error('FFmpeg assembly failed:', error);
-        
+
         // Fallback to simple concatenation if timing-based assembly fails
         logger.warn('Falling back to simple concatenation');
-        
+
         const segmentFiles = sortedSegments.map((seg: any) => seg.generated_audio_path);
         const concatListPath = path.join(outputDir, 'concat_list.txt');
         const concatContent = segmentFiles.map((file: string) => `file '${file}'`).join('\n');
         await fs.writeFile(concatListPath, concatContent);
-        
+
         await execAsync(
           `ffmpeg -f concat -safe 0 -i "${concatListPath}" -c copy "${outputPath}" -y`
         );
@@ -293,13 +299,9 @@ export class FinalAssemblyWorker {
         subscriptionTier: 'FREE', // Default for MVP
       };
 
-      await this.muxingQueue.add(
-        `muxing-${projectId}`,
-        muxingJobData,
-        {
-          priority: 1, // High priority
-        }
-      );
+      await this.muxingQueue.add(`muxing-${projectId}`, muxingJobData, {
+        priority: 1, // High priority
+      });
 
       logger.info(`[Final Assembly Worker] Enqueued muxing job for project ${projectId}`);
     } catch (error: any) {
@@ -321,7 +323,7 @@ export class FinalAssemblyWorker {
       // For now, we rely on the assembly service validation
       logger.info(
         `Validating final audio: ${finalAudioPath} ` +
-        `(expected: ${expectedDurationMs}ms, tolerance: ${toleranceMs}ms)`
+          `(expected: ${expectedDurationMs}ms, tolerance: ${toleranceMs}ms)`
       );
 
       // Check file exists
@@ -346,4 +348,3 @@ export class FinalAssemblyWorker {
 
 // Export singleton instance
 export const finalAssemblyWorker = new FinalAssemblyWorker();
-

@@ -69,7 +69,7 @@ export function VoiceCloneConsentModal({
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <h2 className="text-2xl font-bold mb-4">{consentForm.title}</h2>
-          
+
           <p className="text-gray-700 mb-6">{consentForm.content.introduction}</p>
 
           <div className="space-y-6">
@@ -79,9 +79,13 @@ export function VoiceCloneConsentModal({
               </h3>
               <p className="text-gray-700 mb-2">{consentForm.content.legalRepresentation.text}</p>
               <ul className="list-disc pl-6 space-y-1">
-                {consentForm.content.legalRepresentation.items.map((item: string, index: number) => (
-                  <li key={index} className="text-gray-700">{item}</li>
-                ))}
+                {consentForm.content.legalRepresentation.items.map(
+                  (item: string, index: number) => (
+                    <li key={index} className="text-gray-700">
+                      {item}
+                    </li>
+                  )
+                )}
               </ul>
             </section>
 
@@ -92,7 +96,9 @@ export function VoiceCloneConsentModal({
               <p className="text-gray-700 mb-2">{consentForm.content.usageRestrictions.text}</p>
               <ul className="list-disc pl-6 space-y-1">
                 {consentForm.content.usageRestrictions.items.map((item: string, index: number) => (
-                  <li key={index} className="text-gray-700">{item}</li>
+                  <li key={index} className="text-gray-700">
+                    {item}
+                  </li>
                 ))}
               </ul>
             </section>
@@ -101,20 +107,24 @@ export function VoiceCloneConsentModal({
               <h3 className="text-lg font-semibold mb-2">
                 {consentForm.content.liabilityAcknowledgment.title}
               </h3>
-              <p className="text-gray-700 mb-2">{consentForm.content.liabilityAcknowledgment.text}</p>
+              <p className="text-gray-700 mb-2">
+                {consentForm.content.liabilityAcknowledgment.text}
+              </p>
               <ul className="list-disc pl-6 space-y-1">
-                {consentForm.content.liabilityAcknowledgment.items.map((item: string, index: number) => (
-                  <li key={index} className="text-gray-700">{item}</li>
-                ))}
+                {consentForm.content.liabilityAcknowledgment.items.map(
+                  (item: string, index: number) => (
+                    <li key={index} className="text-gray-700">
+                      {item}
+                    </li>
+                  )
+                )}
               </ul>
             </section>
 
             <section className="border-t pt-4">
-              <h3 className="text-lg font-semibold mb-2">
-                {consentForm.content.consent.title}
-              </h3>
+              <h3 className="text-lg font-semibold mb-2">{consentForm.content.consent.title}</h3>
               <p className="text-gray-700 mb-4">{consentForm.content.consent.text}</p>
-              
+
               <label className="flex items-start gap-3 cursor-pointer">
                 <input
                   type="checkbox"
@@ -123,7 +133,8 @@ export function VoiceCloneConsentModal({
                   className="mt-1"
                 />
                 <span className="text-sm text-gray-700">
-                  I have read, understood, and agree to the Voice Clone Consent and Acknowledgment terms above.
+                  I have read, understood, and agree to the Voice Clone Consent and Acknowledgment
+                  terms above.
                 </span>
               </label>
             </section>

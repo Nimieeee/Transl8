@@ -3,12 +3,7 @@ import multer from 'multer';
 import { z } from 'zod';
 import { authenticateToken } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
-import {
-  generateStorageKey,
-  uploadFile,
-  generateSignedUrl,
-  deleteFile,
-} from '../lib/storage';
+import { generateStorageKey, uploadFile, generateSignedUrl, deleteFile } from '../lib/storage';
 import { validateVideo, extractAudio } from '../lib/video-validator';
 import { wsManager } from '../lib/websocket';
 import {
@@ -66,7 +61,10 @@ const SUPPORTED_LANGUAGES = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'ja', 'ko
 /**
  * Validate language pair support
  */
-function validateLanguagePair(sourceLanguage: string, targetLanguage: string): { valid: boolean; error?: string } {
+function validateLanguagePair(
+  sourceLanguage: string,
+  targetLanguage: string
+): { valid: boolean; error?: string } {
   if (!SUPPORTED_LANGUAGES.includes(sourceLanguage)) {
     return { valid: false, error: `Source language '${sourceLanguage}' is not supported` };
   }
@@ -82,37 +80,51 @@ function validateLanguagePair(sourceLanguage: string, targetLanguage: string): {
 // Validation schemas
 const createProjectSchema = z.object({
   name: z.string().min(1).max(255),
-  sourceLanguage: z.string().length(2).refine(
-    (lang) => SUPPORTED_LANGUAGES.includes(lang),
-    { message: 'Unsupported source language' }
-  ),
-  targetLanguage: z.string().length(2).refine(
-    (lang) => SUPPORTED_LANGUAGES.includes(lang),
-    { message: 'Unsupported target language' }
-  ),
+  sourceLanguage: z
+    .string()
+    .length(2)
+    .refine((lang) => SUPPORTED_LANGUAGES.includes(lang), {
+      message: 'Unsupported source language',
+    }),
+  targetLanguage: z
+    .string()
+    .length(2)
+    .refine((lang) => SUPPORTED_LANGUAGES.includes(lang), {
+      message: 'Unsupported target language',
+    }),
 });
 
 const updateProjectSchema = z.object({
   name: z.string().min(1).max(255).optional(),
-  sourceLanguage: z.string().length(2).refine(
-    (lang) => SUPPORTED_LANGUAGES.includes(lang),
-    { message: 'Unsupported source language' }
-  ).optional(),
-  targetLanguage: z.string().length(2).refine(
-    (lang) => SUPPORTED_LANGUAGES.includes(lang),
-    { message: 'Unsupported target language' }
-  ).optional(),
-  voiceConfig: z.object({
-    type: z.enum(['preset', 'clone']),
-    voiceId: z.string(),
-    parameters: z.object({
-      speed: z.number().min(0.5).max(2.0).optional(),
-      pitch: z.number().min(-12).max(12).optional(),
-      emotion: z.string().optional(),
-      style: z.string().optional(),
-    }).optional(),
-    speakerMapping: z.record(z.string()).optional(),
-  }).optional(),
+  sourceLanguage: z
+    .string()
+    .length(2)
+    .refine((lang) => SUPPORTED_LANGUAGES.includes(lang), {
+      message: 'Unsupported source language',
+    })
+    .optional(),
+  targetLanguage: z
+    .string()
+    .length(2)
+    .refine((lang) => SUPPORTED_LANGUAGES.includes(lang), {
+      message: 'Unsupported target language',
+    })
+    .optional(),
+  voiceConfig: z
+    .object({
+      type: z.enum(['preset', 'clone']),
+      voiceId: z.string(),
+      parameters: z
+        .object({
+          speed: z.number().min(0.5).max(2.0).optional(),
+          pitch: z.number().min(-12).max(12).optional(),
+          emotion: z.string().optional(),
+          style: z.string().optional(),
+        })
+        .optional(),
+      speakerMapping: z.record(z.string()).optional(),
+    })
+    .optional(),
 });
 
 /**
@@ -255,7 +267,7 @@ router.put('/:id', authenticateToken, async (req: Request, res: Response) => {
     // Validate language pair if both languages are being updated
     const sourceLanguage = body.sourceLanguage || project.sourceLanguage;
     const targetLanguage = body.targetLanguage || project.targetLanguage;
-    
+
     const languageValidation = validateLanguagePair(sourceLanguage, targetLanguage);
     if (!languageValidation.valid) {
       res.status(400).json({ error: languageValidation.error });
@@ -415,12 +427,7 @@ router.post(
       wsManager.sendUploadProgress(projectId, 30, 'Uploading video to storage...');
 
       // Upload video to S3
-      const videoKey = generateStorageKey(
-        userId,
-        projectId,
-        req.file.originalname,
-        'videos'
-      );
+      const videoKey = generateStorageKey(userId, projectId, req.file.originalname, 'videos');
 
       if (!tempFilePath) {
         throw new Error('Temporary file path is null');
@@ -485,7 +492,10 @@ router.post(
       });
 
       wsManager.sendUploadProgress(projectId, 100, 'Upload complete!');
-      wsManager.sendComplete(projectId, 'Video uploaded successfully. Processing will begin shortly.');
+      wsManager.sendComplete(
+        projectId,
+        'Video uploaded successfully. Processing will begin shortly.'
+      );
 
       res.json({
         message: 'Video uploaded successfully',
@@ -498,7 +508,7 @@ router.post(
       });
     } catch (error) {
       console.error('Error uploading video:', error);
-      
+
       if (req.params.id) {
         wsManager.sendError(
           req.params.id,
@@ -551,10 +561,10 @@ router.get('/:id/status', authenticateToken, async (req: Request, res: Response)
     if (currentJob && project.duration) {
       // Rough estimates based on stage (in seconds per minute of video)
       const stageEstimates: Record<string, number> = {
-        STT: 30,      // 30 seconds per minute of video
-        MT: 10,       // 10 seconds per minute of video
-        TTS: 60,      // 60 seconds per minute of video
-        MUXING: 5,    // 5 seconds per minute of video
+        STT: 30, // 30 seconds per minute of video
+        MT: 10, // 10 seconds per minute of video
+        TTS: 60, // 60 seconds per minute of video
+        MUXING: 5, // 5 seconds per minute of video
         LIPSYNC: 120, // 120 seconds per minute of video
       };
 
@@ -584,7 +594,7 @@ router.get('/:id/status', authenticateToken, async (req: Request, res: Response)
 
     let overallProgress = 0;
     const completedJobs = project.jobs.filter((job: any) => job.status === 'COMPLETED');
-    
+
     for (const job of completedJobs) {
       overallProgress += stageWeights[job.stage] || 0;
     }
@@ -737,14 +747,16 @@ const updateTranscriptSchema = z.object({
       text: z.string(),
       speaker: z.string().optional(),
       confidence: z.number().optional(),
-      words: z.array(
-        z.object({
-          word: z.string(),
-          start: z.number(),
-          end: z.number(),
-          confidence: z.number().optional(),
-        })
-      ).optional(),
+      words: z
+        .array(
+          z.object({
+            word: z.string(),
+            start: z.number(),
+            end: z.number(),
+            confidence: z.number().optional(),
+          })
+        )
+        .optional(),
     })
   ),
   text: z.string().optional(),
@@ -790,15 +802,15 @@ router.put('/:id/transcript', authenticateToken, async (req: Request, res: Respo
     // Create edited content preserving timestamps
     const segments = body.segments.map((segment, index) => {
       const originalSegment = originalContent.segments[index];
-      
+
       // Ensure words have proper confidence values
-      const words = (segment.words || originalSegment?.words || []).map(word => ({
+      const words = (segment.words || originalSegment?.words || []).map((word) => ({
         word: word.word,
         start: word.start,
         end: word.end,
         confidence: word.confidence ?? 1.0,
       }));
-      
+
       return {
         id: segment.id,
         start: segment.start,
@@ -811,10 +823,10 @@ router.put('/:id/transcript', authenticateToken, async (req: Request, res: Respo
     });
 
     // Calculate speaker count
-    const uniqueSpeakers = new Set(segments.map(s => s.speaker));
-    
+    const uniqueSpeakers = new Set(segments.map((s) => s.speaker));
+
     const editedContent: Transcript = {
-      text: body.text || segments.map(s => s.text).join(' '),
+      text: body.text || segments.map((s) => s.text).join(' '),
       duration: originalContent.duration,
       language: originalContent.language,
       segments,
@@ -959,12 +971,12 @@ router.put('/:id/translation', authenticateToken, async (req: Request, res: Resp
 
     // Create edited content preserving timestamps and structure
     const editedContent = {
-      text: body.text || body.segments.map(s => s.text).join(' '),
+      text: body.text || body.segments.map((s) => s.text).join(' '),
       duration: originalContent.duration,
       language: translation.targetLanguage,
       segments: body.segments.map((segment, index) => {
         const originalSegment = originalContent.segments?.[index];
-        
+
         return {
           id: segment.id,
           start: segment.start,
@@ -1046,16 +1058,16 @@ router.post('/:id/approve-stage', authenticateToken, async (req: Request, res: R
 
     // Validate that the stage is complete
     if (project.jobs.length === 0) {
-      res.status(400).json({ 
-        error: `No ${stage} job found for this project. The stage must be completed before approval.` 
+      res.status(400).json({
+        error: `No ${stage} job found for this project. The stage must be completed before approval.`,
       });
       return;
     }
 
     const stageJob = project.jobs[0];
     if (stageJob.status !== 'COMPLETED') {
-      res.status(400).json({ 
-        error: `${stage} stage is not complete. Current status: ${stageJob.status}` 
+      res.status(400).json({
+        error: `${stage} stage is not complete. Current status: ${stageJob.status}`,
       });
       return;
     }
@@ -1137,8 +1149,9 @@ router.post('/:id/approve-stage', authenticateToken, async (req: Request, res: R
 
       // Verify voice configuration exists
       if (!project.voiceConfig) {
-        res.status(400).json({ 
-          error: 'Voice configuration is required before approving translation. Please configure voices first.' 
+        res.status(400).json({
+          error:
+            'Voice configuration is required before approving translation. Please configure voices first.',
         });
         return;
       }

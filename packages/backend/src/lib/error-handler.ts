@@ -50,7 +50,7 @@ export function isRetryableError(error: Error): boolean {
     /rate limit/i,
   ];
 
-  return transientPatterns.some(pattern => pattern.test(error.message));
+  return transientPatterns.some((pattern) => pattern.test(error.message));
 }
 
 /**
@@ -60,7 +60,7 @@ export function calculateBackoffDelay(attemptsMade: number): number {
   // Exponential backoff: 5s, 15s, 45s, 135s, etc.
   const baseDelay = 5000; // 5 seconds
   const maxDelay = 300000; // 5 minutes
-  
+
   const delay = baseDelay * Math.pow(3, attemptsMade - 1);
   return Math.min(delay, maxDelay);
 }
@@ -68,11 +68,7 @@ export function calculateBackoffDelay(attemptsMade: number): number {
 /**
  * Handle job failure with retry logic
  */
-export async function handleJobFailure(
-  job: BullJob,
-  error: Error,
-  stage: JobStage
-): Promise<void> {
+export async function handleJobFailure(job: BullJob, error: Error, stage: JobStage): Promise<void> {
   const jobId = job.id as string;
   const attemptsMade = job.attemptsMade;
   const maxAttempts = job.opts.attempts || 3;
@@ -193,19 +189,11 @@ export function createErrorResponse(error: Error) {
  */
 export function validateJobData(jobData: any, stage: JobStage): void {
   if (!jobData.projectId) {
-    throw new JobProcessingError(
-      'Missing projectId in job data',
-      JobErrorType.VALIDATION,
-      false
-    );
+    throw new JobProcessingError('Missing projectId in job data', JobErrorType.VALIDATION, false);
   }
 
   if (!jobData.userId) {
-    throw new JobProcessingError(
-      'Missing userId in job data',
-      JobErrorType.VALIDATION,
-      false
-    );
+    throw new JobProcessingError('Missing userId in job data', JobErrorType.VALIDATION, false);
   }
 
   // Stage-specific validation

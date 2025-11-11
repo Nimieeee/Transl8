@@ -38,10 +38,7 @@ interface LipSyncBenchmarkResult extends BenchmarkResult {
 /**
  * Run lip-sync inference on a test case
  */
-async function runLipSyncInference(
-  videoPath: string,
-  audioPath: string
-): Promise<string> {
+async function runLipSyncInference(videoPath: string, audioPath: string): Promise<string> {
   try {
     // Check if files exist
     if (!fs.existsSync(videoPath) || !fs.existsSync(audioPath)) {
@@ -53,21 +50,14 @@ async function runLipSyncInference(
     formData.append('video', fs.createReadStream(videoPath));
     formData.append('audio', fs.createReadStream(audioPath));
 
-    const response = await axios.post(
-      `${API_BASE_URL}/api/models/lipsync/sync`,
-      formData,
-      {
-        headers: formData.getHeaders(),
-        timeout: 300000, // 5 minutes
-        responseType: 'arraybuffer',
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/api/models/lipsync/sync`, formData, {
+      headers: formData.getHeaders(),
+      timeout: 300000, // 5 minutes
+      responseType: 'arraybuffer',
+    });
 
     // Save video to temp file
-    const tempPath = path.join(
-      RESULTS_DIR,
-      `temp_synced_${Date.now()}_${Math.random()}.mp4`
-    );
+    const tempPath = path.join(RESULTS_DIR, `temp_synced_${Date.now()}_${Math.random()}.mp4`);
     fs.writeFileSync(tempPath, response.data);
 
     return tempPath;
@@ -87,43 +77,26 @@ function estimateFrameCount(duration: number, fps: number = 30): number {
 /**
  * Benchmark a single test case
  */
-async function benchmarkTestCase(
-  testCase: any
-): Promise<LipSyncBenchmarkResult> {
-  console.log(
-    `  Testing: ${testCase.id} (${testCase.videoQuality}, ${testCase.faceAngle})`
-  );
+async function benchmarkTestCase(testCase: any): Promise<LipSyncBenchmarkResult> {
+  console.log(`  Testing: ${testCase.id} (${testCase.videoQuality}, ${testCase.faceAngle})`);
 
   const startTime = Date.now();
 
   try {
     // Run lip-sync inference
-    const syncedVideoPath = await runLipSyncInference(
-      testCase.videoPath,
-      testCase.audioPath
-    );
+    const syncedVideoPath = await runLipSyncInference(testCase.videoPath, testCase.audioPath);
 
     const processingTime = (Date.now() - startTime) / 1000;
 
     // Calculate sync accuracy
-    const syncAccuracy = calculateSyncAccuracy(
-      syncedVideoPath,
-      testCase.audioPath
-    );
+    const syncAccuracy = calculateSyncAccuracy(syncedVideoPath, testCase.audioPath);
 
     // Calculate face quality
-    const faceQuality = calculateFaceQuality(
-      testCase.videoPath,
-      syncedVideoPath
-    );
+    const faceQuality = calculateFaceQuality(testCase.videoPath, syncedVideoPath);
 
     // Calculate performance metrics
     const frameCount = estimateFrameCount(testCase.duration);
-    const performance = calculatePerformanceMetrics(
-      syncedVideoPath,
-      processingTime,
-      frameCount
-    );
+    const performance = calculatePerformanceMetrics(syncedVideoPath, processingTime, frameCount);
 
     // Calculate quality-performance tradeoff
     const tradeoff = calculateQualityPerformanceTradeoff(
@@ -183,9 +156,7 @@ async function benchmarkTestCase(
 /**
  * Calculate aggregate metrics
  */
-function calculateAggregateMetrics(
-  results: LipSyncBenchmarkResult[]
-): Record<string, number> {
+function calculateAggregateMetrics(results: LipSyncBenchmarkResult[]): Record<string, number> {
   const successfulResults = results.filter((r) => r.success);
 
   if (successfulResults.length === 0) {
@@ -194,53 +165,40 @@ function calculateAggregateMetrics(
 
   // Average sync confidence
   const avgSyncConfidence =
-    successfulResults.reduce(
-      (sum, r) => sum + (r.metrics.syncConfidence || 0),
-      0
-    ) / successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.syncConfidence || 0), 0) /
+    successfulResults.length;
 
   // Average face quality
   const avgSSIM =
-    successfulResults.reduce((sum, r) => sum + (r.metrics.ssim || 0), 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.ssim || 0), 0) / successfulResults.length;
 
   const avgPSNR =
-    successfulResults.reduce((sum, r) => sum + (r.metrics.psnr || 0), 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.psnr || 0), 0) / successfulResults.length;
 
   // Average processing speed
   const avgFPS =
-    successfulResults.reduce((sum, r) => sum + (r.metrics.fps || 0), 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.fps || 0), 0) / successfulResults.length;
 
   // Average tradeoff score
   const avgTradeoff =
-    successfulResults.reduce(
-      (sum, r) => sum + (r.metrics.tradeoffScore || 0),
-      0
-    ) / successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.tradeoffScore || 0), 0) /
+    successfulResults.length;
 
   // Metrics by video quality
   const qualities = [...new Set(successfulResults.map((r) => r.videoQuality))];
   const metricsByQuality: Record<string, any> = {};
 
   qualities.forEach((quality) => {
-    const qualityResults = successfulResults.filter(
-      (r) => r.videoQuality === quality
-    );
+    const qualityResults = successfulResults.filter((r) => r.videoQuality === quality);
     metricsByQuality[quality] = {
       syncConfidence:
         qualityResults.reduce((sum, r) => sum + (r.metrics.syncConfidence || 0), 0) /
         qualityResults.length,
       ssim:
-        qualityResults.reduce((sum, r) => sum + (r.metrics.ssim || 0), 0) /
-        qualityResults.length,
-      fps:
-        qualityResults.reduce((sum, r) => sum + (r.metrics.fps || 0), 0) /
-        qualityResults.length,
+        qualityResults.reduce((sum, r) => sum + (r.metrics.ssim || 0), 0) / qualityResults.length,
+      fps: qualityResults.reduce((sum, r) => sum + (r.metrics.fps || 0), 0) / qualityResults.length,
       processingTime:
-        qualityResults.reduce((sum, r) => sum + r.processingTime, 0) /
-        qualityResults.length,
+        qualityResults.reduce((sum, r) => sum + r.processingTime, 0) / qualityResults.length,
     };
   });
 
@@ -259,8 +217,7 @@ function calculateAggregateMetrics(
 
   // Average processing time
   const avgProcessingTime =
-    successfulResults.reduce((sum, r) => sum + r.processingTime, 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + r.processingTime, 0) / successfulResults.length;
 
   return {
     averageSyncConfidence: Math.round(avgSyncConfidence * 10000) / 10000,
@@ -271,32 +228,32 @@ function calculateAggregateMetrics(
     metricsByQuality,
     metricsByAngle,
     averageProcessingTime: Math.round(avgProcessingTime * 100) / 100,
-    successRate:
-      Math.round((successfulResults.length / results.length) * 10000) / 100,
+    successRate: Math.round((successfulResults.length / results.length) * 10000) / 100,
   };
 }
 
 /**
  * Generate summary
  */
-function generateSummary(
-  aggregateMetrics: Record<string, number>,
-  totalCases: number
-): string {
+function generateSummary(aggregateMetrics: Record<string, number>, totalCases: number): string {
   const qualityComparisons = compareVideoQualities(
-    Object.entries(aggregateMetrics.metricsByQuality || {}).map(([quality, metrics]: [string, any]) => ({
-      quality,
-      syncAccuracy: metrics.syncConfidence,
-      faceQuality: metrics.ssim,
-      processingTime: metrics.processingTime,
-    }))
+    Object.entries(aggregateMetrics.metricsByQuality || {}).map(
+      ([quality, metrics]: [string, any]) => ({
+        quality,
+        syncAccuracy: metrics.syncConfidence,
+        faceQuality: metrics.ssim,
+        processingTime: metrics.processingTime,
+      })
+    )
   );
 
   const angleComparisons = compareFaceAngles(
-    Object.entries(aggregateMetrics.metricsByAngle || {}).map(([angle, metrics]: [string, any]) => ({
-      angle,
-      syncAccuracy: metrics.syncConfidence,
-    }))
+    Object.entries(aggregateMetrics.metricsByAngle || {}).map(
+      ([angle, metrics]: [string, any]) => ({
+        angle,
+        syncAccuracy: metrics.syncConfidence,
+      })
+    )
   );
 
   const qualityText = qualityComparisons
@@ -308,8 +265,7 @@ function generateSummary(
 
   const angleText = angleComparisons
     .map(
-      (c) =>
-        `  - ${c.angle}: Sync ${c.syncAccuracy.toFixed(4)} (${c.difficulty})\n    ${c.notes}`
+      (c) => `  - ${c.angle}: Sync ${c.syncAccuracy.toFixed(4)} (${c.difficulty})\n    ${c.notes}`
     )
     .join('\n');
 
@@ -372,10 +328,7 @@ async function main(): Promise<void> {
   };
 
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const reportPath = path.join(
-    RESULTS_DIR,
-    `lipsync_benchmark_${timestamp}.json`
-  );
+  const reportPath = path.join(RESULTS_DIR, `lipsync_benchmark_${timestamp}.json`);
 
   if (!fs.existsSync(RESULTS_DIR)) {
     fs.mkdirSync(RESULTS_DIR, { recursive: true });

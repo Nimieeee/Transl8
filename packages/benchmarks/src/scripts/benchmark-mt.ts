@@ -68,10 +68,8 @@ function generateMockTranslation(
   // Simple mock translations for common test cases
   const mockTranslations: Record<string, string> = {
     'Hello, how are you today?': 'Hola, ¿cómo estás hoy?',
-    'The weather is beautiful this morning.':
-      'El clima está hermoso esta mañana.',
-    'I would like to book a table for two.':
-      'Je voudrais réserver une table pour deux.',
+    'The weather is beautiful this morning.': 'El clima está hermoso esta mañana.',
+    'I would like to book a table for two.': 'Je voudrais réserver une table pour deux.',
     'The meeting is scheduled for tomorrow at 3 PM.':
       'Das Treffen ist für morgen um 15 Uhr geplant.',
   };
@@ -104,10 +102,7 @@ async function benchmarkTestCase(testCase: any): Promise<MTBenchmarkResult> {
     // Calculate glossary accuracy if applicable
     let glossaryAccuracy: GlossaryAccuracyResult | undefined;
     if (testCase.glossaryTerms && Object.keys(testCase.glossaryTerms).length > 0) {
-      glossaryAccuracy = calculateGlossaryAccuracy(
-        translation,
-        testCase.glossaryTerms
-      );
+      glossaryAccuracy = calculateGlossaryAccuracy(translation, testCase.glossaryTerms);
     }
 
     // Calculate fluency score
@@ -152,9 +147,7 @@ async function benchmarkTestCase(testCase: any): Promise<MTBenchmarkResult> {
 /**
  * Calculate aggregate metrics
  */
-function calculateAggregateMetrics(
-  results: MTBenchmarkResult[]
-): Record<string, number> {
+function calculateAggregateMetrics(results: MTBenchmarkResult[]): Record<string, number> {
   const successfulResults = results.filter((r) => r.success);
 
   if (successfulResults.length === 0) {
@@ -163,17 +156,14 @@ function calculateAggregateMetrics(
 
   // Average BLEU
   const avgBLEU =
-    successfulResults.reduce((sum, r) => sum + (r.metrics.bleu || 0), 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.bleu || 0), 0) / successfulResults.length;
 
   // Average glossary accuracy
   const glossaryResults = successfulResults.filter((r) => r.glossaryAccuracy);
   const avgGlossaryAccuracy =
     glossaryResults.length > 0
-      ? glossaryResults.reduce(
-          (sum, r) => sum + (r.metrics.glossaryAccuracy || 0),
-          0
-        ) / glossaryResults.length
+      ? glossaryResults.reduce((sum, r) => sum + (r.metrics.glossaryAccuracy || 0), 0) /
+        glossaryResults.length
       : 0;
 
   // Average fluency
@@ -188,8 +178,7 @@ function calculateAggregateMetrics(
   languagePairs.forEach((pair) => {
     const pairResults = successfulResults.filter((r) => r.languagePair === pair);
     bleuByPair[pair] =
-      pairResults.reduce((sum, r) => sum + (r.metrics.bleu || 0), 0) /
-      pairResults.length;
+      pairResults.reduce((sum, r) => sum + (r.metrics.bleu || 0), 0) / pairResults.length;
   });
 
   // BLEU by domain
@@ -199,44 +188,32 @@ function calculateAggregateMetrics(
   domains.forEach((domain) => {
     const domainResults = successfulResults.filter((r) => r.domain === domain);
     bleuByDomain[domain] =
-      domainResults.reduce((sum, r) => sum + (r.metrics.bleu || 0), 0) /
-      domainResults.length;
+      domainResults.reduce((sum, r) => sum + (r.metrics.bleu || 0), 0) / domainResults.length;
   });
 
   // Average processing time
   const avgProcessingTime =
-    successfulResults.reduce((sum, r) => sum + r.processingTime, 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + r.processingTime, 0) / successfulResults.length;
 
   return {
     averageBLEU: Math.round(avgBLEU * 100) / 100,
     averageGlossaryAccuracy: Math.round(avgGlossaryAccuracy * 100) / 100,
     averageFluency: Math.round(avgFluency * 100) / 100,
     ...Object.fromEntries(
-      Object.entries(bleuByPair).map(([k, v]) => [
-        `bleu_${k}`,
-        Math.round(v * 100) / 100,
-      ])
+      Object.entries(bleuByPair).map(([k, v]) => [`bleu_${k}`, Math.round(v * 100) / 100])
     ),
     ...Object.fromEntries(
-      Object.entries(bleuByDomain).map(([k, v]) => [
-        `bleu_${k}`,
-        Math.round(v * 100) / 100,
-      ])
+      Object.entries(bleuByDomain).map(([k, v]) => [`bleu_${k}`, Math.round(v * 100) / 100])
     ),
     averageProcessingTime: Math.round(avgProcessingTime * 100) / 100,
-    successRate:
-      Math.round((successfulResults.length / results.length) * 10000) / 100,
+    successRate: Math.round((successfulResults.length / results.length) * 10000) / 100,
   };
 }
 
 /**
  * Generate summary
  */
-function generateSummary(
-  aggregateMetrics: Record<string, number>,
-  totalCases: number
-): string {
+function generateSummary(aggregateMetrics: Record<string, number>, totalCases: number): string {
   const languagePairMetrics = Object.entries(aggregateMetrics)
     .filter(([k]) => k.startsWith('bleu_') && k.includes('-'))
     .map(([k, v]) => `  - ${k.replace('bleu_', '')}: ${v}`)

@@ -38,9 +38,7 @@ export default function StatusPage() {
       }
     } catch (err: any) {
       console.error('Status fetch error:', err);
-      setError(
-        err.response?.data?.error?.message || 'Failed to fetch job status'
-      );
+      setError(err.response?.data?.error?.message || 'Failed to fetch job status');
     } finally {
       setIsLoading(false);
     }
@@ -117,9 +115,7 @@ export default function StatusPage() {
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="bg-white shadow rounded-lg p-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Dubbing in Progress
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dubbing in Progress</h1>
           <p className="text-gray-600 mb-8">
             Your video is being dubbed. This may take a few minutes.
           </p>
@@ -134,9 +130,7 @@ export default function StatusPage() {
             <div className="space-y-6">
               {/* Status Message */}
               <div className="text-center">
-                <p className="text-lg font-medium text-gray-900">
-                  {getStatusMessage()}
-                </p>
+                <p className="text-lg font-medium text-gray-900">{getStatusMessage()}</p>
               </div>
 
               {/* Progress Bar */}
@@ -158,11 +152,7 @@ export default function StatusPage() {
                 <div className="rounded-md bg-red-50 p-4">
                   <div className="flex">
                     <div className="flex-shrink-0">
-                      <svg
-                        className="h-5 w-5 text-red-400"
-                        viewBox="0 0 20 20"
-                        fill="currentColor"
-                      >
+                      <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                         <path
                           fillRule="evenodd"
                           d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -171,9 +161,7 @@ export default function StatusPage() {
                       </svg>
                     </div>
                     <div className="ml-3">
-                      <h3 className="text-sm font-medium text-red-800">
-                        Error Details
-                      </h3>
+                      <h3 className="text-sm font-medium text-red-800">Error Details</h3>
                       <div className="mt-2 text-sm text-red-700">
                         <p>{jobStatus.error}</p>
                       </div>
@@ -213,9 +201,7 @@ export default function StatusPage() {
                 <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Job ID</dt>
-                    <dd className="mt-1 text-sm text-gray-900 font-mono">
-                      {jobStatus.jobId}
-                    </dd>
+                    <dd className="mt-1 text-sm text-gray-900 font-mono">{jobStatus.jobId}</dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Status</dt>
@@ -225,10 +211,10 @@ export default function StatusPage() {
                           jobStatus.status === 'completed'
                             ? 'bg-green-100 text-green-800'
                             : jobStatus.status === 'failed'
-                            ? 'bg-red-100 text-red-800'
-                            : jobStatus.status === 'processing'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-gray-100 text-gray-800'
+                              ? 'bg-red-100 text-red-800'
+                              : jobStatus.status === 'processing'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-gray-100 text-gray-800'
                         }`}
                       >
                         {jobStatus.status}
@@ -236,18 +222,14 @@ export default function StatusPage() {
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">
-                      Started At
-                    </dt>
+                    <dt className="text-sm font-medium text-gray-500">Started At</dt>
                     <dd className="mt-1 text-sm text-gray-900">
                       {new Date(jobStatus.createdAt).toLocaleString()}
                     </dd>
                   </div>
                   {jobStatus.completedAt && (
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">
-                        Completed At
-                      </dt>
+                      <dt className="text-sm font-medium text-gray-500">Completed At</dt>
                       <dd className="mt-1 text-sm text-gray-900">
                         {new Date(jobStatus.completedAt).toLocaleString()}
                       </dd>

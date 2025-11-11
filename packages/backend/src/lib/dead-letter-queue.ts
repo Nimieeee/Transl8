@@ -89,7 +89,7 @@ export async function getDeadLetterJobs(
   offset: number = 0
 ): Promise<DeadLetterJobData[]> {
   const jobs = await deadLetterQueue.getJobs(['completed', 'failed'], offset, offset + limit - 1);
-  return jobs.map(job => job.data as DeadLetterJobData);
+  return jobs.map((job) => job.data as DeadLetterJobData);
 }
 
 /**
@@ -97,9 +97,7 @@ export async function getDeadLetterJobs(
  */
 export async function getUserDeadLetterJobs(userId: string): Promise<DeadLetterJobData[]> {
   const jobs = await deadLetterQueue.getJobs(['completed', 'failed']);
-  return jobs
-    .map(job => job.data as DeadLetterJobData)
-    .filter(data => data.userId === userId);
+  return jobs.map((job) => job.data as DeadLetterJobData).filter((data) => data.userId === userId);
 }
 
 /**
@@ -108,8 +106,8 @@ export async function getUserDeadLetterJobs(userId: string): Promise<DeadLetterJ
 export async function getProjectDeadLetterJobs(projectId: string): Promise<DeadLetterJobData[]> {
   const jobs = await deadLetterQueue.getJobs(['completed', 'failed']);
   return jobs
-    .map(job => job.data as DeadLetterJobData)
-    .filter(data => data.projectId === projectId);
+    .map((job) => job.data as DeadLetterJobData)
+    .filter((data) => data.projectId === projectId);
 }
 
 /**
@@ -117,7 +115,7 @@ export async function getProjectDeadLetterJobs(projectId: string): Promise<DeadL
  */
 export async function retryFromDeadLetterQueue(dlqJobId: string): Promise<string> {
   const job = await deadLetterQueue.getJob(dlqJobId);
-  
+
   if (!job) {
     throw new Error('Dead letter queue job not found');
   }
@@ -154,11 +152,14 @@ export async function getDeadLetterQueueStats() {
 
   // Get jobs by stage
   const jobs = await deadLetterQueue.getJobs(['completed', 'failed']);
-  const byStage = jobs.reduce((acc, job) => {
-    const data = job.data as DeadLetterJobData;
-    acc[data.stage] = (acc[data.stage] || 0) + 1;
-    return acc;
-  }, {} as Record<JobStage, number>);
+  const byStage = jobs.reduce(
+    (acc, job) => {
+      const data = job.data as DeadLetterJobData;
+      acc[data.stage] = (acc[data.stage] || 0) + 1;
+      return acc;
+    },
+    {} as Record<JobStage, number>
+  );
 
   return {
     total: completed + failed + waiting,
@@ -175,9 +176,9 @@ export async function getDeadLetterQueueStats() {
 export async function cleanDeadLetterQueue(olderThanDays: number = 7): Promise<number> {
   const grace = olderThanDays * 24 * 3600 * 1000; // Convert to milliseconds
   const cleaned = await deadLetterQueue.clean(grace, 1000, 'completed');
-  
+
   console.log(`[DLQ] Cleaned ${cleaned.length} old jobs`);
-  
+
   return cleaned.length;
 }
 

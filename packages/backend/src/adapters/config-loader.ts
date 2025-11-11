@@ -1,8 +1,8 @@
 /**
  * Model Configuration Loader
- * 
+ *
  * Loads model configurations from JSON file and initializes the model registry
- * 
+ *
  * Requirements: 14.2, 14.4
  */
 
@@ -43,10 +43,10 @@ export function loadModelConfig(configPath?: string): ConfigFile {
   try {
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const config: ConfigFile = JSON.parse(fileContent);
-    
+
     // Validate configuration structure
     validateConfig(config);
-    
+
     return config;
   } catch (error) {
     if (error instanceof Error) {
@@ -65,7 +65,7 @@ function validateConfig(config: ConfigFile): void {
   }
 
   const stages: PipelineStage[] = ['stt', 'mt', 'tts', 'lipsync'];
-  
+
   for (const stage of stages) {
     if (!Array.isArray(config.models[stage])) {
       throw new Error(`Configuration missing or invalid "models.${stage}" array`);
@@ -146,7 +146,7 @@ export function updateModelInConfig(
   updates: Partial<ModelConfig>
 ): ConfigFile {
   const models = config.models[stage];
-  const index = models.findIndex(m => m.name === modelName);
+  const index = models.findIndex((m) => m.name === modelName);
 
   if (index === -1) {
     throw new Error(`Model ${modelName} not found in stage ${stage}`);
@@ -166,9 +166,9 @@ export function addModelToConfig(
   modelConfig: ModelConfig
 ): ConfigFile {
   const models = config.models[stage];
-  
+
   // Check if model already exists
-  const exists = models.some(m => m.name === modelConfig.name);
+  const exists = models.some((m) => m.name === modelConfig.name);
   if (exists) {
     throw new Error(`Model ${modelConfig.name} already exists in stage ${stage}`);
   }
@@ -187,7 +187,7 @@ export function removeModelFromConfig(
   modelName: string
 ): ConfigFile {
   const models = config.models[stage];
-  const index = models.findIndex(m => m.name === modelName);
+  const index = models.findIndex((m) => m.name === modelName);
 
   if (index === -1) {
     throw new Error(`Model ${modelName} not found in stage ${stage}`);
@@ -212,7 +212,7 @@ export function setDefaultModel(
   modelName: string
 ): ConfigFile {
   const models = config.models[stage];
-  const exists = models.some(m => m.name === modelName);
+  const exists = models.some((m) => m.name === modelName);
 
   if (!exists) {
     throw new Error(`Model ${modelName} not found in stage ${stage}`);

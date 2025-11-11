@@ -99,8 +99,15 @@ class ContentModerationService {
 
     // Check if voice clone name matches known public figures (basic check)
     const publicFigureNames = [
-      'obama', 'trump', 'biden', 'musk', 'bezos', 'gates',
-      'celebrity', 'president', 'politician',
+      'obama',
+      'trump',
+      'biden',
+      'musk',
+      'bezos',
+      'gates',
+      'celebrity',
+      'president',
+      'politician',
     ];
 
     const nameLower = voiceClone.name.toLowerCase();
@@ -147,19 +154,32 @@ class ContentModerationService {
   private containsProhibitedTerms(text: string): boolean {
     const prohibitedTerms = [
       // Hate speech
-      'hate', 'racist', 'nazi', 'terrorism',
+      'hate',
+      'racist',
+      'nazi',
+      'terrorism',
       // Violence
-      'kill', 'murder', 'bomb', 'weapon',
+      'kill',
+      'murder',
+      'bomb',
+      'weapon',
       // Sexual content
-      'porn', 'xxx', 'sex',
+      'porn',
+      'xxx',
+      'sex',
       // Illegal activities
-      'drug', 'cocaine', 'heroin', 'meth',
+      'drug',
+      'cocaine',
+      'heroin',
+      'meth',
       // Fraud
-      'scam', 'phishing', 'fraud',
+      'scam',
+      'phishing',
+      'fraud',
     ];
 
     const textLower = text.toLowerCase();
-    
+
     // Simple keyword matching (in production, use ML-based content moderation)
     for (const term of prohibitedTerms) {
       if (textLower.includes(term)) {
@@ -173,11 +193,7 @@ class ContentModerationService {
   /**
    * Flag content for manual review
    */
-  private async flagContent(
-    contentType: string,
-    contentId: string,
-    reason: string
-  ): Promise<void> {
+  private async flagContent(contentType: string, contentId: string, reason: string): Promise<void> {
     try {
       await prisma.contentFlag.create({
         data: {

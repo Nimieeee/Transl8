@@ -34,12 +34,10 @@ describe('Authentication API', () => {
 
     it('should reject registration with existing email', async () => {
       // Create user first
-      await request(app)
-        .post('/api/auth/register')
-        .send({
-          email: 'duplicate@test.com',
-          password: 'SecurePass123!',
-        });
+      await request(app).post('/api/auth/register').send({
+        email: 'duplicate@test.com',
+        password: 'SecurePass123!',
+      });
 
       // Try to register again
       const response = await request(app)
@@ -81,12 +79,10 @@ describe('Authentication API', () => {
   describe('POST /api/auth/login', () => {
     beforeEach(async () => {
       // Create test user
-      await request(app)
-        .post('/api/auth/register')
-        .send({
-          email: testUsers.free.email,
-          password: testUsers.free.password,
-        });
+      await request(app).post('/api/auth/register').send({
+        email: testUsers.free.email,
+        password: testUsers.free.password,
+      });
     });
 
     it('should login with valid credentials', async () => {
@@ -135,12 +131,10 @@ describe('Authentication API', () => {
 
     beforeEach(async () => {
       // Register and get tokens
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({
-          email: 'refresh@test.com',
-          password: 'SecurePass123!',
-        });
+      const response = await request(app).post('/api/auth/register').send({
+        email: 'refresh@test.com',
+        password: 'SecurePass123!',
+      });
 
       refreshToken = response.body.tokens.refreshToken;
     });
@@ -168,9 +162,7 @@ describe('Authentication API', () => {
 
     it('should reject refresh with revoked token', async () => {
       // Use the token once
-      await request(app)
-        .post('/api/auth/refresh')
-        .send({ refreshToken });
+      await request(app).post('/api/auth/refresh').send({ refreshToken });
 
       // Try to use it again (should be revoked)
       const response = await request(app)
@@ -187,12 +179,10 @@ describe('Authentication API', () => {
     let refreshToken: string;
 
     beforeEach(async () => {
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({
-          email: 'logout@test.com',
-          password: 'SecurePass123!',
-        });
+      const response = await request(app).post('/api/auth/register').send({
+        email: 'logout@test.com',
+        password: 'SecurePass123!',
+      });
 
       accessToken = response.body.tokens.accessToken;
       refreshToken = response.body.tokens.refreshToken;
@@ -229,12 +219,10 @@ describe('Authentication API', () => {
     let userId: string;
 
     beforeEach(async () => {
-      const response = await request(app)
-        .post('/api/auth/register')
-        .send({
-          email: 'me@test.com',
-          password: 'SecurePass123!',
-        });
+      const response = await request(app).post('/api/auth/register').send({
+        email: 'me@test.com',
+        password: 'SecurePass123!',
+      });
 
       accessToken = response.body.tokens.accessToken;
       userId = response.body.user.id;
@@ -252,9 +240,7 @@ describe('Authentication API', () => {
     });
 
     it('should require authentication', async () => {
-      const response = await request(app)
-        .get('/api/auth/me')
-        .expect(401);
+      const response = await request(app).get('/api/auth/me').expect(401);
 
       expect(response.body.error.code).toBe('UNAUTHORIZED');
     });

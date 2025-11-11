@@ -1,8 +1,8 @@
 /**
  * TTS-Validated Adaptation Service
- * 
+ *
  * The ultimate solution: Don't trust the LLM - verify with actual TTS!
- * 
+ *
  * This service implements a validation loop that:
  * 1. Gets adapted text from LLM
  * 2. Generates test audio with TTS
@@ -68,7 +68,7 @@ export class TTSValidatedAdaptationService {
     this.adaptationEngine = new AdaptationEngine(adaptationConfig);
     this.mistralClient = getMistralClient();
     this.ttsAdapter = ttsAdapter;
-    
+
     this.config = {
       maxAttempts: validationConfig?.maxAttempts || 10,
       tolerancePercent: validationConfig?.tolerancePercent || 15, // Tighter tolerance: ±15%
@@ -91,10 +91,10 @@ export class TTSValidatedAdaptationService {
     if (segment.duration < 0.3) {
       logger.warn(`   ⚠️  Segment ${segment.id} is extremely short (${segment.duration}s)`);
       logger.warn(`   Using simple translation without TTS validation`);
-      
+
       // For extremely short segments, just do a simple translation
       const simpleTranslation = await this.generateSimpleTranslation(segment, targetLanguage);
-      
+
       return {
         adaptedText: simpleTranslation,
         audioPath: '', // No validated audio for ultra-short segments
@@ -105,16 +105,16 @@ export class TTSValidatedAdaptationService {
         validationHistory: [],
       };
     }
-    
+
     // Determine if this is a short segment and adjust tolerance
     const isShortSegment = segment.duration < this.config.shortSegmentThreshold;
-    const effectiveTolerance = isShortSegment 
-      ? this.config.shortSegmentTolerance 
+    const effectiveTolerance = isShortSegment
+      ? this.config.shortSegmentTolerance
       : this.config.tolerancePercent;
-    
+
     // Use tolerance for validation
     const _tolerance = effectiveTolerance;
-    
+
     logger.info(`🔄 Starting TTS-validated adaptation for segment ${segment.id}`);
     logger.info(`   Target duration: ${segment.duration}s (±${effectiveTolerance}%)`);
     if (isShortSegment) {
@@ -202,16 +202,18 @@ export class TTSValidatedAdaptationService {
           );
 
           logger.info(`   🔄 Retrying with feedback...`);
-          
+
           // Clean up failed test audio
           this.cleanupTestAudio(testAudioPath);
         } else {
           // Max attempts reached
           logger.error(`   ❌ Max attempts (${this.config.maxAttempts}) reached`);
-          
+
           // Return best attempt (closest to target)
           const bestAttempt = this.findBestAttempt(validationHistory);
-          logger.info(`   📊 Using best attempt: #${bestAttempt.attempt} (${bestAttempt.actualDuration.toFixed(2)}s)`);
+          logger.info(
+            `   📊 Using best attempt: #${bestAttempt.attempt} (${bestAttempt.actualDuration.toFixed(2)}s)`
+          );
 
           return {
             adaptedText: bestAttempt.text,
@@ -225,11 +227,11 @@ export class TTSValidatedAdaptationService {
         }
       } catch (error) {
         logger.error(`   ❌ Error in attempt ${attempt}:`, error);
-        
+
         if (attempt === this.config.maxAttempts) {
           throw error;
         }
-        
+
         previousFeedback = `Error occurred: ${error instanceof Error ? error.message : 'Unknown error'}. Please try again.`;
       }
     }
@@ -252,35 +254,35 @@ export class TTSValidatedAdaptationService {
     const sourceChars = segment.text.length;
     const _sourceCharsPerSecond = sourceChars / segment.duration;
     const _tolerance = tolerance;
-    
+
     // Language-specific character expansion/contraction factors
     const expansionFactors: Record<string, number> = {
-      'es': 1.15, // Spanish tends to be ~15% longer
-      'fr': 1.20, // French tends to be ~20% longer
-      'pt': 1.15, // Portuguese similar to Spanish
-      'de': 1.10, // German slightly longer
-      'it': 1.15, // Italian similar to Spanish
-      'ja': 0.70, // Japanese much shorter (uses fewer characters)
-      'ko': 0.75, // Korean shorter
-      'zh': 0.60, // Chinese very compact
-      'ar': 1.05, // Arabic slightly longer
-      'ru': 1.10, // Russian slightly longer
+      es: 1.15, // Spanish tends to be ~15% longer
+      fr: 1.2, // French tends to be ~20% longer
+      pt: 1.15, // Portuguese similar to Spanish
+      de: 1.1, // German slightly longer
+      it: 1.15, // Italian similar to Spanish
+      ja: 0.7, // Japanese much shorter (uses fewer characters)
+      ko: 0.75, // Korean shorter
+      zh: 0.6, // Chinese very compact
+      ar: 1.05, // Arabic slightly longer
+      ru: 1.1, // Russian slightly longer
     };
-    
+
     const expansionFactor = expansionFactors[_targetLanguage] || 1.0;
     const targetChars = Math.round(sourceChars * expansionFactor);
     const targetCharsPerSecond = targetChars / segment.duration;
-    
+
     // Add character guidance to the prompt
     let enhancedFeedback = previousFeedback || '';
-    
+
     if (attempt === 1) {
       // First attempt: provide character guidance
       enhancedFeedback = `CHARACTER GUIDANCE:\n`;
       enhancedFeedback += `• Source text: ${sourceChars} characters in ${segment.duration.toFixed(1)}s\n`;
       enhancedFeedback += `• Target should be approximately ${targetChars} characters\n`;
       enhancedFeedback += `• Aim for ${targetCharsPerSecond.toFixed(1)} characters per second\n\n`;
-      
+
       // Special guidance for very short segments
       if (segment.duration < 1.0) {
         enhancedFeedback += `⚡ VERY SHORT SEGMENT (${segment.duration.toFixed(1)}s):\n`;
@@ -290,10 +292,10 @@ export class TTSValidatedAdaptationService {
         enhancedFeedback += `• Examples: "Stay tuned" → "Espera" (not "Quédense atentos")\n\n`;
       }
     }
-    
+
     const prompt = this.adaptationEngine.buildPrompt(segment, attempt - 1, enhancedFeedback);
     const translation = await this.mistralClient.translate(prompt);
-    
+
     if (!translation) {
       throw new Error('Empty translation received from LLM');
     }
@@ -316,15 +318,12 @@ export class TTSValidatedAdaptationService {
     // Extract voice from config (OpenAI TTS expects just the voice name)
     const voiceId = voiceConfig.voiceId || 'alloy';
     // Synthesize with OpenAI TTS
-    const audioBuffer = await this.ttsAdapter.synthesize(
-      text,
-      voiceConfig
-    );
+    const audioBuffer = await this.ttsAdapter.synthesize(text, voiceConfig);
 
     // Save to temp file
     const outputDir = path.join(process.cwd(), 'temp', 'tts-validation');
     await fs.promises.mkdir(outputDir, { recursive: true });
-    
+
     const testPath = path.join(outputDir, `segment_${segmentId}_test_attempt${attempt}.wav`);
     await fs.promises.writeFile(testPath, audioBuffer);
 
@@ -340,9 +339,9 @@ export class TTSValidatedAdaptationService {
       const { stdout } = await execAsync(
         `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${audioPath}"`
       );
-      
+
       const duration = parseFloat(stdout.trim());
-      
+
       if (isNaN(duration)) {
         throw new Error(`Invalid duration from ffprobe: ${stdout}`);
       }
@@ -401,7 +400,7 @@ export class TTSValidatedAdaptationService {
     feedback += `PREVIOUS TEXT: "${previousText}"\n`;
     feedback += `ACTUAL SPOKEN TIME: ${actualDuration.toFixed(2)} seconds\n`;
     feedback += `DIFFERENCE: ${Math.abs(validation.difference).toFixed(2)}s (${Math.abs(validation.percentDiff).toFixed(1)}%)\n\n`;
-    
+
     // Get more aggressive with feedback after multiple attempts
     if (attempt >= 5 && isVeryOff) {
       feedback += `⚠️  CRITICAL: This is attempt ${attempt}. You are STILL very far off target!\n`;
@@ -412,7 +411,7 @@ export class TTSValidatedAdaptationService {
 
     if (isTooShort) {
       feedback += `You MUST generate a LONGER adaptation.\n\n`;
-      
+
       if (attempt >= 5) {
         feedback += `AGGRESSIVE STRATEGIES (you need to add much more):\n`;
         feedback += `• Add multiple filler phrases and natural hesitations\n`;
@@ -430,7 +429,7 @@ export class TTSValidatedAdaptationService {
       }
     } else {
       feedback += `You MUST generate a SHORTER adaptation.\n\n`;
-      
+
       if (attempt >= 5) {
         feedback += `AGGRESSIVE STRATEGIES (you need to cut much more):\n`;
         feedback += `• Remove ALL filler words and unnecessary phrases\n`;
@@ -474,29 +473,29 @@ export class TTSValidatedAdaptationService {
   ): Promise<string> {
     // For ultra-short segments, use the shortest possible translation
     const shortTranslations: Record<string, Record<string, string>> = {
-      'es': {
+      es: {
         'stay tuned': 'Espera',
-        'wait': 'Espera',
-        'yes': 'Sí',
-        'no': 'No',
-        'ok': 'Vale',
-        'thanks': 'Gracias',
-        'bye': 'Adiós',
+        wait: 'Espera',
+        yes: 'Sí',
+        no: 'No',
+        ok: 'Vale',
+        thanks: 'Gracias',
+        bye: 'Adiós',
       },
-      'fr': {
+      fr: {
         'stay tuned': 'Attends',
-        'wait': 'Attends',
-        'yes': 'Oui',
-        'no': 'Non',
-        'ok': 'Ok',
-        'thanks': 'Merci',
-        'bye': 'Salut',
+        wait: 'Attends',
+        yes: 'Oui',
+        no: 'Non',
+        ok: 'Ok',
+        thanks: 'Merci',
+        bye: 'Salut',
       },
     };
 
     const textLower = segment.text.toLowerCase().trim();
     const translations = shortTranslations[targetLanguage];
-    
+
     if (translations && translations[textLower]) {
       return translations[textLower];
     }
@@ -504,7 +503,7 @@ export class TTSValidatedAdaptationService {
     // Fallback: use LLM but ask for shortest possible
     const prompt = `Translate to ${targetLanguage}. Use the SHORTEST possible translation (1-2 words max): "${segment.text}"`;
     const translation = await this.mistralClient.translate(prompt);
-    
+
     return translation || segment.text;
   }
 
@@ -526,8 +525,8 @@ export class TTSValidatedAdaptationService {
    * Generate summary report
    */
   generateValidationReport(results: TTSValidatedResult[]): string {
-    const successful = results.filter(r => r.status === 'success').length;
-    const failed = results.filter(r => r.status === 'failed').length;
+    const successful = results.filter((r) => r.status === 'success').length;
+    const failed = results.filter((r) => r.status === 'failed').length;
     const totalAttempts = results.reduce((sum, r) => sum + r.attempts, 0);
     const avgAttempts = totalAttempts / results.length;
 
@@ -542,12 +541,14 @@ export class TTSValidatedAdaptationService {
 
     if (failed > 0) {
       report += 'Failed segments:\n';
-      results.filter(r => r.status === 'failed').forEach((result, index) => {
-        const bestAttempt = this.findBestAttempt(result.validationHistory);
-        report += `  ${index + 1}. Target: ${result.targetDuration.toFixed(2)}s, `;
-        report += `Best: ${bestAttempt.actualDuration.toFixed(2)}s `;
-        report += `(${Math.abs(bestAttempt.actualDuration - result.targetDuration).toFixed(2)}s off)\n`;
-      });
+      results
+        .filter((r) => r.status === 'failed')
+        .forEach((result, index) => {
+          const bestAttempt = this.findBestAttempt(result.validationHistory);
+          report += `  ${index + 1}. Target: ${result.targetDuration.toFixed(2)}s, `;
+          report += `Best: ${bestAttempt.actualDuration.toFixed(2)}s `;
+          report += `(${Math.abs(bestAttempt.actualDuration - result.targetDuration).toFixed(2)}s off)\n`;
+        });
     }
 
     return report;

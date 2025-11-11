@@ -19,7 +19,7 @@ const router = Router();
 router.get('/stats', authenticateToken, async (_req, res) => {
   try {
     const stats = await getAllQueueStats();
-    
+
     res.json({
       success: true,
       stats,
@@ -41,7 +41,7 @@ router.get('/stats', authenticateToken, async (_req, res) => {
 router.get('/stats/:stage', authenticateToken, async (req, res) => {
   try {
     const stage = req.params.stage.toUpperCase() as JobStage;
-    
+
     if (!['STT', 'MT', 'TTS', 'MUXING', 'LIPSYNC'].includes(stage)) {
       return res.status(400).json({
         success: false,
@@ -50,7 +50,7 @@ router.get('/stats/:stage', authenticateToken, async (req, res) => {
     }
 
     const stats = await getQueueStats(stage);
-    
+
     res.json({
       success: true,
       stats,
@@ -74,7 +74,7 @@ router.get('/:stage/jobs', authenticateToken, async (req, res) => {
     const stage = req.params.stage.toUpperCase() as JobStage;
     const status = (req.query.status as string) || 'waiting';
     const limit = parseInt(req.query.limit as string) || 10;
-    
+
     if (!['STT', 'MT', 'TTS', 'MUXING', 'LIPSYNC'].includes(stage)) {
       return res.status(400).json({
         success: false,
@@ -143,7 +143,7 @@ router.get('/:stage/jobs', authenticateToken, async (req, res) => {
 router.post('/:stage/pause', authenticateToken, async (req, res) => {
   try {
     const stage = req.params.stage.toUpperCase() as JobStage;
-    
+
     if (!['STT', 'MT', 'TTS', 'MUXING', 'LIPSYNC'].includes(stage)) {
       return res.status(400).json({
         success: false,
@@ -152,7 +152,7 @@ router.post('/:stage/pause', authenticateToken, async (req, res) => {
     }
 
     await pauseQueue(stage);
-    
+
     res.json({
       success: true,
       message: `Queue ${stage} paused successfully`,
@@ -173,7 +173,7 @@ router.post('/:stage/pause', authenticateToken, async (req, res) => {
 router.post('/:stage/resume', authenticateToken, async (req, res) => {
   try {
     const stage = req.params.stage.toUpperCase() as JobStage;
-    
+
     if (!['STT', 'MT', 'TTS', 'MUXING', 'LIPSYNC'].includes(stage)) {
       return res.status(400).json({
         success: false,
@@ -182,7 +182,7 @@ router.post('/:stage/resume', authenticateToken, async (req, res) => {
     }
 
     await resumeQueue(stage);
-    
+
     res.json({
       success: true,
       message: `Queue ${stage} resumed successfully`,
@@ -204,7 +204,7 @@ router.post('/:stage/clean', authenticateToken, async (req, res) => {
   try {
     const stage = req.params.stage.toUpperCase() as JobStage;
     const grace = parseInt(req.body.grace as string) || 3600; // Default 1 hour
-    
+
     if (!['STT', 'MT', 'TTS', 'MUXING', 'LIPSYNC'].includes(stage)) {
       return res.status(400).json({
         success: false,
@@ -213,7 +213,7 @@ router.post('/:stage/clean', authenticateToken, async (req, res) => {
     }
 
     await cleanQueue(stage, grace);
-    
+
     res.json({
       success: true,
       message: `Queue ${stage} cleaned successfully`,
@@ -235,7 +235,7 @@ router.get('/dead-letter/stats', authenticateToken, async (_req, res) => {
   try {
     const { getDeadLetterQueueStats } = await import('../lib/dead-letter-queue');
     const stats = await getDeadLetterQueueStats();
-    
+
     res.json({
       success: true,
       stats,
@@ -258,7 +258,7 @@ router.get('/dead-letter/jobs', authenticateToken, async (_req, res) => {
     const userId = _req.user!.userId;
     const { getUserDeadLetterJobs } = await import('../lib/dead-letter-queue');
     const jobs = await getUserDeadLetterJobs(userId);
-    
+
     res.json({
       success: true,
       jobs,
@@ -281,9 +281,9 @@ router.post('/dead-letter/:jobId/retry', authenticateToken, async (req, res) => 
   try {
     const { jobId } = req.params;
     const { retryFromDeadLetterQueue } = await import('../lib/dead-letter-queue');
-    
+
     const newJobId = await retryFromDeadLetterQueue(jobId);
-    
+
     res.json({
       success: true,
       message: 'Job retried from dead letter queue',

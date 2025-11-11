@@ -1,7 +1,7 @@
 // @ts-nocheck
 /**
  * Adaptation Quality Metrics Service
- * 
+ *
  * Tracks and analyzes adaptation engine performance including success rates,
  * retry attempts, and validation failure reasons.
  */
@@ -52,19 +52,21 @@ export class AdaptationMetricsService {
    */
   async recordProjectMetrics(projectId: string, contextMap: ContextMap): Promise<void> {
     const languagePair = `${contextMap.source_language}-${contextMap.target_language}`;
-    
+
     const totalSegments = contextMap.segments.length;
-    const successfulSegments = contextMap.segments.filter(s => s.status === 'success').length;
-    const failedSegments = contextMap.segments.filter(s => s.status?.startsWith('failed_')).length;
-    
+    const successfulSegments = contextMap.segments.filter((s) => s.status === 'success').length;
+    const failedSegments = contextMap.segments.filter((s) =>
+      s.status?.startsWith('failed_')
+    ).length;
+
     const totalAttempts = contextMap.segments.reduce((sum, s) => sum + (s.attempts || 0), 0);
     const averageAttempts = totalSegments > 0 ? totalAttempts / totalSegments : 0;
-    
+
     const successRate = totalSegments > 0 ? (successfulSegments / totalSegments) * 100 : 0;
-    
+
     // Collect validation failure reasons
     const validationFailureReasons: Record<string, number> = {};
-    contextMap.segments.forEach(segment => {
+    contextMap.segments.forEach((segment) => {
       if (segment.status?.startsWith('failed_') && segment.validation_feedback) {
         const reason = segment.validation_feedback;
         validationFailureReasons[reason] = (validationFailureReasons[reason] || 0) + 1;
@@ -85,7 +87,9 @@ export class AdaptationMetricsService {
       },
     });
 
-    logger.info(`Recorded adaptation metrics for project ${projectId}: ${successRate.toFixed(1)}% success rate`);
+    logger.info(
+      `Recorded adaptation metrics for project ${projectId}: ${successRate.toFixed(1)}% success rate`
+    );
   }
 
   /**
@@ -98,7 +102,7 @@ export class AdaptationMetricsService {
     endDate?: Date
   ): Promise<AdaptationMetrics | null> {
     const languagePair = `${sourceLanguage}-${targetLanguage}`;
-    
+
     const where: any = { languagePair };
     if (startDate || endDate) {
       where.createdAt = {};
@@ -120,13 +124,13 @@ export class AdaptationMetricsService {
     const successfulSegments = metrics.reduce((sum, m) => sum + m.successfulSegments, 0);
     const failedSegments = metrics.reduce((sum, m) => sum + m.failedSegments, 0);
     const totalAttempts = metrics.reduce((sum, m) => sum + m.averageAttempts * m.totalSegments, 0);
-    
+
     const successRate = totalSegments > 0 ? (successfulSegments / totalSegments) * 100 : 0;
     const averageAttempts = totalSegments > 0 ? totalAttempts / totalSegments : 0;
 
     // Merge validation failure reasons
     const validationFailureReasons: Record<string, number> = {};
-    metrics.forEach(m => {
+    metrics.forEach((m) => {
       const reasons = m.validationFailureReasons as Record<string, number>;
       if (reasons) {
         Object.entries(reasons).forEach(([reason, count]) => {
@@ -169,32 +173,37 @@ export class AdaptationMetricsService {
     const totalProjects = allMetrics.length;
     const totalSegments = allMetrics.reduce((sum, m) => sum + m.totalSegments, 0);
     const successfulSegments = allMetrics.reduce((sum, m) => sum + m.successfulSegments, 0);
-    const totalAttempts = allMetrics.reduce((sum, m) => sum + m.averageAttempts * m.totalSegments, 0);
-    
+    const totalAttempts = allMetrics.reduce(
+      (sum, m) => sum + m.averageAttempts * m.totalSegments,
+      0
+    );
+
     const overallSuccessRate = totalSegments > 0 ? (successfulSegments / totalSegments) * 100 : 0;
     const averageAttempts = totalSegments > 0 ? totalAttempts / totalSegments : 0;
 
     // Group by language pair
     const byLanguagePairMap = new Map<string, AdaptationMetrics>();
-    allMetrics.forEach(metric => {
+    allMetrics.forEach((metric) => {
       const existing = byLanguagePairMap.get(metric.languagePair);
       if (existing) {
         existing.totalSegments += metric.totalSegments;
         existing.successfulSegments += metric.successfulSegments;
         existing.failedSegments += metric.failedSegments;
-        existing.successRate = existing.totalSegments > 0 
-          ? (existing.successfulSegments / existing.totalSegments) * 100 
-          : 0;
-        
-        const totalAttempts = existing.averageAttempts * (existing.totalSegments - metric.totalSegments) +
-                             metric.averageAttempts * metric.totalSegments;
+        existing.successRate =
+          existing.totalSegments > 0
+            ? (existing.successfulSegments / existing.totalSegments) * 100
+            : 0;
+
+        const totalAttempts =
+          existing.averageAttempts * (existing.totalSegments - metric.totalSegments) +
+          metric.averageAttempts * metric.totalSegments;
         existing.averageAttempts = totalAttempts / existing.totalSegments;
 
         // Merge validation failure reasons
         const reasons = metric.validationFailureReasons as Record<string, number>;
         if (reasons) {
           Object.entries(reasons).forEach(([reason, count]) => {
-            existing.validationFailureReasons[reason] = 
+            existing.validationFailureReasons[reason] =
               (existing.validationFailureReasons[reason] || 0) + count;
           });
         }
@@ -206,7 +215,9 @@ export class AdaptationMetricsService {
           failedSegments: metric.failedSegments,
           successRate: metric.successRate,
           averageAttempts: metric.averageAttempts,
-          validationFailureReasons: { ...(metric.validationFailureReasons as Record<string, number> || {}) },
+          validationFailureReasons: {
+            ...((metric.validationFailureReasons as Record<string, number>) || {}),
+          },
           processingTimeMs: 0,
           timestamp: metric.createdAt,
         });
@@ -225,9 +236,9 @@ export class AdaptationMetricsService {
     });
 
     const recentFailures: AdaptationDashboardData['recentFailures'] = [];
-    recentProjects.forEach(project => {
+    recentProjects.forEach((project) => {
       const contextMap = project.content as ContextMap;
-      contextMap.segments.forEach(segment => {
+      contextMap.segments.forEach((segment) => {
         if (segment.status?.startsWith('failed_')) {
           recentFailures.push({
             projectId: project.projectId,
@@ -247,7 +258,7 @@ export class AdaptationMetricsService {
 
     // Aggregate validation failure reasons
     const validationFailureBreakdown: Record<string, number> = {};
-    allMetrics.forEach(metric => {
+    allMetrics.forEach((metric) => {
       const reasons = metric.validationFailureReasons as Record<string, number>;
       if (reasons) {
         Object.entries(reasons).forEach(([reason, count]) => {
@@ -257,8 +268,11 @@ export class AdaptationMetricsService {
     });
 
     // Calculate trends over time (daily aggregation)
-    const trendsMap = new Map<string, { successCount: number; totalCount: number; attemptSum: number }>();
-    allMetrics.forEach(metric => {
+    const trendsMap = new Map<
+      string,
+      { successCount: number; totalCount: number; attemptSum: number }
+    >();
+    allMetrics.forEach((metric) => {
       const dateKey = metric.createdAt.toISOString().split('T')[0];
       const existing = trendsMap.get(dateKey);
       if (existing) {
@@ -330,8 +344,10 @@ export class AdaptationMetricsService {
     reason: string,
     attempts: number
   ): Promise<void> {
-    logger.warn(`Validation failure in project ${projectId}, segment ${segmentId}: ${reason} (attempt ${attempts})`);
-    
+    logger.warn(
+      `Validation failure in project ${projectId}, segment ${segmentId}: ${reason} (attempt ${attempts})`
+    );
+
     // This could be used for real-time alerting
     // For now, just log it
   }
@@ -339,14 +355,16 @@ export class AdaptationMetricsService {
   /**
    * Get alert-worthy metrics (low success rates)
    */
-  async getAlerts(threshold: number = 70): Promise<Array<{
-    languagePair: string;
-    successRate: number;
-    totalSegments: number;
-    message: string;
-  }>> {
+  async getAlerts(threshold: number = 70): Promise<
+    Array<{
+      languagePair: string;
+      successRate: number;
+      totalSegments: number;
+      message: string;
+    }>
+  > {
     const dashboardData = await this.getDashboardData(7); // Last 7 days
-    
+
     const alerts: Array<{
       languagePair: string;
       successRate: number;
@@ -354,7 +372,7 @@ export class AdaptationMetricsService {
       message: string;
     }> = [];
 
-    dashboardData.byLanguagePair.forEach(metrics => {
+    dashboardData.byLanguagePair.forEach((metrics) => {
       if (metrics.successRate < threshold && metrics.totalSegments >= 10) {
         alerts.push({
           languagePair: metrics.languagePair,

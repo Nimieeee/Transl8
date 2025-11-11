@@ -100,7 +100,7 @@ router.get('/project/:projectId', authenticateToken, async (req, res) => {
 
     res.json({
       success: true,
-      jobs: jobs.map(job => ({
+      jobs: jobs.map((job) => ({
         id: job.id,
         stage: job.stage,
         status: job.status,

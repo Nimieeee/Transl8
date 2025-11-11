@@ -19,11 +19,7 @@ export class STTDatasetBuilder {
   /**
    * Add a test case from LibriSpeech format
    */
-  addLibriSpeechCase(
-    audioPath: string,
-    transcriptPath: string,
-    caseId: string
-  ): void {
+  addLibriSpeechCase(audioPath: string, transcriptPath: string, caseId: string): void {
     const transcript = fs.readFileSync(transcriptPath, 'utf-8').trim();
     const duration = this.estimateAudioDuration(audioPath);
 
@@ -50,12 +46,8 @@ export class STTDatasetBuilder {
     caseId: string,
     audioQuality: 'clean' | 'noisy' | 'very_noisy' = 'clean'
   ): void {
-    const fullTranscript = speakers
-      .flatMap((s) => s.segments.map((seg) => seg.text))
-      .join(' ');
-    const duration = Math.max(
-      ...speakers.flatMap((s) => s.segments.map((seg) => seg.end))
-    );
+    const fullTranscript = speakers.flatMap((s) => s.segments.map((seg) => seg.text)).join(' ');
+    const duration = Math.max(...speakers.flatMap((s) => s.segments.map((seg) => seg.end)));
 
     this.testCases.push({
       id: caseId,
@@ -78,11 +70,7 @@ export class STTDatasetBuilder {
     noiseLevel: 'noisy' | 'very_noisy',
     caseId: string
   ): void {
-    const noisyAudioPath = this.generateNoisyAudio(
-      cleanAudioPath,
-      noiseLevel,
-      caseId
-    );
+    const noisyAudioPath = this.generateNoisyAudio(cleanAudioPath, noiseLevel, caseId);
     const duration = this.estimateAudioDuration(noisyAudioPath);
 
     this.testCases.push({
@@ -142,17 +130,10 @@ export class STTDatasetBuilder {
     return 10.0;
   }
 
-  private generateNoisyAudio(
-    cleanPath: string,
-    noiseLevel: string,
-    caseId: string
-  ): string {
+  private generateNoisyAudio(cleanPath: string, noiseLevel: string, caseId: string): string {
     // Placeholder: In real implementation, add noise using ffmpeg or audio library
     // For now, return the clean path with a marker
-    const noisyPath = path.join(
-      this.datasetDir,
-      `${caseId}_${noiseLevel}.wav`
-    );
+    const noisyPath = path.join(this.datasetDir, `${caseId}_${noiseLevel}.wav`);
     // In production: ffmpeg -i clean.wav -i noise.wav -filter_complex amix noisy.wav
     return noisyPath;
   }
@@ -178,8 +159,7 @@ export function createSampleSTTDataset(): BenchmarkDataset<STTTestCase> {
   builder.testCases.push({
     id: 'clean_002',
     audioPath: './datasets/stt/samples/clean_002.wav',
-    groundTruthTranscript:
-      'Artificial intelligence is transforming the way we create content.',
+    groundTruthTranscript: 'Artificial intelligence is transforming the way we create content.',
     language: 'en',
     duration: 4.2,
     speakerCount: 1,
@@ -190,8 +170,7 @@ export function createSampleSTTDataset(): BenchmarkDataset<STTTestCase> {
   builder.testCases.push({
     id: 'multi_001',
     audioPath: './datasets/stt/samples/multi_001.wav',
-    groundTruthTranscript:
-      'Hello everyone. Welcome to the show. Thanks for having me.',
+    groundTruthTranscript: 'Hello everyone. Welcome to the show. Thanks for having me.',
     language: 'en',
     duration: 6.0,
     speakerCount: 2,

@@ -113,16 +113,16 @@ export function correlationIdMiddleware() {
   return (req: any, res: any, next: any) => {
     // Get correlation ID from header or generate new one
     const correlationId = req.headers['x-correlation-id'] || generateCorrelationId();
-    
+
     // Store in request object
     req.correlationId = correlationId;
-    
+
     // Set in response header
     res.setHeader('x-correlation-id', correlationId);
-    
+
     // Store in correlation ID store
     correlationIdStore.set(correlationId);
-    
+
     // Log request
     logger.info('Incoming request', {
       method: req.method,
@@ -130,7 +130,7 @@ export function correlationIdMiddleware() {
       ip: req.ip,
       userAgent: req.headers['user-agent'],
     });
-    
+
     // Log response
     res.on('finish', () => {
       logger.info('Request completed', {
@@ -139,14 +139,14 @@ export function correlationIdMiddleware() {
         statusCode: res.statusCode,
         duration: Date.now() - req._startTime,
       });
-      
+
       // Clear correlation ID after request
       correlationIdStore.clear();
     });
-    
+
     // Store start time
     req._startTime = Date.now();
-    
+
     next();
   };
 }
@@ -187,14 +187,14 @@ export function logDatabaseQuery(
 ): void {
   const level = success ? 'debug' : 'error';
   const message = success ? 'Database query executed' : 'Database query failed';
-  
+
   logger.log(level, message, {
     operation,
     duration,
     success,
     query: query ? query.substring(0, 200) : undefined, // Truncate long queries
   });
-  
+
   // Log slow queries as warnings
   if (success && duration > 1000) {
     logger.warn('Slow database query detected', {
@@ -216,7 +216,7 @@ export function logJobProcessing(
 ): void {
   const level = status === 'failed' ? 'error' : 'info';
   const message = `Job ${status}`;
-  
+
   logger.log(level, message, {
     stage,
     jobId,
@@ -236,7 +236,7 @@ export function logModelInference(
 ): void {
   const level = success ? 'info' : 'error';
   const message = success ? 'Model inference completed' : 'Model inference failed';
-  
+
   logger.log(level, message, {
     model,
     duration,
@@ -269,7 +269,7 @@ export function logSecurityEvent(
   context?: Record<string, any>
 ): void {
   const level = severity === 'critical' || severity === 'high' ? 'error' : 'warn';
-  
+
   logger.log(level, `Security event: ${event}`, {
     event,
     severity,
@@ -280,11 +280,7 @@ export function logSecurityEvent(
 /**
  * Log API rate limit event
  */
-export function logRateLimitEvent(
-  ip: string,
-  userId?: string,
-  endpoint?: string
-): void {
+export function logRateLimitEvent(ip: string, userId?: string, endpoint?: string): void {
   logger.warn('Rate limit exceeded', {
     ip,
     userId,

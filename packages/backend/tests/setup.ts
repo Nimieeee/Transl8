@@ -5,7 +5,8 @@ import Redis from 'ioredis';
 process.env.NODE_ENV = 'test';
 process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-only';
 process.env.JWT_REFRESH_SECRET = 'test-jwt-refresh-secret-key-for-testing-only';
-process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/dubbing_test';
+process.env.DATABASE_URL =
+  process.env.TEST_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/dubbing_test';
 process.env.REDIS_URL = process.env.TEST_REDIS_URL || 'redis://localhost:6379/1';
 process.env.AWS_S3_BUCKET = 'test-bucket';
 process.env.AWS_REGION = 'us-east-1';

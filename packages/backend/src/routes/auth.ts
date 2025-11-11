@@ -7,12 +7,7 @@ import {
   invalidateRefreshToken,
   invalidateAllUserTokens,
 } from '../lib/redis';
-import {
-  registerSchema,
-  loginSchema,
-  refreshTokenSchema,
-  AuthResponse,
-} from '../types/auth';
+import { registerSchema, loginSchema, refreshTokenSchema, AuthResponse } from '../types/auth';
 import { authenticateToken } from '../middleware/auth';
 import { ZodError } from 'zod';
 

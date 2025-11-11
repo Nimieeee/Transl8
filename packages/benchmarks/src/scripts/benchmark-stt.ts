@@ -33,10 +33,7 @@ interface STTBenchmarkResult extends BenchmarkResult {
 /**
  * Run STT inference on a test case
  */
-async function runSTTInference(
-  audioPath: string,
-  language: string
-): Promise<any> {
+async function runSTTInference(audioPath: string, language: string): Promise<any> {
   try {
     // Check if audio file exists
     if (!fs.existsSync(audioPath)) {
@@ -48,14 +45,10 @@ async function runSTTInference(
     formData.append('audio', fs.createReadStream(audioPath));
     formData.append('language', language);
 
-    const response = await axios.post(
-      `${API_BASE_URL}/api/models/stt/transcribe`,
-      formData,
-      {
-        headers: formData.getHeaders(),
-        timeout: 60000,
-      }
-    );
+    const response = await axios.post(`${API_BASE_URL}/api/models/stt/transcribe`, formData, {
+      headers: formData.getHeaders(),
+      timeout: 60000,
+    });
 
     return response.data;
   } catch (error) {
@@ -144,9 +137,7 @@ function generateMockSTTResult(audioPath: string): any {
 /**
  * Benchmark a single test case
  */
-async function benchmarkTestCase(
-  testCase: any
-): Promise<STTBenchmarkResult> {
+async function benchmarkTestCase(testCase: any): Promise<STTBenchmarkResult> {
   console.log(`  Testing: ${testCase.id}`);
 
   const startTime = Date.now();
@@ -158,10 +149,7 @@ async function benchmarkTestCase(
     const processingTime = (Date.now() - startTime) / 1000;
 
     // Calculate WER
-    const werResult = calculateWER(
-      testCase.groundTruthTranscript,
-      result.text
-    );
+    const werResult = calculateWER(testCase.groundTruthTranscript, result.text);
 
     // Calculate DER if multi-speaker
     let derResult: DERResult | undefined;
@@ -225,9 +213,7 @@ async function benchmarkTestCase(
 /**
  * Calculate aggregate metrics
  */
-function calculateAggregateMetrics(
-  results: STTBenchmarkResult[]
-): Record<string, number> {
+function calculateAggregateMetrics(results: STTBenchmarkResult[]): Record<string, number> {
   const successfulResults = results.filter((r) => r.success);
 
   if (successfulResults.length === 0) {
@@ -236,8 +222,7 @@ function calculateAggregateMetrics(
 
   // Average WER
   const avgWER =
-    successfulResults.reduce((sum, r) => sum + (r.metrics.wer || 0), 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + (r.metrics.wer || 0), 0) / successfulResults.length;
 
   // Average DER (for multi-speaker cases)
   const multiSpeakerResults = successfulResults.filter((r) => r.der);
@@ -253,38 +238,28 @@ function calculateAggregateMetrics(
     successfulResults.length;
 
   // WER by audio quality
-  const cleanResults = successfulResults.filter(
-    (r) => r.audioQuality === 'clean'
-  );
-  const noisyResults = successfulResults.filter(
-    (r) => r.audioQuality === 'noisy'
-  );
-  const veryNoisyResults = successfulResults.filter(
-    (r) => r.audioQuality === 'very_noisy'
-  );
+  const cleanResults = successfulResults.filter((r) => r.audioQuality === 'clean');
+  const noisyResults = successfulResults.filter((r) => r.audioQuality === 'noisy');
+  const veryNoisyResults = successfulResults.filter((r) => r.audioQuality === 'very_noisy');
 
   const avgWERClean =
     cleanResults.length > 0
-      ? cleanResults.reduce((sum, r) => sum + (r.metrics.wer || 0), 0) /
-        cleanResults.length
+      ? cleanResults.reduce((sum, r) => sum + (r.metrics.wer || 0), 0) / cleanResults.length
       : 0;
 
   const avgWERNoisy =
     noisyResults.length > 0
-      ? noisyResults.reduce((sum, r) => sum + (r.metrics.wer || 0), 0) /
-        noisyResults.length
+      ? noisyResults.reduce((sum, r) => sum + (r.metrics.wer || 0), 0) / noisyResults.length
       : 0;
 
   const avgWERVeryNoisy =
     veryNoisyResults.length > 0
-      ? veryNoisyResults.reduce((sum, r) => sum + (r.metrics.wer || 0), 0) /
-        veryNoisyResults.length
+      ? veryNoisyResults.reduce((sum, r) => sum + (r.metrics.wer || 0), 0) / veryNoisyResults.length
       : 0;
 
   // Average processing time
   const avgProcessingTime =
-    successfulResults.reduce((sum, r) => sum + r.processingTime, 0) /
-    successfulResults.length;
+    successfulResults.reduce((sum, r) => sum + r.processingTime, 0) / successfulResults.length;
 
   return {
     averageWER: Math.round(avgWER * 100) / 100,
@@ -294,18 +269,14 @@ function calculateAggregateMetrics(
     averageWERNoisy: Math.round(avgWERNoisy * 100) / 100,
     averageWERVeryNoisy: Math.round(avgWERVeryNoisy * 100) / 100,
     averageProcessingTime: Math.round(avgProcessingTime * 100) / 100,
-    successRate:
-      Math.round((successfulResults.length / results.length) * 10000) / 100,
+    successRate: Math.round((successfulResults.length / results.length) * 10000) / 100,
   };
 }
 
 /**
  * Generate summary
  */
-function generateSummary(
-  aggregateMetrics: Record<string, number>,
-  totalCases: number
-): string {
+function generateSummary(aggregateMetrics: Record<string, number>, totalCases: number): string {
   return `
 STT Benchmark Results Summary:
 - Total test cases: ${totalCases}

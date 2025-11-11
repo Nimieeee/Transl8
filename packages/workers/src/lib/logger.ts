@@ -99,7 +99,7 @@ export function logJobProcessing(
 ): void {
   const level = status === 'failed' ? 'error' : 'info';
   const message = `Job ${status}`;
-  
+
   logger.log(level, message, {
     stage,
     jobId,
@@ -119,7 +119,7 @@ export function logModelInference(
 ): void {
   const level = success ? 'info' : 'error';
   const message = success ? 'Model inference completed' : 'Model inference failed';
-  
+
   logger.log(level, message, {
     model,
     duration,

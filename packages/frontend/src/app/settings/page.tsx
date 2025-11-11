@@ -16,8 +16,20 @@ export default function SettingsPage() {
   const tierFeatures = {
     free: ['10 minutes/month', 'Watermarked videos', 'Basic voices'],
     creator: ['120 minutes/month', 'No watermark', '3 voice clones', 'Premium voices'],
-    pro: ['Unlimited processing', 'No watermark', '10 voice clones', 'Lip-sync', 'Priority processing'],
-    enterprise: ['Unlimited processing', 'API access', 'Unlimited voice clones', 'Custom models', 'Dedicated support'],
+    pro: [
+      'Unlimited processing',
+      'No watermark',
+      '10 voice clones',
+      'Lip-sync',
+      'Priority processing',
+    ],
+    enterprise: [
+      'Unlimited processing',
+      'API access',
+      'Unlimited voice clones',
+      'Custom models',
+      'Dedicated support',
+    ],
   };
 
   return (
@@ -28,10 +40,7 @@ export default function SettingsPage() {
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex items-center justify-between">
               <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-              <button
-                onClick={() => router.push('/dashboard')}
-                className="btn-secondary"
-              >
+              <button onClick={() => router.push('/dashboard')} className="btn-secondary">
                 Back to Dashboard
               </button>
             </div>
@@ -50,7 +59,9 @@ export default function SettingsPage() {
               </div>
               <div className="flex justify-between py-2 border-b border-gray-200">
                 <span className="text-gray-600">Subscription Tier</span>
-                <span className="font-medium text-gray-900 capitalize">{user.subscriptionTier}</span>
+                <span className="font-medium text-gray-900 capitalize">
+                  {user.subscriptionTier}
+                </span>
               </div>
               <div className="flex justify-between py-2">
                 <span className="text-gray-600">Member Since</span>
@@ -69,7 +80,8 @@ export default function SettingsPage() {
                 <div className="flex justify-between text-sm mb-2">
                   <span className="text-gray-600">Processing Minutes</span>
                   <span className="font-medium text-gray-900">
-                    {user.processingMinutesUsed} / {user.processingMinutesLimit === -1 ? '∞' : user.processingMinutesLimit}
+                    {user.processingMinutesUsed} /{' '}
+                    {user.processingMinutesLimit === -1 ? '∞' : user.processingMinutesLimit}
                   </span>
                 </div>
                 {user.processingMinutesLimit !== -1 && (
@@ -87,7 +99,9 @@ export default function SettingsPage() {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Voice Clone Slots</span>
                   <span className="font-medium text-gray-900">
-                    {user.voiceCloneSlots === -1 ? 'Unlimited' : `${user.voiceCloneSlots} available`}
+                    {user.voiceCloneSlots === -1
+                      ? 'Unlimited'
+                      : `${user.voiceCloneSlots} available`}
                   </span>
                 </div>
               </div>
@@ -99,22 +113,34 @@ export default function SettingsPage() {
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Subscription</h2>
             <div className="space-y-4">
               <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-medium text-gray-900 mb-2 capitalize">{user.subscriptionTier} Plan</h3>
+                <h3 className="font-medium text-gray-900 mb-2 capitalize">
+                  {user.subscriptionTier} Plan
+                </h3>
                 <ul className="space-y-1 text-sm text-gray-600">
-                  {tierFeatures[user.subscriptionTier as keyof typeof tierFeatures]?.map((feature, index) => (
-                    <li key={index} className="flex items-center">
-                      <svg className="w-4 h-4 text-success-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      {feature}
-                    </li>
-                  ))}
+                  {tierFeatures[user.subscriptionTier as keyof typeof tierFeatures]?.map(
+                    (feature, index) => (
+                      <li key={index} className="flex items-center">
+                        <svg
+                          className="w-4 h-4 text-success-500 mr-2"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                        {feature}
+                      </li>
+                    )
+                  )}
                 </ul>
               </div>
               {user.subscriptionTier !== 'enterprise' && (
-                <button className="btn-primary w-full">
-                  Upgrade Plan
-                </button>
+                <button className="btn-primary w-full">Upgrade Plan</button>
               )}
             </div>
           </div>

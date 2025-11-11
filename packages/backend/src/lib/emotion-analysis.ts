@@ -1,10 +1,10 @@
 /**
  * Emotion Analysis Service
- * 
+ *
  * Service for analyzing emotions in audio segments using wav2vec2-based
  * Speech Emotion Recognition. Processes clean vocal prompts and tags
  * segments with detected emotions.
- * 
+ *
  * Requirements: 17.3, 17.4
  */
 
@@ -52,7 +52,7 @@ export class EmotionAnalysisService {
 
   /**
    * Analyze emotion for a single segment
-   * 
+   *
    * @param segment - Segment information with clean prompt path
    * @returns Emotion analysis result
    */
@@ -79,9 +79,7 @@ export class EmotionAnalysisService {
         confidence = 1.0;
       }
 
-      logger.info(
-        `Segment ${segment.id}: emotion=${emotion}, confidence=${confidence.toFixed(3)}`
-      );
+      logger.info(`Segment ${segment.id}: emotion=${emotion}, confidence=${confidence.toFixed(3)}`);
 
       return {
         segmentId: segment.id,
@@ -98,7 +96,7 @@ export class EmotionAnalysisService {
 
   /**
    * Analyze emotions for multiple segments in batch
-   * 
+   *
    * @param segments - Array of segment information
    * @returns Map of segment IDs to emotion results
    */
@@ -112,8 +110,10 @@ export class EmotionAnalysisService {
     // Process in batches
     for (let i = 0; i < segments.length; i += this.batchSize) {
       const batch = segments.slice(i, i + this.batchSize);
-      
-      logger.info(`Processing batch ${Math.floor(i / this.batchSize) + 1}/${Math.ceil(segments.length / this.batchSize)}`);
+
+      logger.info(
+        `Processing batch ${Math.floor(i / this.batchSize) + 1}/${Math.ceil(segments.length / this.batchSize)}`
+      );
 
       // Filter segments with valid clean prompt paths
       const validSegments = batch.filter((seg) => {
@@ -161,7 +161,7 @@ export class EmotionAnalysisService {
         }
       } catch (error: any) {
         logger.error(`Batch emotion analysis error: ${error.message}`);
-        
+
         // Add fallback results for failed batch
         for (const segment of validSegments) {
           if (!results.has(segment.id)) {
@@ -178,7 +178,7 @@ export class EmotionAnalysisService {
 
   /**
    * Handle edge cases for emotion analysis
-   * 
+   *
    * @param segment - Segment information
    * @returns Emotion result or null if segment should be skipped
    */
@@ -212,14 +212,14 @@ export class EmotionAnalysisService {
 
   /**
    * Get fallback result when emotion analysis fails
-   * 
+   *
    * @param segmentId - Segment ID
    * @param reason - Reason for fallback
    * @returns Fallback emotion result
    */
   private getFallbackResult(segmentId: number, reason: string): SegmentEmotionResult {
     logger.warn(`Using fallback emotion for segment ${segmentId}: ${reason}`);
-    
+
     return {
       segmentId,
       emotion: this.fallbackEmotion,
@@ -231,7 +231,7 @@ export class EmotionAnalysisService {
 
   /**
    * Get neutral emotion scores
-   * 
+   *
    * @returns Scores with neutral at 1.0 and others at 0.0
    */
   private getNeutralScores(): Record<EmotionTag, number> {
@@ -249,7 +249,7 @@ export class EmotionAnalysisService {
 
   /**
    * Health check for emotion analysis service
-   * 
+   *
    * @returns Health status
    */
   async healthCheck(): Promise<boolean> {

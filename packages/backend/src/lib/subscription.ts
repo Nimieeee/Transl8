@@ -7,15 +7,18 @@ import { prisma } from './prisma';
 import type { SubscriptionTier, User } from '../types/database';
 
 // Subscription tier limits configuration
-export const SUBSCRIPTION_TIER_LIMITS: Record<SubscriptionTier, {
-  processingMinutes: number;
-  voiceCloneSlots: number;
-  hasWatermark: boolean;
-  hasLipSync: boolean;
-  priority: number;
-  displayName: string;
-  price: number;
-}> = {
+export const SUBSCRIPTION_TIER_LIMITS: Record<
+  SubscriptionTier,
+  {
+    processingMinutes: number;
+    voiceCloneSlots: number;
+    hasWatermark: boolean;
+    hasLipSync: boolean;
+    priority: number;
+    displayName: string;
+    price: number;
+  }
+> = {
   FREE: {
     processingMinutes: 10,
     voiceCloneSlots: 0,
@@ -92,14 +95,14 @@ export async function checkProcessingQuota(
   }
 
   const tierLimits = getTierLimits(user.subscriptionTier);
-  
+
   // Unlimited tiers (PRO, ENTERPRISE)
   if (tierLimits.processingMinutes === -1) {
     return { allowed: true, remainingMinutes: -1 };
   }
 
   const remainingMinutes = user.processingMinutesLimit - user.processingMinutesUsed;
-  
+
   if (remainingMinutes < durationMinutes) {
     return {
       allowed: false,
@@ -114,10 +117,7 @@ export async function checkProcessingQuota(
 /**
  * Track processing time usage for a user
  */
-export async function trackProcessingUsage(
-  userId: string,
-  durationMinutes: number
-): Promise<void> {
+export async function trackProcessingUsage(userId: string, durationMinutes: number): Promise<void> {
   await prisma.user.update({
     where: { id: userId },
     data: {
@@ -147,7 +147,7 @@ export async function checkVoiceCloneQuota(
   }
 
   const tierLimits = getTierLimits(user.subscriptionTier);
-  
+
   // Unlimited voice clones (ENTERPRISE)
   if (tierLimits.voiceCloneSlots === -1) {
     return { allowed: true, remainingSlots: -1 };
@@ -218,12 +218,9 @@ export async function upgradeSubscription(
     where: { id: userId },
     data: {
       subscriptionTier: newTier,
-      processingMinutesLimit: tierLimits.processingMinutes === -1 
-        ? 999999 
-        : tierLimits.processingMinutes,
-      voiceCloneSlots: tierLimits.voiceCloneSlots === -1 
-        ? 999 
-        : tierLimits.voiceCloneSlots,
+      processingMinutesLimit:
+        tierLimits.processingMinutes === -1 ? 999999 : tierLimits.processingMinutes,
+      voiceCloneSlots: tierLimits.voiceCloneSlots === -1 ? 999 : tierLimits.voiceCloneSlots,
     },
   });
 
@@ -259,16 +256,14 @@ export async function getSubscriptionDetails(userId: string) {
     usage: {
       processingMinutesUsed: user.processingMinutesUsed,
       processingMinutesLimit: user.processingMinutesLimit,
-      processingMinutesRemaining: 
-        tierLimits.processingMinutes === -1 
-          ? -1 
+      processingMinutesRemaining:
+        tierLimits.processingMinutes === -1
+          ? -1
           : user.processingMinutesLimit - user.processingMinutesUsed,
       voiceClonesUsed: voiceCloneCount,
       voiceClonesLimit: user.voiceCloneSlots,
-      voiceClonesRemaining: 
-        tierLimits.voiceCloneSlots === -1 
-          ? -1 
-          : user.voiceCloneSlots - voiceCloneCount,
+      voiceClonesRemaining:
+        tierLimits.voiceCloneSlots === -1 ? -1 : user.voiceCloneSlots - voiceCloneCount,
     },
   };
 }
@@ -281,8 +276,10 @@ export function getAllTiers() {
     tier: tier as SubscriptionTier,
     ...limits,
     features: {
-      processingMinutes: limits.processingMinutes === -1 ? 'Unlimited' : `${limits.processingMinutes} minutes/month`,
-      voiceClones: limits.voiceCloneSlots === -1 ? 'Unlimited' : `${limits.voiceCloneSlots} voice clones`,
+      processingMinutes:
+        limits.processingMinutes === -1 ? 'Unlimited' : `${limits.processingMinutes} minutes/month`,
+      voiceClones:
+        limits.voiceCloneSlots === -1 ? 'Unlimited' : `${limits.voiceCloneSlots} voice clones`,
       watermark: limits.hasWatermark ? 'Yes' : 'No',
       lipSync: limits.hasLipSync ? 'Included' : 'Not available',
       priority: `Priority ${limits.priority}`,
@@ -395,12 +392,7 @@ export async function handlePaymentFailed(invoice: any): Promise<void> {
     ? new Date(invoice.next_payment_attempt * 1000)
     : undefined;
 
-  await handlePaymentFailure(
-    user.id,
-    invoice.id,
-    invoice.attempt_count || 1,
-    nextRetryDate
-  );
+  await handlePaymentFailure(user.id, invoice.id, invoice.attempt_count || 1, nextRetryDate);
 }
 
 /**

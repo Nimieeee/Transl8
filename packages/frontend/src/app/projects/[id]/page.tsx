@@ -47,10 +47,7 @@ export default function ProjectPage() {
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">Project not found</h2>
-            <button
-              onClick={() => router.push('/dashboard')}
-              className="btn-primary mt-4"
-            >
+            <button onClick={() => router.push('/dashboard')} className="btn-primary mt-4">
               Back to Dashboard
             </button>
           </div>
@@ -59,9 +56,7 @@ export default function ProjectPage() {
     );
   }
 
-  const currentStageIndex = status?.currentJob
-    ? stageOrder.indexOf(status.currentJob.stage)
-    : -1;
+  const currentStageIndex = status?.currentJob ? stageOrder.indexOf(status.currentJob.stage) : -1;
 
   return (
     <ProtectedRoute>
@@ -83,10 +78,7 @@ export default function ProjectPage() {
                     Live
                   </div>
                 )}
-                <button
-                  onClick={() => router.push('/dashboard')}
-                  className="btn-secondary"
-                >
+                <button onClick={() => router.push('/dashboard')} className="btn-secondary">
                   Back to Dashboard
                 </button>
               </div>
@@ -105,10 +97,10 @@ export default function ProjectPage() {
                   project.status === 'completed'
                     ? 'bg-success-100 text-success-800'
                     : project.status === 'failed'
-                    ? 'bg-error-100 text-error-800'
-                    : project.status === 'processing'
-                    ? 'bg-yellow-100 text-yellow-800'
-                    : 'bg-blue-100 text-blue-800'
+                      ? 'bg-error-100 text-error-800'
+                      : project.status === 'processing'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-blue-100 text-blue-800'
                 }`}
               >
                 {project.status.charAt(0).toUpperCase() + project.status.slice(1)}
@@ -121,7 +113,8 @@ export default function ProjectPage() {
                 <div>
                   <div className="flex items-center justify-between text-sm mb-2">
                     <span className="text-gray-600">
-                      {status.currentJob && stageLabels[status.currentJob.stage as keyof typeof stageLabels]}
+                      {status.currentJob &&
+                        stageLabels[status.currentJob.stage as keyof typeof stageLabels]}
                     </span>
                     <span className="font-medium text-gray-900">{status.progress}%</span>
                   </div>
@@ -135,7 +128,8 @@ export default function ProjectPage() {
 
                 {status.estimatedTimeRemaining && (
                   <p className="text-sm text-gray-600">
-                    Estimated time remaining: {Math.ceil(status.estimatedTimeRemaining / 60)} minutes
+                    Estimated time remaining: {Math.ceil(status.estimatedTimeRemaining / 60)}{' '}
+                    minutes
                   </p>
                 )}
               </div>
@@ -154,18 +148,24 @@ export default function ProjectPage() {
                     <div
                       key={stage}
                       className={`flex items-center p-3 rounded-lg ${
-                        isCompleted
-                          ? 'bg-success-50'
-                          : isCurrent
-                          ? 'bg-primary-50'
-                          : 'bg-gray-50'
+                        isCompleted ? 'bg-success-50' : isCurrent ? 'bg-primary-50' : 'bg-gray-50'
                       }`}
                     >
                       <div className="flex-shrink-0">
                         {isCompleted ? (
                           <div className="w-6 h-6 bg-success-500 rounded-full flex items-center justify-center">
-                            <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            <svg
+                              className="w-4 h-4 text-white"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M5 13l4 4L19 7"
+                              />
                             </svg>
                           </div>
                         ) : isCurrent ? (
@@ -179,8 +179,8 @@ export default function ProjectPage() {
                           isCompleted
                             ? 'text-success-900'
                             : isCurrent
-                            ? 'text-primary-900'
-                            : 'text-gray-500'
+                              ? 'text-primary-900'
+                              : 'text-gray-500'
                         }`}
                       >
                         {stageLabels[stage as keyof typeof stageLabels]}
@@ -196,11 +196,24 @@ export default function ProjectPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {project.status === 'review' && (
               <>
-                <Link href={`/projects/${projectId}/transcript`} className="card hover:shadow-medium transition-shadow cursor-pointer">
+                <Link
+                  href={`/projects/${projectId}/transcript`}
+                  className="card hover:shadow-medium transition-shadow cursor-pointer"
+                >
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      <svg
+                        className="w-8 h-8 text-primary-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
                       </svg>
                     </div>
                     <div className="ml-4">
@@ -210,11 +223,24 @@ export default function ProjectPage() {
                   </div>
                 </Link>
 
-                <Link href={`/projects/${projectId}/translation`} className="card hover:shadow-medium transition-shadow cursor-pointer">
+                <Link
+                  href={`/projects/${projectId}/translation`}
+                  className="card hover:shadow-medium transition-shadow cursor-pointer"
+                >
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
-                      <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                      <svg
+                        className="w-8 h-8 text-primary-600"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
+                        />
                       </svg>
                     </div>
                     <div className="ml-4">
@@ -230,16 +256,8 @@ export default function ProjectPage() {
               <div className="md:col-span-2">
                 <div className="card">
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Download Video</h3>
-                  <video
-                    controls
-                    className="w-full rounded-lg mb-4"
-                    src={project.videoUrl}
-                  />
-                  <a
-                    href={project.videoUrl}
-                    download
-                    className="btn-primary w-full text-center"
-                  >
+                  <video controls className="w-full rounded-lg mb-4" src={project.videoUrl} />
+                  <a href={project.videoUrl} download className="btn-primary w-full text-center">
                     Download Dubbed Video
                   </a>
                 </div>
@@ -251,8 +269,18 @@ export default function ProjectPage() {
           {project.status === 'failed' && status?.currentJob?.errorMessage && (
             <div className="mt-6 rounded-md bg-error-50 p-4">
               <div className="flex">
-                <svg className="h-5 w-5 text-error-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="h-5 w-5 text-error-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
                 <div className="ml-3">
                   <h3 className="text-sm font-medium text-error-800">Processing Failed</h3>

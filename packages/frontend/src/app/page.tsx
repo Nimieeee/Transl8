@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const router = useRouter();
-  
+
   useEffect(() => {
     // Redirect to upload page immediately
     router.push('/upload');

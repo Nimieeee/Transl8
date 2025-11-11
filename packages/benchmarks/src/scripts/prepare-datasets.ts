@@ -7,22 +7,10 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  createSampleSTTDataset,
-  STTDatasetBuilder,
-} from '../datasets/stt-dataset';
-import {
-  createSampleMTDataset,
-  MTDatasetBuilder,
-} from '../datasets/mt-dataset';
-import {
-  createSampleTTSDataset,
-  TTSDatasetBuilder,
-} from '../datasets/tts-dataset';
-import {
-  createSampleLipSyncDataset,
-  LipSyncDatasetBuilder,
-} from '../datasets/lipsync-dataset';
+import { createSampleSTTDataset, STTDatasetBuilder } from '../datasets/stt-dataset';
+import { createSampleMTDataset, MTDatasetBuilder } from '../datasets/mt-dataset';
+import { createSampleTTSDataset, TTSDatasetBuilder } from '../datasets/tts-dataset';
+import { createSampleLipSyncDataset, LipSyncDatasetBuilder } from '../datasets/lipsync-dataset';
 
 const DATASETS_DIR = path.join(__dirname, '../../datasets');
 const RESULTS_DIR = path.join(__dirname, '../../results');
@@ -121,9 +109,7 @@ async function main(): Promise<void> {
     'lipsync',
     'Video samples for evaluating lip synchronization accuracy and face restoration quality.'
   );
-  console.log(
-    `✓ Lip-Sync dataset created with ${lipsyncDataset.testCases.length} test cases\n`
-  );
+  console.log(`✓ Lip-Sync dataset created with ${lipsyncDataset.testCases.length} test cases\n`);
 
   // Create summary
   const summary = {
@@ -152,12 +138,14 @@ async function main(): Promise<void> {
   fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2));
 
   console.log('=== Dataset Preparation Complete ===');
-  console.log(`\nTotal test cases prepared: ${
-    sttDataset.testCases.length +
-    mtDataset.testCases.length +
-    ttsDataset.testCases.length +
-    lipsyncDataset.testCases.length
-  }`);
+  console.log(
+    `\nTotal test cases prepared: ${
+      sttDataset.testCases.length +
+      mtDataset.testCases.length +
+      ttsDataset.testCases.length +
+      lipsyncDataset.testCases.length
+    }`
+  );
   console.log(`\nDatasets location: ${DATASETS_DIR}`);
   console.log(`Summary saved to: ${summaryPath}`);
   console.log('\nNext steps:');

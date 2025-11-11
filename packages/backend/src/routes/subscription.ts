@@ -292,12 +292,8 @@ router.post('/change-tier', authenticateToken, async (req: Request, res: Respons
     // Update Stripe subscription with proration
     const { updateSubscription } = await import('../lib/stripe');
     const prorationBehavior = immediate ? 'always_invoice' : 'create_prorations';
-    
-    await updateSubscription(
-      user.stripeSubscriptionId,
-      tier,
-      prorationBehavior
-    );
+
+    await updateSubscription(user.stripeSubscriptionId, tier, prorationBehavior);
 
     // Update local database
     await upgradeSubscription(req.user.userId, tier);
@@ -362,10 +358,7 @@ router.post('/cancel', authenticateToken, async (req: Request, res: Response) =>
 
     // Cancel Stripe subscription
     const { cancelSubscription } = await import('../lib/stripe');
-    const subscription = await cancelSubscription(
-      user.stripeSubscriptionId,
-      immediately === true
-    );
+    const subscription = await cancelSubscription(user.stripeSubscriptionId, immediately === true);
 
     // Update local database
     if (immediately) {
@@ -610,11 +603,7 @@ router.post('/webhook', async (req: Request, res: Response) => {
 
   try {
     // Verify webhook signature
-    const event = verifyWebhookSignature(
-      req.body,
-      sig as string,
-      webhookSecret
-    );
+    const event = verifyWebhookSignature(req.body, sig as string, webhookSecret);
 
     logger.info('Stripe webhook received', {
       type: event.type,
@@ -664,7 +653,10 @@ router.post('/webhook', async (req: Request, res: Response) => {
           select: { id: true, subscriptionStatus: true },
         });
 
-        if (user && (user.subscriptionStatus === 'past_due' || user.subscriptionStatus === 'grace_period')) {
+        if (
+          user &&
+          (user.subscriptionStatus === 'past_due' || user.subscriptionStatus === 'grace_period')
+        ) {
           const { handlePaymentRecovery } = await import('../lib/payment-failures');
           await handlePaymentRecovery(user.id, invoice.id);
         }

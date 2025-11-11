@@ -79,9 +79,7 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
             </h3>
           </Link>
           <span
-            className={`px-2 py-1 text-xs font-medium rounded-full ${
-              statusColors[project.status]
-            }`}
+            className={`px-2 py-1 text-xs font-medium rounded-full ${statusColors[project.status]}`}
           >
             {statusLabels[project.status]}
           </span>
@@ -89,12 +87,7 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
 
         <div className="flex items-center text-sm text-gray-600 space-x-4">
           <div className="flex items-center">
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -105,12 +98,7 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
             {formatDuration(project.duration)}
           </div>
           <div className="flex items-center">
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"

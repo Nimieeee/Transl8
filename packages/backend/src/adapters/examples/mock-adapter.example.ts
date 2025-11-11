@@ -1,6 +1,6 @@
 /**
  * Mock Adapter Implementation Example
- * 
+ *
  * This file demonstrates how to implement model adapters
  * for testing and development purposes.
  */
@@ -62,7 +62,7 @@ export class MockSTTAdapter extends STTAdapter {
 
     return {
       transcript: {
-        text: segments.map(s => s.text).join(' '),
+        text: segments.map((s) => s.text).join(' '),
         duration: 7.0,
         language,
         segments,
@@ -86,7 +86,7 @@ export class MockSTTAdapter extends STTAdapter {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -119,14 +119,14 @@ export class MockMTAdapter extends MTAdapter {
     // Simulate processing delay
     await this.delay(1000);
 
-    const translatedSegments: TranslationSegment[] = segments.map(segment => ({
+    const translatedSegments: TranslationSegment[] = segments.map((segment) => ({
       id: segment.id,
       sourceText: segment.text,
       translatedText: `[${targetLanguage}] ${segment.text}`,
       start: segment.start,
       end: segment.end,
       speaker: segment.speaker,
-      confidence: 0.90,
+      confidence: 0.9,
     }));
 
     return {
@@ -134,13 +134,13 @@ export class MockMTAdapter extends MTAdapter {
         sourceLanguage,
         targetLanguage,
         segments: translatedSegments,
-        fullText: translatedSegments.map(s => s.translatedText).join(' '),
+        fullText: translatedSegments.map((s) => s.translatedText).join(' '),
       },
       metadata: {
         processingTime: 1000,
         modelName: this.name,
         modelVersion: this.version,
-        confidence: 0.90,
+        confidence: 0.9,
       },
     };
   }
@@ -154,7 +154,7 @@ export class MockMTAdapter extends MTAdapter {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -184,7 +184,7 @@ export class MockTTSAdapter extends TTSAdapter {
     // Simulate processing delay
     await this.delay(2000);
 
-    const audioSegments = segments.map(segment => ({
+    const audioSegments = segments.map((segment) => ({
       segmentId: segment.id,
       audioData: Buffer.alloc(0), // Mock audio data
       start: segment.start,
@@ -220,7 +220,7 @@ export class MockTTSAdapter extends TTSAdapter {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -260,7 +260,7 @@ export class MockLipSyncAdapter extends LipSyncAdapter {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

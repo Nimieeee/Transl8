@@ -1,7 +1,7 @@
 // @ts-nocheck
 /**
  * OpenAI TTS Adapter
- * 
+ *
  * Adapter for OpenAI's Text-to-Speech API
  * Supports multiple voices and languages
  */
@@ -55,13 +55,11 @@ export class OpenAITTSAdapter implements TTSAdapter {
         const voice = this.getVoiceFromConfig(voiceConfig);
         const speed = voiceConfig?.parameters?.speed || 1.0;
 
-        console.log(`[OpenAI TTS] Segment ${i}: "${segment.translatedText.substring(0, 50)}..." (voice: ${voice}, speed: ${speed})`);
-
-        const audioData = await this.synthesize(
-          segment.translatedText,
-          voice,
-          speed
+        console.log(
+          `[OpenAI TTS] Segment ${i}: "${segment.translatedText.substring(0, 50)}..." (voice: ${voice}, speed: ${speed})`
         );
+
+        const audioData = await this.synthesize(segment.translatedText, voice, speed);
 
         audioSegments.push({
           segmentId: i,
@@ -79,7 +77,7 @@ export class OpenAITTSAdapter implements TTSAdapter {
     }
 
     // Concatenate all audio segments
-    const concatenatedAudio = Buffer.concat(audioSegments.map(s => s.audioData));
+    const concatenatedAudio = Buffer.concat(audioSegments.map((s) => s.audioData));
 
     const totalTime = Date.now() - startTime;
 
@@ -124,23 +122,25 @@ export class OpenAITTSAdapter implements TTSAdapter {
   /**
    * Get OpenAI voice from voice config
    */
-  private getVoiceFromConfig(config?: VoiceConfig): 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer' {
+  private getVoiceFromConfig(
+    config?: VoiceConfig
+  ): 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer' {
     if (!config || !config.voiceId) {
       return this.defaultVoice;
     }
 
     // Map voice IDs to OpenAI voices
     const voiceMap: Record<string, 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'> = {
-      'alloy': 'alloy',
-      'echo': 'echo',
-      'fable': 'fable',
-      'onyx': 'onyx',
-      'nova': 'nova',
-      'shimmer': 'shimmer',
+      alloy: 'alloy',
+      echo: 'echo',
+      fable: 'fable',
+      onyx: 'onyx',
+      nova: 'nova',
+      shimmer: 'shimmer',
       // Fallback mappings
-      'male': 'onyx',
-      'female': 'nova',
-      'neutral': 'alloy',
+      male: 'onyx',
+      female: 'nova',
+      neutral: 'alloy',
     };
 
     const voiceId = config.voiceId.toLowerCase();

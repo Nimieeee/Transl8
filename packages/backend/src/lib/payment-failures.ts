@@ -41,7 +41,7 @@ export async function handlePaymentFailure(
     await sendPaymentFailureEmail(userId, 'second_attempt', nextRetryDate);
   } else if (attemptCount >= MAX_RETRY_ATTEMPTS) {
     await sendPaymentFailureEmail(userId, 'final_attempt', nextRetryDate);
-    
+
     // Start grace period
     await startGracePeriod(userId);
   }
@@ -75,10 +75,7 @@ async function startGracePeriod(userId: string): Promise<void> {
 /**
  * Schedule grace period expiration check
  */
-async function scheduleGracePeriodExpiration(
-  userId: string,
-  expirationDate: Date
-): Promise<void> {
+async function scheduleGracePeriodExpiration(userId: string, expirationDate: Date): Promise<void> {
   // This would typically use a job queue or scheduled task
   // For now, we'll log it
   logger.info('Grace period expiration scheduled', {
@@ -139,10 +136,7 @@ async function downgradeAfterGracePeriod(userId: string): Promise<void> {
 /**
  * Handle successful payment after failure
  */
-export async function handlePaymentRecovery(
-  userId: string,
-  invoiceId: string
-): Promise<void> {
+export async function handlePaymentRecovery(userId: string, invoiceId: string): Promise<void> {
   logger.info('Payment recovered', { userId, invoiceId });
 
   // Update subscription status back to active
@@ -260,9 +254,7 @@ function getPaymentFailureEmailContent(
   tier: SubscriptionTier,
   nextRetryDate?: Date
 ): { subject: string; html: string } {
-  const retryDateStr = nextRetryDate
-    ? nextRetryDate.toLocaleDateString()
-    : 'soon';
+  const retryDateStr = nextRetryDate ? nextRetryDate.toLocaleDateString() : 'soon';
 
   switch (attemptType) {
     case 'first_attempt':
@@ -307,9 +299,7 @@ function getPaymentFailureEmailContent(
 /**
  * Get subscription status with grace period information
  */
-export async function getSubscriptionStatusWithGracePeriod(
-  userId: string
-): Promise<{
+export async function getSubscriptionStatusWithGracePeriod(userId: string): Promise<{
   status: string;
   inGracePeriod: boolean;
   gracePeriodEndsAt?: Date;

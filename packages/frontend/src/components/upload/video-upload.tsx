@@ -50,7 +50,9 @@ export function VideoUpload({ projectId, onUploadComplete, onError }: VideoUploa
     try {
       const duration = await getVideoDuration(file);
       if (duration > MAX_DURATION) {
-        setValidationError(`Video duration exceeds 5 minute limit (${Math.round(duration / 60)} minutes).`);
+        setValidationError(
+          `Video duration exceeds 5 minute limit (${Math.round(duration / 60)} minutes).`
+        );
         return false;
       }
     } catch (err) {
@@ -161,7 +163,7 @@ export function VideoUpload({ projectId, onUploadComplete, onError }: VideoUploa
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + ' ' + sizes[i];
   };
 
   return (
@@ -194,9 +196,7 @@ export function VideoUpload({ projectId, onUploadComplete, onError }: VideoUploa
           <p className="mt-4 text-lg font-medium text-gray-900">
             Drop your video here, or click to browse
           </p>
-          <p className="mt-2 text-sm text-gray-500">
-            MP4 or MOV up to 500MB, max 5 minutes
-          </p>
+          <p className="mt-2 text-sm text-gray-500">MP4 or MOV up to 500MB, max 5 minutes</p>
           <input
             ref={fileInputRef}
             type="file"
@@ -204,10 +204,7 @@ export function VideoUpload({ projectId, onUploadComplete, onError }: VideoUploa
             onChange={handleFileInputChange}
             className="hidden"
           />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="btn-primary mt-6"
-          >
+          <button onClick={() => fileInputRef.current?.click()} className="btn-primary mt-6">
             Select Video
           </button>
         </div>
@@ -240,9 +237,7 @@ export function VideoUpload({ projectId, onUploadComplete, onError }: VideoUploa
       {/* Language Selector */}
       {file && !isUploading && (
         <div className="card">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Target Language
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Target Language</label>
           <select
             value={targetLanguage}
             onChange={(e) => setTargetLanguage(e.target.value)}
@@ -304,7 +299,8 @@ export function VideoUpload({ projectId, onUploadComplete, onError }: VideoUploa
           </div>
           <div className="mt-4">
             <button onClick={handleUpload} className="btn-primary w-full">
-              Upload & Translate to {SUPPORTED_LANGUAGES.find(l => l.code === targetLanguage)?.name}
+              Upload & Translate to{' '}
+              {SUPPORTED_LANGUAGES.find((l) => l.code === targetLanguage)?.name}
             </button>
           </div>
         </div>

@@ -14,7 +14,7 @@ export function FeedbackForm({ type = 'general', category, onSuccess }: Feedback
     type,
     category: category || '',
     rating: 0,
-    content: ''
+    content: '',
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -29,7 +29,7 @@ export function FeedbackForm({ type = 'general', category, onSuccess }: Feedback
       await apiClient.post('/api/feedback', formData);
       setSuccess(true);
       setFormData({ type, category: category || '', rating: 0, content: '' });
-      
+
       if (onSuccess) {
         onSuccess();
       }
@@ -54,9 +54,7 @@ export function FeedbackForm({ type = 'general', category, onSuccess }: Feedback
 
       <form onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Feedback Type
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Feedback Type</label>
           <select
             value={formData.type}
             onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
@@ -84,9 +82,7 @@ export function FeedbackForm({ type = 'general', category, onSuccess }: Feedback
 
         {formData.type === 'survey' && (
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Rating (1-10)
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Rating (1-10)</label>
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
                 <button
@@ -107,9 +103,7 @@ export function FeedbackForm({ type = 'general', category, onSuccess }: Feedback
         )}
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Your Feedback
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Your Feedback</label>
           <textarea
             value={formData.content}
             onChange={(e) => setFormData({ ...formData, content: e.target.value })}

@@ -1,10 +1,10 @@
 /**
  * TTS Worker - Processes text-to-speech jobs
- * 
+ *
  * Consumes jobs from the TTS queue, fetches approved translations from database,
  * generates audio for each segment with appropriate voice (preset or cloned),
  * concatenates segments with proper timing alignment, and uploads to storage.
- * 
+ *
  * Requirements: 4.5, 12.3
  */
 
@@ -223,8 +223,6 @@ export class TTSWorker {
     return mapping;
   }
 
-
-
   /**
    * Synthesize segments using OpenAI TTS
    */
@@ -248,7 +246,7 @@ export class TTSWorker {
       try {
         // Get translated text from segment
         const translatedText = segment.adapted_text || segment.text;
-        
+
         if (!translatedText) {
           throw new Error(`No text found for segment ${segment.id}`);
         }
@@ -256,30 +254,31 @@ export class TTSWorker {
         // Save segment audio to local file (for development without AWS)
         const outputDir = path.join(process.cwd(), 'temp', projectId, 'tts-output');
         await fs.promises.mkdir(outputDir, { recursive: true });
-        
-        const segmentAudioPath = path.join(
-          outputDir,
-          `segment_${String(i).padStart(4, '0')}.wav`
-        );
+
+        const segmentAudioPath = path.join(outputDir, `segment_${String(i).padStart(4, '0')}.wav`);
 
         // Check if we have validated audio from TTS-validated adaptation
         if (segment.validatedAudioPath && fs.existsSync(segment.validatedAudioPath)) {
-          console.log(`[TTS Worker] Using validated audio for segment ${i}: "${translatedText.substring(0, 50)}..." (pre-validated)`);
-          
+          console.log(
+            `[TTS Worker] Using validated audio for segment ${i}: "${translatedText.substring(0, 50)}..." (pre-validated)`
+          );
+
           // Copy validated audio to TTS output location
           await fs.promises.copyFile(segment.validatedAudioPath, segmentAudioPath);
-          
+
           // Get duration of validated audio
           const { exec } = await import('child_process');
           const { promisify } = await import('util');
           const execAsync = promisify(exec);
-          
+
           const { stdout } = await execAsync(
             `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${segmentAudioPath}"`
           );
           const duration = parseFloat(stdout.trim());
-          
-          console.log(`[TTS Worker] Validated audio copied: ${segmentAudioPath} (${duration.toFixed(2)}s)`);
+
+          console.log(
+            `[TTS Worker] Validated audio copied: ${segmentAudioPath} (${duration.toFixed(2)}s)`
+          );
 
           // Read audio data for compatibility
           const audioData = await fs.promises.readFile(segmentAudioPath);
@@ -292,7 +291,7 @@ export class TTSWorker {
             audioData,
             start: segment.start_ms || segment.start,
             end: segment.end_ms || segment.end,
-            duration: segment.actualDuration || segment.duration || (segment.end - segment.start),
+            duration: segment.actualDuration || segment.duration || segment.end - segment.start,
             url: segmentAudioUrl,
           });
 
@@ -302,24 +301,24 @@ export class TTSWorker {
         // No validated audio - synthesize with TTS
         const voice = this.getOpenAIVoice(voiceConfig);
         const speed = 1.0; // Always use normal speed for natural speech
-        
+
         const segmentDuration = (segment.end_ms - segment.start_ms) / 1000;
         const estimatedDuration = this.estimateSpeechDuration(translatedText);
-        
+
         if (estimatedDuration > 0 && segmentDuration > 0) {
           const durationDiff = estimatedDuration - segmentDuration;
           const percentDiff = (durationDiff / segmentDuration) * 100;
-          console.log(`[OpenAI TTS] Duration info: segment=${segmentDuration.toFixed(1)}s, estimated=${estimatedDuration.toFixed(1)}s, diff=${durationDiff.toFixed(1)}s (${percentDiff.toFixed(1)}%), speed=1.0x (natural)`);
+          console.log(
+            `[OpenAI TTS] Duration info: segment=${segmentDuration.toFixed(1)}s, estimated=${estimatedDuration.toFixed(1)}s, diff=${durationDiff.toFixed(1)}s (${percentDiff.toFixed(1)}%), speed=1.0x (natural)`
+          );
         }
 
-        console.log(`[TTS Worker] Synthesizing segment ${i}: "${translatedText.substring(0, 50)}..." (voice: ${voice}, speed: ${speed.toFixed(2)}x)`);
+        console.log(
+          `[TTS Worker] Synthesizing segment ${i}: "${translatedText.substring(0, 50)}..." (voice: ${voice}, speed: ${speed.toFixed(2)}x)`
+        );
 
         // Synthesize using OpenAI TTS with calculated speed
-        const audioData = await this.ttsAdapter.synthesize(
-          translatedText,
-          voice,
-          speed
-        );
+        const audioData = await this.ttsAdapter.synthesize(translatedText, voice, speed);
 
         await fs.promises.writeFile(segmentAudioPath, audioData);
 
@@ -333,7 +332,7 @@ export class TTSWorker {
           audioData,
           start: segment.start_ms || segment.start,
           end: segment.end_ms || segment.end,
-          duration: segment.duration || (segment.end - segment.start),
+          duration: segment.duration || segment.end - segment.start,
           url: segmentAudioUrl,
         });
 
@@ -353,7 +352,9 @@ export class TTSWorker {
       warnings,
     };
 
-    console.log(`[TTS Worker] Completed ${audioSegments.length}/${segments.length} segments in ${totalTime}ms`);
+    console.log(
+      `[TTS Worker] Completed ${audioSegments.length}/${segments.length} segments in ${totalTime}ms`
+    );
 
     // Return empty buffer - Final Assembly will handle concatenation with proper timing
     return {
@@ -370,24 +371,24 @@ export class TTSWorker {
   private estimateSpeechDuration(text: string, language: string = 'es'): number {
     // Average speaking rates (words per minute)
     const speakingRates: Record<string, number> = {
-      'en': 150, // English: ~150 wpm
-      'es': 180, // Spanish: ~180 wpm (faster)
-      'fr': 160, // French: ~160 wpm
-      'pt': 170, // Portuguese: ~170 wpm
-      'ja': 200, // Japanese: ~200 wpm (syllables)
-      'ko': 190, // Korean: ~190 wpm
-      'sw': 150, // Swahili: ~150 wpm
+      en: 150, // English: ~150 wpm
+      es: 180, // Spanish: ~180 wpm (faster)
+      fr: 160, // French: ~160 wpm
+      pt: 170, // Portuguese: ~170 wpm
+      ja: 200, // Japanese: ~200 wpm (syllables)
+      ko: 190, // Korean: ~190 wpm
+      sw: 150, // Swahili: ~150 wpm
     };
 
     const wpm = speakingRates[language] || 150;
-    
+
     // Count words (simple split by spaces)
     const wordCount = text.trim().split(/\s+/).length;
-    
+
     // Calculate duration in seconds
     const durationMinutes = wordCount / wpm;
     const durationSeconds = durationMinutes * 60;
-    
+
     // Add buffer for punctuation pauses (10%)
     return durationSeconds * 1.1;
   }
@@ -395,28 +396,28 @@ export class TTSWorker {
   /**
    * Get OpenAI voice from voice config
    */
-  private getOpenAIVoice(config?: VoiceConfig): 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer' {
+  private getOpenAIVoice(
+    config?: VoiceConfig
+  ): 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer' {
     if (!config || !config.voiceId) {
       return 'alloy';
     }
 
     const voiceMap: Record<string, 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer'> = {
-      'alloy': 'alloy',
-      'echo': 'echo',
-      'fable': 'fable',
-      'onyx': 'onyx',
-      'nova': 'nova',
-      'shimmer': 'shimmer',
-      'male': 'onyx',
-      'female': 'nova',
-      'neutral': 'alloy',
+      alloy: 'alloy',
+      echo: 'echo',
+      fable: 'fable',
+      onyx: 'onyx',
+      nova: 'nova',
+      shimmer: 'shimmer',
+      male: 'onyx',
+      female: 'nova',
+      neutral: 'alloy',
     };
 
     const voiceId = config.voiceId.toLowerCase();
     return voiceMap[voiceId] || 'alloy';
   }
-
-
 
   /**
    * Concatenate audio buffers
@@ -442,13 +443,9 @@ export class TTSWorker {
         userId,
       };
 
-      await this.finalAssemblyQueue.add(
-        `final-assembly-${projectId}`,
-        finalAssemblyJobData,
-        {
-          priority: 1, // High priority
-        }
-      );
+      await this.finalAssemblyQueue.add(`final-assembly-${projectId}`, finalAssemblyJobData, {
+        priority: 1, // High priority
+      });
 
       logger.info(`[TTS Worker] Enqueued final assembly job for project ${projectId}`);
     } catch (error: any) {

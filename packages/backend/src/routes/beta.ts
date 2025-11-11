@@ -11,7 +11,7 @@ router.post('/invite-codes', authenticateToken, async (_req, res) => {
   try {
     // Only admins can generate invite codes (add admin check in production)
     const inviteCode = crypto.randomBytes(8).toString('hex').toUpperCase();
-    
+
     res.json({ inviteCode });
   } catch (error) {
     logger.error('Error generating invite code:', error);
@@ -32,7 +32,7 @@ router.post('/activate', authenticateToken, async (req, res) => {
     // Check if user is already a beta tester
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { isBetaTester: true, betaInviteCode: true }
+      select: { isBetaTester: true, betaInviteCode: true },
     });
 
     if (user?.isBetaTester) {
@@ -41,7 +41,7 @@ router.post('/activate', authenticateToken, async (req, res) => {
 
     // Check if invite code is already used
     const existingUser = await prisma.user.findUnique({
-      where: { betaInviteCode: inviteCode }
+      where: { betaInviteCode: inviteCode },
     });
 
     if (existingUser) {
@@ -57,22 +57,22 @@ router.post('/activate', authenticateToken, async (req, res) => {
         betaOnboardedAt: new Date(),
         subscriptionTier: 'PRO',
         processingMinutesLimit: -1, // Unlimited for beta
-        voiceCloneSlots: 10
+        voiceCloneSlots: 10,
       },
       select: {
         id: true,
         email: true,
         isBetaTester: true,
         subscriptionTier: true,
-        processingMinutesLimit: true
-      }
+        processingMinutesLimit: true,
+      },
     });
 
     logger.info(`Beta access activated for user ${userId} with code ${inviteCode}`);
 
     res.json({
       message: 'Beta access activated successfully',
-      user: updatedUser
+      user: updatedUser,
     });
   } catch (error) {
     logger.error('Error activating beta access:', error);
@@ -90,8 +90,8 @@ router.get('/onboarding-status', authenticateToken, async (req, res) => {
       select: {
         isBetaTester: true,
         betaOnboardedAt: true,
-        subscriptionTier: true
-      }
+        subscriptionTier: true,
+      },
     });
 
     if (!user?.isBetaTester) {
@@ -100,14 +100,14 @@ router.get('/onboarding-status', authenticateToken, async (req, res) => {
 
     // Check onboarding completion (e.g., first project created)
     const projectCount = await prisma.project.count({
-      where: { userId }
+      where: { userId },
     });
 
     res.json({
       isBetaTester: true,
       onboardedAt: user.betaOnboardedAt,
       hasCreatedProject: projectCount > 0,
-      subscriptionTier: user.subscriptionTier
+      subscriptionTier: user.subscriptionTier,
     });
   } catch (error) {
     logger.error('Error fetching onboarding status:', error);

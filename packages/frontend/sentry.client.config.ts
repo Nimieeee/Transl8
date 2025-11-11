@@ -3,19 +3,19 @@ import * as Sentry from '@sentry/nextjs';
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   environment: process.env.NODE_ENV || 'development',
-  
+
   // Adjust this value in production, or use tracesSampler for greater control
   tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-  
+
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
-  
+
   replaysOnErrorSampleRate: 1.0,
-  
+
   // This sets the sample rate to be 10%. You may want this to be 100% while
   // in development and sample at a lower rate in production
   replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 0.1,
-  
+
   // You can remove this option if you're not planning to use the Sentry Session Replay feature:
   integrations: [
     Sentry.replayIntegration({
@@ -24,15 +24,15 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
-  
+
   // Filter out sensitive data
   beforeSend(event, hint) {
     // Remove sensitive data from breadcrumbs
     if (event.breadcrumbs) {
-      event.breadcrumbs = event.breadcrumbs.map(breadcrumb => {
+      event.breadcrumbs = event.breadcrumbs.map((breadcrumb) => {
         if (breadcrumb.data) {
           const sensitiveKeys = ['password', 'token', 'authorization', 'api_key'];
-          sensitiveKeys.forEach(key => {
+          sensitiveKeys.forEach((key) => {
             if (breadcrumb.data && key in breadcrumb.data) {
               breadcrumb.data[key] = '[REDACTED]';
             }
@@ -41,10 +41,10 @@ Sentry.init({
         return breadcrumb;
       });
     }
-    
+
     return event;
   },
-  
+
   // Ignore certain errors
   ignoreErrors: [
     // Random plugins/extensions
@@ -76,7 +76,7 @@ Sentry.init({
     'chrome-extension://',
     'moz-extension://',
   ],
-  
+
   denyUrls: [
     // Chrome extensions
     /extensions\//i,

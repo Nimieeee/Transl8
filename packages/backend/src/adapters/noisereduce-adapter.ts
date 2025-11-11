@@ -1,9 +1,9 @@
 /**
  * Noise Reduction Adapter
- * 
+ *
  * Adapter for noisereduce library to remove ambient noise from audio.
  * Removes hiss, ambient noise, and other stationary noise.
- * 
+ *
  * Requirements: 16.3
  */
 
@@ -33,7 +33,7 @@ export class NoiseReduceAdapter {
 
   /**
    * Remove ambient noise from audio
-   * 
+   *
    * @param audioPath - Path to audio file
    * @param outputPath - Path for cleaned audio output
    * @param options - Noise reduction options
@@ -61,15 +61,11 @@ export class NoiseReduceAdapter {
       formData.append('stationary', (options.stationary !== false).toString());
 
       // Call noise reduction service
-      const response = await axios.post(
-        `${this.serviceUrl}/reduce`,
-        formData,
-        {
-          headers: formData.getHeaders(),
-          responseType: 'arraybuffer',
-          timeout: 60000, // 1 minute timeout
-        }
-      );
+      const response = await axios.post(`${this.serviceUrl}/reduce`, formData, {
+        headers: formData.getHeaders(),
+        responseType: 'arraybuffer',
+        timeout: 60000, // 1 minute timeout
+      });
 
       // Save cleaned audio to output path
       fs.writeFileSync(outputPath, response.data);
@@ -82,18 +78,15 @@ export class NoiseReduceAdapter {
         cleanedPath: outputPath,
         processingTime,
       };
-
     } catch (error: any) {
       logger.error(`Noise reduction error: ${error.message}`);
-      
+
       if (error.response) {
         throw new Error(
           `Noise reduction service error: ${error.response.status} - ${error.response.data}`
         );
       } else if (error.code === 'ECONNREFUSED') {
-        throw new Error(
-          `Cannot connect to noise reduction service at ${this.serviceUrl}`
-        );
+        throw new Error(`Cannot connect to noise reduction service at ${this.serviceUrl}`);
       } else {
         throw new Error(`Noise reduction failed: ${error.message}`);
       }
@@ -102,7 +95,7 @@ export class NoiseReduceAdapter {
 
   /**
    * Health check for the noise reduction service
-   * 
+   *
    * @returns Health status
    */
   async healthCheck(): Promise<{ healthy: boolean; latency?: number; error?: string }> {
@@ -126,7 +119,6 @@ export class NoiseReduceAdapter {
           error: 'Service reported unhealthy status',
         };
       }
-
     } catch (error: any) {
       return {
         healthy: false,

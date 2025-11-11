@@ -60,9 +60,10 @@ describe('Robust Pipeline Integration Tests', () => {
           speaker: seg.speaker,
           confidence: seg.confidence,
           previous_line: idx > 0 ? mockMultiSpeakerTranscript.segments[idx - 1].text : null,
-          next_line: idx < mockMultiSpeakerTranscript.segments.length - 1 
-            ? mockMultiSpeakerTranscript.segments[idx + 1].text 
-            : null,
+          next_line:
+            idx < mockMultiSpeakerTranscript.segments.length - 1
+              ? mockMultiSpeakerTranscript.segments[idx + 1].text
+              : null,
         })),
       };
 
@@ -80,7 +81,7 @@ describe('Robust Pipeline Integration Tests', () => {
       expect(contextMap.content).toHaveProperty('segments');
 
       // Stage 2: Vocal Isolation - Add clean prompt paths
-      const updatedSegments = (contextMapData.segments as any[]).map(seg => ({
+      const updatedSegments = (contextMapData.segments as any[]).map((seg) => ({
         ...seg,
         clean_prompt_path: `/path/to/clean_prompt_${seg.id}.wav`,
       }));
@@ -239,7 +240,7 @@ describe('Robust Pipeline Integration Tests', () => {
       });
 
       // Simulate vocal isolation adding clean prompt path
-      const updatedSegments = (contextMapData.segments as any[]).map(seg => ({
+      const updatedSegments = (contextMapData.segments as any[]).map((seg) => ({
         ...seg,
         clean_prompt_path: `/path/to/clean_vocals_${seg.id}.wav`,
         vocal_isolation_quality: {
@@ -263,7 +264,7 @@ describe('Robust Pipeline Integration Tests', () => {
         where: { id: contextMap.id },
       });
       const segment = (updatedContextMap?.content as any).segments[0];
-      
+
       expect(segment.clean_prompt_path).toBeDefined();
       expect(segment.vocal_isolation_quality).toBeDefined();
       expect(segment.vocal_isolation_quality.music_energy_reduction).toBeGreaterThan(0.9);
@@ -312,7 +313,7 @@ describe('Robust Pipeline Integration Tests', () => {
       });
 
       // Simulate adaptation with validation
-      const adaptedSegments = (contextMapData.segments as any[]).map(seg => {
+      const adaptedSegments = (contextMapData.segments as any[]).map((seg) => {
         const originalLength = seg.text.length;
         const adaptedText = `Adapted: ${seg.text}`;
         const adaptedLength = adaptedText.length;
@@ -398,7 +399,7 @@ describe('Robust Pipeline Integration Tests', () => {
           totalSegments: numSegments,
           maxDriftMs: 0,
           averageDriftMs: 0,
-          segmentAccuracy: segments.map(seg => ({ segment_id: seg.id, drift_ms: 0 })),
+          segmentAccuracy: segments.map((seg) => ({ segment_id: seg.id, drift_ms: 0 })),
           syncQualityScore: 1.0,
         },
       });

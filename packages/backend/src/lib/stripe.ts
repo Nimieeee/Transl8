@@ -87,10 +87,7 @@ export async function createCheckoutSession(
 /**
  * Get or create a Stripe customer for a user
  */
-export async function getOrCreateCustomer(
-  userId: string,
-  email: string
-): Promise<Stripe.Customer> {
+export async function getOrCreateCustomer(userId: string, email: string): Promise<Stripe.Customer> {
   if (!stripe) {
     throw new Error('Stripe is not configured');
   }
@@ -260,9 +257,7 @@ export function verifyWebhookSignature(
 /**
  * Get customer's active subscriptions
  */
-export async function getCustomerSubscriptions(
-  customerId: string
-): Promise<Stripe.Subscription[]> {
+export async function getCustomerSubscriptions(customerId: string): Promise<Stripe.Subscription[]> {
   if (!stripe) {
     throw new Error('Stripe is not configured');
   }

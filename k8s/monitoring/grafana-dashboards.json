@@ -20,14 +20,14 @@
             "thresholds": {
               "mode": "absolute",
               "steps": [
-                {"value": 0, "color": "green"},
-                {"value": 15000, "color": "yellow"},
-                {"value": 20000, "color": "red"}
+                { "value": 0, "color": "green" },
+                { "value": 15000, "color": "yellow" },
+                { "value": 20000, "color": "red" }
               ]
             }
           }
         },
-        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 0}
+        "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 }
       },
       {
         "id": 2,
@@ -39,7 +39,7 @@
             "legendFormat": "{{service}}"
           }
         ],
-        "gridPos": {"h": 8, "w": 12, "x": 6, "y": 0}
+        "gridPos": { "h": 8, "w": 12, "x": 6, "y": 0 }
       },
       {
         "id": 3,
@@ -51,10 +51,8 @@
             "legendFormat": "{{app}}"
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 }
       },
       {
         "id": 4,
@@ -66,10 +64,8 @@
             "legendFormat": "{{service}}"
           }
         ],
-        "yaxes": [
-          {"format": "currencyUSD"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+        "yaxes": [{ "format": "currencyUSD" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 }
       },
       {
         "id": 5,
@@ -89,14 +85,14 @@
             "thresholds": {
               "mode": "absolute",
               "steps": [
-                {"value": 0, "color": "green"},
-                {"value": 70, "color": "yellow"},
-                {"value": 90, "color": "red"}
+                { "value": 0, "color": "green" },
+                { "value": 70, "color": "yellow" },
+                { "value": 90, "color": "red" }
               ]
             }
           }
         },
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 }
       },
       {
         "id": 6,
@@ -108,7 +104,7 @@
             "legendFormat": "{{queue_name}}"
           }
         ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 }
       },
       {
         "id": 7,
@@ -120,7 +116,7 @@
             "legendFormat": "{{app}}"
           }
         ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 24 }
       },
       {
         "id": 8,
@@ -132,10 +128,8 @@
             "legendFormat": "{{service}} - {{queue_name}}"
           }
         ],
-        "yaxes": [
-          {"format": "currencyUSD"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+        "yaxes": [{ "format": "currencyUSD" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 24 }
       },
       {
         "id": 9,
@@ -147,10 +141,8 @@
             "legendFormat": "{{gpu}} on {{kubernetes_node}}"
           }
         ],
-        "yaxes": [
-          {"format": "percent", "min": 0, "max": 100}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 32}
+        "yaxes": [{ "format": "percent", "min": 0, "max": 100 }],
+        "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 }
       },
       {
         "id": 10,
@@ -162,10 +154,8 @@
             "legendFormat": "{{queue_name}} (p95)"
           }
         ],
-        "yaxes": [
-          {"format": "s"}
-        ],
-        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 32}
+        "yaxes": [{ "format": "s" }],
+        "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 }
       },
       {
         "id": 11,
@@ -177,7 +167,7 @@
             "legendFormat": "{{label_node_kubernetes_io_instance_type}}"
           }
         ],
-        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 0}
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 }
       },
       {
         "id": 12,
@@ -195,7 +185,7 @@
             "decimals": 1
           }
         },
-        "gridPos": {"h": 4, "w": 6, "x": 18, "y": 4}
+        "gridPos": { "h": 4, "w": 6, "x": 18, "y": 4 }
       }
     ],
     "refresh": "30s",

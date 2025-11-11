@@ -12,9 +12,9 @@ const router = Router();
 router.get('/dashboard', authenticateToken, async (req, res) => {
   try {
     const days = parseInt(req.query.days as string) || 30;
-    
+
     const dashboard = await audioQualityMonitor.getDashboard(days);
-    
+
     res.json(dashboard);
   } catch (error) {
     logger.error('Failed to get audio quality dashboard:', error);
@@ -29,9 +29,9 @@ router.get('/dashboard', authenticateToken, async (req, res) => {
 router.get('/project/:projectId', authenticateToken, async (req, res) => {
   try {
     const { projectId } = req.params;
-    
+
     const metrics = await audioQualityMonitor.getProjectMetrics(projectId);
-    
+
     res.json({ metrics });
   } catch (error) {
     logger.error('Failed to get project audio quality metrics:', error);

@@ -15,24 +15,24 @@ export function initSentry(app: Express): void {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     environment: process.env.NODE_ENV || 'development',
-    
+
     // Performance Monitoring
     tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-    
+
     // Profiling
     profilesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
-    
+
     integrations: [
       // Enable HTTP calls tracing
       new Sentry.Integrations.Http({ tracing: true }),
-      
+
       // Enable Express.js middleware tracing
       new Sentry.Integrations.Express({ app }),
-      
+
       // Enable profiling
       new ProfilingIntegration(),
     ],
-    
+
     // Filter out sensitive data
     beforeSend(event, hint) {
       // Remove sensitive headers
@@ -40,11 +40,11 @@ export function initSentry(app: Express): void {
         delete event.request.headers['authorization'];
         delete event.request.headers['cookie'];
       }
-      
+
       // Remove sensitive query parameters
       if (event.request?.query_string) {
         const sensitiveParams = ['token', 'password', 'api_key'];
-        sensitiveParams.forEach(param => {
+        sensitiveParams.forEach((param) => {
           if (event.request?.query_string?.includes(param)) {
             event.request.query_string = event.request.query_string.replace(
               new RegExp(`${param}=[^&]*`, 'gi'),
@@ -53,10 +53,10 @@ export function initSentry(app: Express): void {
           }
         });
       }
-      
+
       return event;
     },
-    
+
     // Ignore certain errors
     ignoreErrors: [
       // Browser errors that shouldn't reach backend

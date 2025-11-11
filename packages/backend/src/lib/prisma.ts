@@ -23,7 +23,7 @@ export const configurePrisma = () => {
   // Default pool size is calculated based on: num_physical_cpus * 2 + 1
   // Can be overridden via DATABASE_URL connection_limit parameter
   // Example: postgresql://user:password@localhost:5432/db?connection_limit=10
-  
+
   return prisma;
 };
 

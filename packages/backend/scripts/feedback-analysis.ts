@@ -48,23 +48,24 @@ async function getFeedbackSummary() {
 
   const totalFeedback = feedback.length;
   const totalBetaUsers = await prisma.user.count({ where: { isBetaTester: true } });
-  
-  const ratingsOnly = feedback.filter(f => f.rating !== null);
-  const avgRating = ratingsOnly.length > 0
-    ? ratingsOnly.reduce((sum, f) => sum + (f.rating || 0), 0) / ratingsOnly.length
-    : 0;
+
+  const ratingsOnly = feedback.filter((f) => f.rating !== null);
+  const avgRating =
+    ratingsOnly.length > 0
+      ? ratingsOnly.reduce((sum, f) => sum + (f.rating || 0), 0) / ratingsOnly.length
+      : 0;
 
   const responseRate = totalBetaUsers > 0 ? (totalFeedback / totalBetaUsers) * 100 : 0;
 
   // Count by type
   const byType: Record<string, number> = {};
-  feedback.forEach(f => {
+  feedback.forEach((f) => {
     byType[f.type] = (byType[f.type] || 0) + 1;
   });
 
   // Count by category
   const byCategory: Record<string, number> = {};
-  feedback.forEach(f => {
+  feedback.forEach((f) => {
     if (f.category) {
       byCategory[f.category] = (byCategory[f.category] || 0) + 1;
     }
@@ -91,10 +92,10 @@ async function analyzeFeatureRequests() {
   // Extract and count feature requests from content
   const featureMap = new Map<string, { count: number; users: Set<string>; priorities: number[] }>();
 
-  featureRequests.forEach(f => {
+  featureRequests.forEach((f) => {
     // Simple keyword extraction (in production, use NLP)
     const keywords = extractKeywords(f.content);
-    keywords.forEach(keyword => {
+    keywords.forEach((keyword) => {
       if (!featureMap.has(keyword)) {
         featureMap.set(keyword, { count: 0, users: new Set(), priorities: [] });
       }
@@ -112,9 +113,10 @@ async function analyzeFeatureRequests() {
     .map(([feature, data]) => ({
       feature,
       count: data.count,
-      avgPriority: data.priorities.length > 0
-        ? data.priorities.reduce((a, b) => a + b, 0) / data.priorities.length
-        : 5,
+      avgPriority:
+        data.priorities.length > 0
+          ? data.priorities.reduce((a, b) => a + b, 0) / data.priorities.length
+          : 5,
       users: Array.from(data.users),
     }))
     .sort((a, b) => b.count - a.count)
@@ -133,11 +135,14 @@ async function analyzePainPoints() {
   });
 
   // Extract and categorize pain points
-  const painPointMap = new Map<string, { count: number; users: Set<string>; severities: string[] }>();
+  const painPointMap = new Map<
+    string,
+    { count: number; users: Set<string>; severities: string[] }
+  >();
 
-  bugReports.forEach(f => {
+  bugReports.forEach((f) => {
     const keywords = extractKeywords(f.content);
-    keywords.forEach(keyword => {
+    keywords.forEach((keyword) => {
       if (!painPointMap.has(keyword)) {
         painPointMap.set(keyword, { count: 0, users: new Set(), severities: [] });
       }
@@ -161,8 +166,9 @@ async function analyzePainPoints() {
     .sort((a, b) => {
       // Sort by severity first, then count
       const severityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
-      const severityDiff = (severityOrder[a.severity as keyof typeof severityOrder] || 2) - 
-                          (severityOrder[b.severity as keyof typeof severityOrder] || 2);
+      const severityDiff =
+        (severityOrder[a.severity as keyof typeof severityOrder] || 2) -
+        (severityOrder[b.severity as keyof typeof severityOrder] || 2);
       return severityDiff !== 0 ? severityDiff : b.count - a.count;
     })
     .slice(0, 20);
@@ -185,9 +191,9 @@ async function analyzePositiveHighlights() {
   // Extract positive highlights
   const highlightMap = new Map<string, { count: number; users: Set<string> }>();
 
-  positiveFeedback.forEach(f => {
+  positiveFeedback.forEach((f) => {
     const keywords = extractKeywords(f.content);
-    keywords.forEach(keyword => {
+    keywords.forEach((keyword) => {
       if (!highlightMap.has(keyword)) {
         highlightMap.set(keyword, { count: 0, users: new Set() });
       }
@@ -221,10 +227,10 @@ async function prioritizeImprovements(
   }> = [];
 
   // Add pain points (bugs) with high priority
-  painPoints.forEach(p => {
+  painPoints.forEach((p) => {
     const severityWeight = { critical: 10, high: 7, medium: 5, low: 3 };
     const impact = (severityWeight[p.severity as keyof typeof severityWeight] || 5) * p.count;
-    
+
     let priority: 'critical' | 'high' | 'medium' | 'low';
     if (p.severity === 'critical' || impact > 50) priority = 'critical';
     else if (p.severity === 'high' || impact > 30) priority = 'high';
@@ -240,9 +246,9 @@ async function prioritizeImprovements(
   });
 
   // Add feature requests
-  featureRequests.forEach(f => {
+  featureRequests.forEach((f) => {
     const impact = f.count * (11 - f.avgPriority); // Higher priority = lower number
-    
+
     let priority: 'critical' | 'high' | 'medium' | 'low';
     if (f.count >= 10 && f.avgPriority <= 3) priority = 'critical';
     else if (f.count >= 5 && f.avgPriority <= 5) priority = 'high';
@@ -285,8 +291,8 @@ async function segmentUsers() {
 
   // Power users: 5+ projects, 3+ feedback
   const powerUsers = betaUsers
-    .filter(u => u.projects.length >= 5 && u.feedback.length >= 3)
-    .map(u => ({
+    .filter((u) => u.projects.length >= 5 && u.feedback.length >= 3)
+    .map((u) => ({
       email: u.email,
       feedback: u.feedback.length,
       projects: u.projects.length,
@@ -297,17 +303,19 @@ async function segmentUsers() {
   // At-risk users: No activity in 7+ days or multiple issues
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const atRiskUsers = betaUsers
-    .filter(u => {
-      const lastProject = u.projects.length > 0
-        ? new Date(Math.max(...u.projects.map(p => new Date(p.createdAt).getTime())))
-        : new Date(0);
+    .filter((u) => {
+      const lastProject =
+        u.projects.length > 0
+          ? new Date(Math.max(...u.projects.map((p) => new Date(p.createdAt).getTime())))
+          : new Date(0);
       return lastProject < sevenDaysAgo || u.supportTickets.length >= 3;
     })
-    .map(u => ({
+    .map((u) => ({
       email: u.email,
-      lastActive: u.projects.length > 0
-        ? new Date(Math.max(...u.projects.map(p => new Date(p.createdAt).getTime())))
-        : new Date(u.betaOnboardedAt || u.createdAt),
+      lastActive:
+        u.projects.length > 0
+          ? new Date(Math.max(...u.projects.map((p) => new Date(p.createdAt).getTime())))
+          : new Date(u.betaOnboardedAt || u.createdAt),
       issues: u.supportTickets.length,
     }))
     .sort((a, b) => a.lastActive.getTime() - b.lastActive.getTime())
@@ -315,15 +323,14 @@ async function segmentUsers() {
 
   // Champions: High ratings, active feedback
   const champions = betaUsers
-    .filter(u => {
-      const ratings = u.feedback.filter(f => f.rating !== null).map(f => f.rating!);
-      const avgRating = ratings.length > 0
-        ? ratings.reduce((a, b) => a + b, 0) / ratings.length
-        : 0;
+    .filter((u) => {
+      const ratings = u.feedback.filter((f) => f.rating !== null).map((f) => f.rating!);
+      const avgRating =
+        ratings.length > 0 ? ratings.reduce((a, b) => a + b, 0) / ratings.length : 0;
       return avgRating >= 8 && u.feedback.length >= 3;
     })
-    .map(u => {
-      const ratings = u.feedback.filter(f => f.rating !== null).map(f => f.rating!);
+    .map((u) => {
+      const ratings = u.feedback.filter((f) => f.rating !== null).map((f) => f.rating!);
       const avgRating = ratings.reduce((a, b) => a + b, 0) / ratings.length;
       return {
         email: u.email,
@@ -340,16 +347,68 @@ async function segmentUsers() {
 // Helper functions
 function extractKeywords(text: string): string[] {
   // Simple keyword extraction (in production, use proper NLP)
-  const commonWords = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'is', 'was', 'are', 'were', 'been', 'be', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'my', 'your', 'his', 'her', 'its', 'our', 'their']);
-  
-  const words = text.toLowerCase()
+  const commonWords = new Set([
+    'the',
+    'a',
+    'an',
+    'and',
+    'or',
+    'but',
+    'in',
+    'on',
+    'at',
+    'to',
+    'for',
+    'of',
+    'with',
+    'is',
+    'was',
+    'are',
+    'were',
+    'been',
+    'be',
+    'have',
+    'has',
+    'had',
+    'do',
+    'does',
+    'did',
+    'will',
+    'would',
+    'could',
+    'should',
+    'may',
+    'might',
+    'can',
+    'this',
+    'that',
+    'these',
+    'those',
+    'i',
+    'you',
+    'he',
+    'she',
+    'it',
+    'we',
+    'they',
+    'my',
+    'your',
+    'his',
+    'her',
+    'its',
+    'our',
+    'their',
+  ]);
+
+  const words = text
+    .toLowerCase()
     .replace(/[^\w\s]/g, ' ')
     .split(/\s+/)
-    .filter(w => w.length > 3 && !commonWords.has(w));
+    .filter((w) => w.length > 3 && !commonWords.has(w));
 
   // Count word frequency
   const wordCount = new Map<string, number>();
-  words.forEach(w => {
+  words.forEach((w) => {
     wordCount.set(w, (wordCount.get(w) || 0) + 1);
   });
 
@@ -362,32 +421,29 @@ function extractKeywords(text: string): string[] {
 
 function getMostCommonSeverity(severities: string[]): string {
   if (severities.length === 0) return 'medium';
-  
-  const counts = severities.reduce((acc, s) => {
-    acc[s] = (acc[s] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
 
-  return Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])[0][0];
+  const counts = severities.reduce(
+    (acc, s) => {
+      acc[s] = (acc[s] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
+  return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
 }
 
 async function generateFeedbackAnalysis(): Promise<FeedbackAnalysis> {
   console.log('Analyzing beta feedback...\n');
 
-  const [
-    summary,
-    featureRequests,
-    painPoints,
-    positiveHighlights,
-    userSegments,
-  ] = await Promise.all([
-    getFeedbackSummary(),
-    analyzeFeatureRequests(),
-    analyzePainPoints(),
-    analyzePositiveHighlights(),
-    segmentUsers(),
-  ]);
+  const [summary, featureRequests, painPoints, positiveHighlights, userSegments] =
+    await Promise.all([
+      getFeedbackSummary(),
+      analyzeFeatureRequests(),
+      analyzePainPoints(),
+      analyzePositiveHighlights(),
+      segmentUsers(),
+    ]);
 
   const prioritizedImprovements = await prioritizeImprovements(featureRequests, painPoints);
 
@@ -457,28 +513,34 @@ function displayAnalysis(analysis: FeedbackAnalysis) {
   // Prioritized Improvements
   console.log('🎯 PRIORITIZED IMPROVEMENTS');
   console.log('-'.repeat(80));
-  const byCritical = analysis.prioritizedImprovements.filter(i => i.priority === 'critical');
-  const byHigh = analysis.prioritizedImprovements.filter(i => i.priority === 'high');
-  const byMedium = analysis.prioritizedImprovements.filter(i => i.priority === 'medium');
+  const byCritical = analysis.prioritizedImprovements.filter((i) => i.priority === 'critical');
+  const byHigh = analysis.prioritizedImprovements.filter((i) => i.priority === 'high');
+  const byMedium = analysis.prioritizedImprovements.filter((i) => i.priority === 'medium');
 
   if (byCritical.length > 0) {
     console.log('\n🔴 CRITICAL:');
     byCritical.forEach((imp, i) => {
-      console.log(`  ${i + 1}. ${imp.improvement} (Impact: ${imp.impact.toFixed(0)}, Frequency: ${imp.frequency})`);
+      console.log(
+        `  ${i + 1}. ${imp.improvement} (Impact: ${imp.impact.toFixed(0)}, Frequency: ${imp.frequency})`
+      );
     });
   }
 
   if (byHigh.length > 0) {
     console.log('\n🟠 HIGH:');
     byHigh.slice(0, 5).forEach((imp, i) => {
-      console.log(`  ${i + 1}. ${imp.improvement} (Impact: ${imp.impact.toFixed(0)}, Frequency: ${imp.frequency})`);
+      console.log(
+        `  ${i + 1}. ${imp.improvement} (Impact: ${imp.impact.toFixed(0)}, Frequency: ${imp.frequency})`
+      );
     });
   }
 
   if (byMedium.length > 0) {
     console.log('\n🟡 MEDIUM:');
     byMedium.slice(0, 5).forEach((imp, i) => {
-      console.log(`  ${i + 1}. ${imp.improvement} (Impact: ${imp.impact.toFixed(0)}, Frequency: ${imp.frequency})`);
+      console.log(
+        `  ${i + 1}. ${imp.improvement} (Impact: ${imp.impact.toFixed(0)}, Frequency: ${imp.frequency})`
+      );
     });
   }
   console.log();
@@ -486,7 +548,7 @@ function displayAnalysis(analysis: FeedbackAnalysis) {
   // User Segments
   console.log('👥 USER SEGMENTS');
   console.log('-'.repeat(80));
-  
+
   console.log('\n🌟 Power Users (Top 10):');
   analysis.userSegments.powerUsers.slice(0, 10).forEach((u, i) => {
     console.log(`  ${i + 1}. ${u.email} - ${u.projects} projects, ${u.feedback} feedback`);
@@ -494,12 +556,16 @@ function displayAnalysis(analysis: FeedbackAnalysis) {
 
   console.log('\n⚠️  At-Risk Users (Top 10):');
   analysis.userSegments.atRiskUsers.slice(0, 10).forEach((u, i) => {
-    console.log(`  ${i + 1}. ${u.email} - Last active: ${u.lastActive.toISOString().split('T')[0]}, Issues: ${u.issues}`);
+    console.log(
+      `  ${i + 1}. ${u.email} - Last active: ${u.lastActive.toISOString().split('T')[0]}, Issues: ${u.issues}`
+    );
   });
 
   console.log('\n🏆 Champions (Top 10):');
   analysis.userSegments.champions.slice(0, 10).forEach((u, i) => {
-    console.log(`  ${i + 1}. ${u.email} - Rating: ${u.rating.toFixed(1)}/10, ${u.feedback} feedback`);
+    console.log(
+      `  ${i + 1}. ${u.email} - Rating: ${u.rating.toFixed(1)}/10, ${u.feedback} feedback`
+    );
   });
 
   console.log();
@@ -509,7 +575,7 @@ function displayAnalysis(analysis: FeedbackAnalysis) {
 async function exportAnalysis(analysis: FeedbackAnalysis, filename: string) {
   const fs = require('fs');
   const path = require('path');
-  
+
   const outputPath = path.join(process.cwd(), filename);
   fs.writeFileSync(outputPath, JSON.stringify(analysis, null, 2));
   console.log(`\n✅ Analysis exported to: ${outputPath}`);
@@ -540,7 +606,14 @@ async function main() {
       case 'priorities':
         console.log('🎯 PRIORITIZED IMPROVEMENTS\n');
         analysis.prioritizedImprovements.forEach((imp, i) => {
-          const emoji = imp.priority === 'critical' ? '🔴' : imp.priority === 'high' ? '🟠' : imp.priority === 'medium' ? '🟡' : '🟢';
+          const emoji =
+            imp.priority === 'critical'
+              ? '🔴'
+              : imp.priority === 'high'
+                ? '🟠'
+                : imp.priority === 'medium'
+                  ? '🟡'
+                  : '🟢';
           console.log(`${emoji} ${i + 1}. [${imp.priority.toUpperCase()}] ${imp.improvement}`);
           console.log(`   Impact: ${imp.impact.toFixed(0)}, Frequency: ${imp.frequency}\n`);
         });
@@ -558,7 +631,9 @@ async function main() {
         console.log('⚠️  AT-RISK USERS\n');
         analysis.userSegments.atRiskUsers.forEach((u, i) => {
           console.log(`${i + 1}. ${u.email}`);
-          console.log(`   Last Active: ${u.lastActive.toISOString().split('T')[0]}, Issues: ${u.issues}\n`);
+          console.log(
+            `   Last Active: ${u.lastActive.toISOString().split('T')[0]}, Issues: ${u.issues}\n`
+          );
         });
         break;
 

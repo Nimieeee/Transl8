@@ -104,17 +104,23 @@ export function AdaptationMetricsDashboard() {
           </div>
           <div className="bg-purple-50 rounded-lg p-4">
             <p className="text-sm text-purple-600">Total Segments</p>
-            <p className="text-2xl font-bold text-purple-900">{data.overallMetrics.totalSegments.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-purple-900">
+              {data.overallMetrics.totalSegments.toLocaleString()}
+            </p>
           </div>
           <div className="bg-green-50 rounded-lg p-4">
             <p className="text-sm text-green-600">Success Rate</p>
-            <p className={`text-2xl font-bold ${getSuccessRateColor(data.overallMetrics.overallSuccessRate)}`}>
+            <p
+              className={`text-2xl font-bold ${getSuccessRateColor(data.overallMetrics.overallSuccessRate)}`}
+            >
               {data.overallMetrics.overallSuccessRate.toFixed(1)}%
             </p>
           </div>
           <div className="bg-yellow-50 rounded-lg p-4">
             <p className="text-sm text-yellow-600">Avg Attempts</p>
-            <p className="text-2xl font-bold text-yellow-900">{data.overallMetrics.averageAttempts.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-yellow-900">
+              {data.overallMetrics.averageAttempts.toFixed(2)}
+            </p>
           </div>
         </div>
       </div>
@@ -162,8 +168,11 @@ export function AdaptationMetricsDashboard() {
                       <div className="ml-3 w-24 bg-gray-200 rounded-full h-2">
                         <div
                           className={`h-2 rounded-full ${
-                            metrics.successRate >= 90 ? 'bg-green-500' :
-                            metrics.successRate >= 70 ? 'bg-yellow-500' : 'bg-red-500'
+                            metrics.successRate >= 90
+                              ? 'bg-green-500'
+                              : metrics.successRate >= 70
+                                ? 'bg-yellow-500'
+                                : 'bg-red-500'
                           }`}
                           style={{ width: `${metrics.successRate}%` }}
                         />
@@ -192,15 +201,20 @@ export function AdaptationMetricsDashboard() {
           {Object.entries(data.validationFailureBreakdown)
             .sort(([, a], [, b]) => b - a)
             .map(([reason, count]) => {
-              const total = Object.values(data.validationFailureBreakdown).reduce((sum, c) => sum + c, 0);
+              const total = Object.values(data.validationFailureBreakdown).reduce(
+                (sum, c) => sum + c,
+                0
+              );
               const percentage = total > 0 ? (count / total) * 100 : 0;
-              
+
               return (
                 <div key={reason} className="flex items-center">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-sm font-medium text-gray-700">{reason}</span>
-                      <span className="text-sm text-gray-500">{count} ({percentage.toFixed(1)}%)</span>
+                      <span className="text-sm text-gray-500">
+                        {count} ({percentage.toFixed(1)}%)
+                      </span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
@@ -224,9 +238,15 @@ export function AdaptationMetricsDashboard() {
               <table className="min-w-full">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Success Rate</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Avg Attempts</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Date
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Success Rate
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                      Avg Attempts
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -236,7 +256,9 @@ export function AdaptationMetricsDashboard() {
                         {new Date(trend.date).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-2">
-                        <span className={`text-sm font-medium ${getSuccessRateColor(trend.successRate)}`}>
+                        <span
+                          className={`text-sm font-medium ${getSuccessRateColor(trend.successRate)}`}
+                        >
                           {trend.successRate.toFixed(1)}%
                         </span>
                       </td>
@@ -262,7 +284,10 @@ export function AdaptationMetricsDashboard() {
         <div className="divide-y divide-gray-200 max-h-96 overflow-y-auto">
           {data.recentFailures.length > 0 ? (
             data.recentFailures.slice(0, 20).map((failure, index) => (
-              <div key={`${failure.projectId}-${failure.segmentId}-${index}`} className="p-4 hover:bg-gray-50">
+              <div
+                key={`${failure.projectId}-${failure.segmentId}-${index}`}
+                className="p-4 hover:bg-gray-50"
+              >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
@@ -284,9 +309,7 @@ export function AdaptationMetricsDashboard() {
               </div>
             ))
           ) : (
-            <div className="p-8 text-center text-gray-500">
-              No recent failures
-            </div>
+            <div className="p-8 text-center text-gray-500">No recent failures</div>
           )}
         </div>
       </div>

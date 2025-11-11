@@ -1,4 +1,9 @@
-import { STTAdapter, TTSAdapter, VocalIsolationAdapter, EmotionAnalysisAdapter } from '../../src/adapters/types';
+import {
+  STTAdapter,
+  TTSAdapter,
+  VocalIsolationAdapter,
+  EmotionAnalysisAdapter,
+} from '../../src/adapters/types';
 
 // Mock OpenAI Whisper Adapter
 export class MockOpenAIWhisperAdapter implements STTAdapter {
@@ -80,9 +85,7 @@ export class MockNoisereduceAdapter implements VocalIsolationAdapter {
 export class MockEmotionAdapter implements EmotionAnalysisAdapter {
   async analyzeEmotion(audioPath: string): Promise<any> {
     return {
-      segments: [
-        { start: 0.0, end: 5.0, emotion: 'neutral', confidence: 0.85 },
-      ],
+      segments: [{ start: 0.0, end: 5.0, emotion: 'neutral', confidence: 0.85 }],
     };
   }
 
@@ -120,7 +123,7 @@ export class LowConfidenceSTTAdapter implements STTAdapter {
           speaker: 'SPEAKER_00',
           confidence: 0.45, // Low confidence
           words: [
-            { word: 'Low', start: 0.0, end: 1.0, confidence: 0.40 },
+            { word: 'Low', start: 0.0, end: 1.0, confidence: 0.4 },
             { word: 'quality', start: 1.0, end: 3.0, confidence: 0.42 },
             { word: 'transcription', start: 3.0, end: 5.0, confidence: 0.52 },
           ],
