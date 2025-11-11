@@ -132,21 +132,21 @@ function sanitizeObject(obj: any): any {
   if (typeof obj === 'string') {
     return sanitizeString(obj);
   }
-  
+
   if (Array.isArray(obj)) {
-    return obj.map(item => sanitizeObject(item));
+    return obj.map((item) => sanitizeObject(item));
   }
-  
+
   if (obj !== null && typeof obj === 'object') {
     const sanitized: any = {};
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         sanitized[key] = sanitizeObject(obj[key]);
       }
     }
     return sanitized;
   }
-  
+
   return obj;
 }
 
@@ -156,16 +156,16 @@ function sanitizeObject(obj: any): any {
 function sanitizeString(str: string): string {
   // Remove null bytes
   str = str.replace(/\0/g, '');
-  
+
   // Trim whitespace
   str = str.trim();
-  
+
   // Remove potentially dangerous HTML/script tags
   str = str.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
   str = str.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
   str = str.replace(/javascript:/gi, '');
   str = str.replace(/on\w+\s*=/gi, '');
-  
+
   return str;
 }
 
@@ -175,19 +175,19 @@ function sanitizeString(str: string): string {
 export const securityHeaders = (_req: Request, res: Response, next: NextFunction) => {
   // Prevent clickjacking
   res.setHeader('X-Frame-Options', 'DENY');
-  
+
   // Prevent MIME type sniffing
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  
+
   // Enable XSS protection
   res.setHeader('X-XSS-Protection', '1; mode=block');
-  
+
   // Referrer policy
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  
+
   // Permissions policy
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-  
+
   next();
 };
 
@@ -213,11 +213,11 @@ export const preventParameterPollution = (req: Request, _res: Response, next: Ne
 export const requestSizeLimiter = (maxSize: string = '10mb') => {
   return (req: Request, res: Response, next: NextFunction) => {
     const contentLength = req.headers['content-length'];
-    
+
     if (contentLength) {
       const sizeInBytes = parseInt(contentLength, 10);
       const maxSizeInBytes = parseSize(maxSize);
-      
+
       if (sizeInBytes > maxSizeInBytes) {
         return res.status(413).json({
           error: {
@@ -228,7 +228,7 @@ export const requestSizeLimiter = (maxSize: string = '10mb') => {
         });
       }
     }
-    
+
     next();
   };
 };
@@ -243,15 +243,15 @@ function parseSize(size: string): number {
     mb: 1024 * 1024,
     gb: 1024 * 1024 * 1024,
   };
-  
+
   const match = size.toLowerCase().match(/^(\d+(?:\.\d+)?)\s*([a-z]+)$/);
-  
+
   if (!match) {
     return parseInt(size, 10);
   }
-  
+
   const value = parseFloat(match[1]);
   const unit = match[2];
-  
+
   return value * (units[unit] || 1);
 }

@@ -3,22 +3,16 @@ import { verifyToken } from '../lib/auth';
 import { TokenPayload } from '../types/auth';
 
 // Extend Express Request type to include user
-declare global {
-  namespace Express {
-    interface Request {
-      user?: TokenPayload;
-    }
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: TokenPayload;
   }
 }
 
 /**
  * Middleware to verify JWT token and attach user to request
  */
-export function authenticateToken(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+export function authenticateToken(req: Request, res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
 
@@ -51,9 +45,7 @@ export function authenticateToken(
 /**
  * Middleware to check if user has required subscription tier
  */
-export function requireSubscriptionTier(
-  ...allowedTiers: string[]
-) {
+export function requireSubscriptionTier(...allowedTiers: string[]) {
   return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
       res.status(401).json({
@@ -67,7 +59,7 @@ export function requireSubscriptionTier(
     }
 
     const userTier = req.user.subscriptionTier;
-    
+
     if (!allowedTiers.includes(userTier)) {
       res.status(403).json({
         error: {
@@ -86,11 +78,7 @@ export function requireSubscriptionTier(
 /**
  * Optional authentication - attaches user if token is valid but doesn't require it
  */
-export function optionalAuth(
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): void {
+export function optionalAuth(req: Request, _res: Response, next: NextFunction): void {
   const authHeader = req.headers.authorization;
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -109,11 +97,7 @@ export function optionalAuth(
 /**
  * Middleware to require admin role
  */
-export function requireAdmin(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+export function requireAdmin(req: Request, res: Response, next: NextFunction): void {
   if (!req.user) {
     res.status(401).json({
       error: {
@@ -128,7 +112,7 @@ export function requireAdmin(
   // Check if user has admin role (you can add an isAdmin field to User model)
   // For now, we'll check if email matches admin pattern
   const adminEmails = (process.env.ADMIN_EMAILS || '').split(',');
-  
+
   if (!adminEmails.includes(req.user.email)) {
     res.status(403).json({
       error: {
@@ -147,11 +131,7 @@ export function requireAdmin(
  * Middleware to check processing quota before job submission
  * Expects req.body.duration (in seconds) or req.body.durationMinutes
  */
-export async function checkQuota(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<void> {
+export async function checkQuota(req: Request, res: Response, next: NextFunction): Promise<void> {
   if (!req.user) {
     res.status(401).json({
       error: {

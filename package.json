@@ -22,7 +22,10 @@
     "prisma:migrate": "cd packages/backend && npx prisma migrate deploy",
     "prisma:generate": "cd packages/backend && npx prisma generate",
     "test": "echo \"Run tests in individual packages\"",
-    "lint": "echo \"Run linting in individual packages\""
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
   "keywords": [
     "video",
@@ -37,5 +40,13 @@
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.3.3"
   }
 }
