@@ -5,7 +5,8 @@ services:
     env: node
     region: oregon
     plan: starter
-    buildCommand: npm install && npm run build
+    rootDir: packages/backend
+    buildCommand: npm install && npx prisma generate && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -32,8 +33,9 @@ services:
     env: node
     region: oregon
     plan: starter
-    buildCommand: npm install && npm run build:workers
-    startCommand: npm run start:workers
+    rootDir: packages/workers
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
