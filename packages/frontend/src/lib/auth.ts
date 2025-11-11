@@ -67,4 +67,13 @@ export const authService = {
   async resetPassword(token: string, newPassword: string): Promise<void> {
     await apiClient.post('/auth/reset-password', { token, newPassword });
   },
+
+  async getCurrentUser(): Promise<MVPUser | null> {
+    try {
+      const response = await apiClient.get<{ user: MVPUser }>('/auth/me');
+      return response.data.user;
+    } catch {
+      return null;
+    }
+  },
 };
