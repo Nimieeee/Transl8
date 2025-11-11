@@ -5,6 +5,16 @@ import { GDPRSection } from '@/components/settings/gdpr-section';
 
 export default function SettingsPage() {
   const router = useRouter();
+  
+  // Mock user data for MVP (no auth implemented yet)
+  const user = {
+    email: 'user@example.com',
+    subscriptionTier: 'free',
+    createdAt: new Date().toISOString(),
+    processingMinutesUsed: 0,
+    processingMinutesLimit: 10,
+    voiceCloneSlots: 0,
+  };
 
   const tierFeatures = {
     free: ['10 minutes/month', 'Watermarked videos', 'Basic voices'],
