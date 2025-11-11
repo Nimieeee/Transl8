@@ -3,9 +3,11 @@ import { verifyToken } from '../lib/auth';
 import { TokenPayload } from '../types/auth';
 
 // Extend Express Request type to include user
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: TokenPayload;
+declare global {
+  namespace Express {
+    interface Request {
+      user?: TokenPayload;
+    }
   }
 }
 
