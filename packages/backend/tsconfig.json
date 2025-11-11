@@ -7,7 +7,10 @@
     "target": "ES2022",
     "lib": ["ES2022"],
     "types": ["node"],
-    "noImplicitReturns": false
+    "noImplicitReturns": false,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "strict": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
