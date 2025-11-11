@@ -1,0 +1,47 @@
+# Video files
+*.mov
+*.mp4
+*.avi
+*.mkv
+*.webm
+
+# Uploads directory
+uploads/
+packages/backend/uploads/
+
+# Test output
+pipeline-output-*/
+emotion-test-*/
+real-pipeline-*/
+test-segment-timing-data/
+test-real-video-results/
+test-videos/
+
+# Temp directories
+temp/
+tmp/
+packages/workers/temp/
+
+# Python virtual environments
+venv/
+venv_*/
+.venv/
+env/
+
+# Model checkpoints
+*.pth
+*.ckpt
+*.safetensors
+checkpoints/
+checkpoints_*/
+
+# Large dependencies
+Wav2Lip/
+packages/workers/docker/openvoice/OpenVoice/
+packages/workers/docker/openvoice/checkpoints*/
+
+# Development files
+.DS_Store
+*.log
+.env.local
+.env.development.local
