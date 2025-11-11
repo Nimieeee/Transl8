@@ -1,14 +1,114 @@
+# Dependencies
 node_modules
 npm-debug.log
-.next
+yarn-error.log
+yarn.lock
+
+# Testing
+coverage
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+packages/backend/tests
+packages/benchmarks
+
+# Build outputs
 dist
 build
-.git
-.gitignore
+.next
+out
+
+# Environment files
 .env
 .env.local
-*.md
+.env.*.local
+*.env
+
+# Logs
+logs
+*.log
+
+# OS files
+.DS_Store
+.git
+.gitignore
+*.swp
+*.swo
+
+# IDE
 .vscode
 .idea
-coverage
-.DS_Store
+*.sublime-*
+
+# Documentation
+*.md
+!README.md
+docs
+
+# K8s and deployment configs
+k8s
+render.yaml
+railway.json
+fly.toml
+docker-compose.yml
+.github
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv
+venv_*
+.venv
+env
+ENV
+
+# Uploads and temp files
+uploads
+packages/backend/uploads
+packages/workers/uploads
+temp
+tmp
+*.tmp
+packages/workers/temp
+
+# Video files
+*.mov
+*.mp4
+*.avi
+*.mkv
+*.webm
+
+# Model files
+*.pth
+*.ckpt
+*.safetensors
+checkpoints
+checkpoints_*
+Wav2Lip
+packages/workers/docker/openvoice/OpenVoice
+packages/workers/docker/openvoice/checkpoints*
+
+# Test output
+pipeline-output-*
+emotion-test-*
+real-pipeline-*
+test-segment-timing-data
+test-real-video-results
+test-videos
+
+# Scripts
+*.sh
+!scripts/*.sh
+
+# Frontend (not needed for backend deployment)
+packages/frontend
+
+# Workers - exclude heavy Python/Docker stuff but keep TypeScript source
+packages/workers/docker
+packages/workers/python
+packages/workers/temp
+packages/workers/node_modules
