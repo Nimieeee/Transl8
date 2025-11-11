@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ProtectedRoute } from '@/components/auth/protected-route';
 import { VideoUpload } from '@/components/upload/video-upload';
 import { useProject } from '@/hooks/use-projects';
 
@@ -24,17 +23,14 @@ export default function UploadPage() {
 
   if (isLoading) {
     return (
-      <ProtectedRoute>
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
-      </ProtectedRoute>
     );
   }
 
   if (!project) {
     return (
-      <ProtectedRoute>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">Project not found</h2>
@@ -43,12 +39,10 @@ export default function UploadPage() {
             </button>
           </div>
         </div>
-      </ProtectedRoute>
     );
   }
 
   return (
-    <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <header className="bg-white shadow-sm">
@@ -177,6 +171,5 @@ export default function UploadPage() {
           </div>
         </main>
       </div>
-    </ProtectedRoute>
   );
 }

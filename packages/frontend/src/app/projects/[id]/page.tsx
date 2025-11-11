@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ProtectedRoute } from '@/components/auth/protected-route';
 import { useProject } from '@/hooks/use-projects';
 import { useWebSocket } from '@/hooks/use-websocket';
 
@@ -33,17 +32,14 @@ export default function ProjectPage() {
 
   if (isLoading) {
     return (
-      <ProtectedRoute>
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
-      </ProtectedRoute>
     );
   }
 
   if (!project) {
     return (
-      <ProtectedRoute>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">Project not found</h2>
@@ -52,14 +48,12 @@ export default function ProjectPage() {
             </button>
           </div>
         </div>
-      </ProtectedRoute>
     );
   }
 
   const currentStageIndex = status?.currentJob ? stageOrder.indexOf(status.currentJob.stage) : -1;
 
   return (
-    <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <header className="bg-white shadow-sm">
@@ -291,6 +285,5 @@ export default function ProjectPage() {
           )}
         </main>
       </div>
-    </ProtectedRoute>
   );
 }

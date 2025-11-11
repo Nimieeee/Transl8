@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { ProtectedRoute } from '@/components/auth/protected-route';
 import { useProject } from '@/hooks/use-projects';
 import { useVoices, useVoiceClones } from '@/hooks/use-voices';
 import { VoiceConfig } from '@/types/api';
@@ -89,16 +88,13 @@ export default function ConfigurePage() {
 
   if (!project) {
     return (
-      <ProtectedRoute>
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
-      </ProtectedRoute>
     );
   }
 
   return (
-    <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <header className="bg-white shadow-sm">
@@ -436,6 +432,5 @@ export default function ConfigurePage() {
           </div>
         </main>
       </div>
-    </ProtectedRoute>
   );
 }

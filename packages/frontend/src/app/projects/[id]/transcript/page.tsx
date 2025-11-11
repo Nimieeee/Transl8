@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter, useParams } from 'next/navigation';
-import { ProtectedRoute } from '@/components/auth/protected-route';
 import { TranscriptEditor } from '@/components/transcript/transcript-editor';
 import { useProject } from '@/hooks/use-projects';
 import { useTranscript } from '@/hooks/use-transcript';
@@ -26,17 +25,14 @@ export default function TranscriptPage() {
 
   if (isLoading) {
     return (
-      <ProtectedRoute>
         <div className="flex items-center justify-center min-h-screen">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
         </div>
-      </ProtectedRoute>
     );
   }
 
   if (!transcript) {
     return (
-      <ProtectedRoute>
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">Transcript not ready</h2>
@@ -49,12 +45,10 @@ export default function TranscriptPage() {
             </button>
           </div>
         </div>
-      </ProtectedRoute>
     );
   }
 
   return (
-    <ProtectedRoute>
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <header className="bg-white shadow-sm sticky top-0 z-10">
@@ -147,6 +141,5 @@ export default function TranscriptPage() {
           />
         </main>
       </div>
-    </ProtectedRoute>
   );
 }
