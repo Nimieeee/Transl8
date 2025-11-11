@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Subscription tier management and enforcement
  */

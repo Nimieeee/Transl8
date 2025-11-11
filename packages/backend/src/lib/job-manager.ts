@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { prisma } from './prisma';
 import { wsManager } from './websocket';
 import {

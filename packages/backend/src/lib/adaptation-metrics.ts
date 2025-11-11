@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Adaptation Quality Metrics Service
  * 

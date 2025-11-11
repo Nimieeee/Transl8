@@ -267,7 +267,7 @@ export class TTSValidatedAdaptationService {
       'ru': 1.10, // Russian slightly longer
     };
     
-    const expansionFactor = expansionFactors[targetLanguage] || 1.0;
+    const expansionFactor = expansionFactors[_targetLanguage] || 1.0;
     const targetChars = Math.round(sourceChars * expansionFactor);
     const targetCharsPerSecond = targetChars / segment.duration;
     
@@ -315,13 +315,10 @@ export class TTSValidatedAdaptationService {
 
     // Extract voice from config (OpenAI TTS expects just the voice name)
     const voiceId = voiceConfig.voiceId || 'alloy';
-    const speed = 1.0; // Normal speed for validation
-
     // Synthesize with OpenAI TTS
     const audioBuffer = await this.ttsAdapter.synthesize(
       text,
-      voiceConfig,
-      speed
+      voiceConfig
     );
 
     // Save to temp file

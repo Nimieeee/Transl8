@@ -75,7 +75,7 @@ export {
 } from './demucs-adapter';
 
 export {
-  NoisereduceAdapter,
+  NoiseReduceAdapter,
 } from './noisereduce-adapter';
 
 export {
