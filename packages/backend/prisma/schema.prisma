@@ -1,0 +1,143 @@
+// Prisma schema for AI Video Dubbing Platform - MVP Prototype
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User accounts and authentication
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  password     String       // bcrypt hashed
+  createdAt    DateTime     @default(now()) @map("created_at")
+  
+  // Relations
+  jobs         DubbingJob[]
+
+  @@map("users")
+}
+
+// Dubbing jobs
+model DubbingJob {
+  id              String    @id @default(cuid())
+  userId          String?   @map("user_id") // MVP: optional for no-auth mode
+  
+  status          String    // pending, processing, completed, failed
+  progress        Int       @default(0) // 0-100
+  
+  originalFile    String    @map("original_file") // path to uploaded video
+  outputFile      String?   @map("output_file")   // path to dubbed video
+  
+  sourceLanguage  String    @default("en") @map("source_language")
+  targetLanguage  String    @default("es") @map("target_language")
+  
+  error           String?
+  
+  createdAt       DateTime  @default(now()) @map("created_at")
+  completedAt     DateTime? @map("completed_at")
+  expiresAt       DateTime? @map("expires_at") // 24 hours after completion
+  
+  // Relations
+  user            User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contextMap      ContextMap?
+
+  @@index([userId])
+  @@index([status])
+  @@map("dubbing_jobs")
+}
+
+// Context Map for robust pipeline
+model ContextMap {
+  id                  String    @id @default(cuid())
+  projectId           String    @unique @map("project_id")
+  originalDurationMs  Int       @map("original_duration_ms")
+  sourceLanguage      String    @map("source_language")
+  targetLanguage      String    @map("target_language")
+  
+  // JSON content with all segments
+  content             Json
+  
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  project             DubbingJob @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("context_maps")
+}
+
+// Adaptation Quality Metrics
+model AdaptationMetrics {
+  id                        String    @id @default(cuid())
+  projectId                 String    @unique @map("project_id")
+  languagePair              String    @map("language_pair")
+  
+  totalSegments             Int       @map("total_segments")
+  successfulSegments        Int       @map("successful_segments")
+  failedSegments            Int       @map("failed_segments")
+  successRate               Float     @map("success_rate")
+  averageAttempts           Float     @map("average_attempts")
+  
+  // JSON object with validation failure reasons and counts
+  validationFailureReasons  Json      @map("validation_failure_reasons")
+  
+  createdAt                 DateTime  @default(now()) @map("created_at")
+
+  @@index([languagePair])
+  @@index([createdAt])
+  @@map("adaptation_metrics")
+}
+
+// Audio Quality Metrics
+model AudioQualityMetrics {
+  id                    String    @id @default(cuid())
+  projectId             String    @map("project_id")
+  segmentId             Int       @map("segment_id")
+  
+  // Vocal isolation metrics
+  vocalIsolationSnr     Float?    @map("vocal_isolation_snr")
+  spectralPurity        Float?    @map("spectral_purity")
+  
+  // Noise reduction metrics
+  noiseReductionSnr     Float?    @map("noise_reduction_snr")
+  noiseReductionDb      Float?    @map("noise_reduction_db")
+  
+  // TTS output quality
+  ttsQualityScore       Float?    @map("tts_quality_score")
+  ttsConfidence         Float?    @map("tts_confidence")
+  
+  createdAt             DateTime  @default(now()) @map("created_at")
+
+  @@index([projectId])
+  @@index([createdAt])
+  @@map("audio_quality_metrics")
+}
+
+// Synchronization Quality Metrics
+model SyncQualityMetrics {
+  id                    String    @id @default(cuid())
+  projectId             String    @unique @map("project_id")
+  
+  // Timing accuracy
+  totalSegments         Int       @map("total_segments")
+  maxDriftMs            Float     @map("max_drift_ms")
+  averageDriftMs        Float     @map("average_drift_ms")
+  
+  // Segment-level accuracy
+  segmentAccuracy       Json      @map("segment_accuracy") // Array of per-segment drift
+  
+  // Overall quality score
+  syncQualityScore      Float     @map("sync_quality_score")
+  
+  createdAt             DateTime  @default(now()) @map("created_at")
+
+  @@index([projectId])
+  @@index([createdAt])
+  @@map("sync_quality_metrics")
+}

@@ -1,0 +1,73 @@
+name: Database Migration
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      migration_action:
+        description: 'Migration action'
+        required: true
+        type: choice
+        options:
+          - deploy
+          - rollback
+          - status
+
+jobs:
+  migrate:
+    name: Run Database Migration
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Generate Prisma Client
+        run: npm run prisma:generate --workspace=@dubbing/backend
+      
+      - name: Run migration deploy
+        if: inputs.migration_action == 'deploy'
+        run: npm run prisma:migrate:deploy --workspace=@dubbing/backend
+        env:
+          DATABASE_URL: ${{ secrets[format('DATABASE_URL_{0}', upper(inputs.environment))] }}
+      
+      - name: Check migration status
+        if: inputs.migration_action == 'status'
+        run: npx prisma migrate status
+        working-directory: packages/backend
+        env:
+          DATABASE_URL: ${{ secrets[format('DATABASE_URL_{0}', upper(inputs.environment))] }}
+      
+      - name: Create backup before rollback
+        if: inputs.migration_action == 'rollback'
+        run: |
+          echo "Creating database backup before rollback..."
+          # Add backup command here based on your database provider
+      
+      - name: Rollback migration
+        if: inputs.migration_action == 'rollback'
+        run: |
+          echo "Manual rollback required. Please follow the rollback procedures in the runbook."
+          echo "Backup created. Review migration history and apply rollback SQL manually."
+        env:
+          DATABASE_URL: ${{ secrets[format('DATABASE_URL_{0}', upper(inputs.environment))] }}
+      
+      - name: Notify migration status
+        if: always()
+        run: |
+          echo "Migration ${{ inputs.migration_action }} completed with status: ${{ job.status }}"

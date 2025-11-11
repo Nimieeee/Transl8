@@ -1,0 +1,41 @@
+{
+  "name": "transl8",
+  "version": "1.0.0",
+  "description": "AI-powered video dubbing platform",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "install:all": "npm install && cd packages/backend && npm install && cd ../workers && npm install && cd ../frontend && npm install && cd ../..",
+    "build:backend": "cd packages/backend && npm run build",
+    "build:workers": "cd packages/workers && npm run build",
+    "build:frontend": "cd packages/frontend && npm run build",
+    "build:all": "npm run build:backend && npm run build:workers && npm run build:frontend",
+    "dev:backend": "cd packages/backend && npm run dev",
+    "dev:workers": "cd packages/workers && npm run dev",
+    "dev:frontend": "cd packages/frontend && npm run dev",
+    "start:backend": "cd packages/backend && npm start",
+    "start:workers": "cd packages/workers && npm start",
+    "start:frontend": "cd packages/frontend && npm start",
+    "deploy:frontend": "cd packages/frontend && vercel --prod",
+    "prisma:migrate": "cd packages/backend && npx prisma migrate deploy",
+    "prisma:generate": "cd packages/backend && npx prisma generate",
+    "test": "echo \"Run tests in individual packages\"",
+    "lint": "echo \"Run linting in individual packages\""
+  },
+  "keywords": [
+    "video",
+    "dubbing",
+    "translation",
+    "ai",
+    "tts",
+    "stt"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  }
+}

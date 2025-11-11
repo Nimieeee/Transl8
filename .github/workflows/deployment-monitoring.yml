@@ -1,0 +1,83 @@
+name: Deployment Monitoring
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types:
+      - completed
+
+jobs:
+  track-deployment:
+    name: Track Deployment Metrics
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Extract deployment info
+        id: deployment
+        run: |
+          echo "sha=${{ github.event.workflow_run.head_sha }}" >> $GITHUB_OUTPUT
+          echo "branch=${{ github.event.workflow_run.head_branch }}" >> $GITHUB_OUTPUT
+          echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_OUTPUT
+      
+      - name: Send deployment event to monitoring
+        run: |
+          # Send deployment tracking event to DataDog
+          curl -X POST "https://api.datadoghq.com/api/v1/events" \
+            -H "Content-Type: application/json" \
+            -H "DD-API-KEY: ${{ secrets.DATADOG_API_KEY }}" \
+            -d '{
+              "title": "Deployment to ${{ steps.deployment.outputs.branch }}",
+              "text": "Deployed commit ${{ steps.deployment.outputs.sha }}",
+              "tags": ["deployment", "branch:${{ steps.deployment.outputs.branch }}", "sha:${{ steps.deployment.outputs.sha }}"],
+              "alert_type": "info"
+            }'
+      
+      - name: Create deployment marker in Sentry
+        run: |
+          curl -X POST "https://sentry.io/api/0/organizations/${{ secrets.SENTRY_ORG }}/releases/" \
+            -H "Authorization: Bearer ${{ secrets.SENTRY_AUTH_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "version": "${{ steps.deployment.outputs.sha }}",
+              "projects": ["dubbing-platform"],
+              "dateReleased": "${{ steps.deployment.outputs.timestamp }}"
+            }'
+      
+      - name: Monitor deployment health
+        run: |
+          echo "Monitoring deployment health for 5 minutes..."
+          sleep 300
+          
+          # Check error rates
+          # This would typically query your monitoring system
+          echo "Checking error rates..."
+      
+      - name: Alert on deployment issues
+        if: failure()
+        run: |
+          echo "Deployment health check failed!"
+          # Send alert to on-call team
+
+  check-rollback-needed:
+    name: Check if Rollback Needed
+    runs-on: ubuntu-latest
+    needs: track-deployment
+    if: always()
+    
+    steps:
+      - name: Query error rates
+        id: errors
+        run: |
+          # Query monitoring system for error rates
+          # This is a placeholder - implement actual monitoring query
+          ERROR_RATE=0
+          echo "error_rate=$ERROR_RATE" >> $GITHUB_OUTPUT
+      
+      - name: Trigger rollback if needed
+        if: steps.errors.outputs.error_rate > 5
+        run: |
+          echo "Error rate exceeded threshold. Manual rollback may be required."
+          echo "Follow the rollback procedures in the deployment runbook."

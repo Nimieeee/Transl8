@@ -1,0 +1,55 @@
+services:
+  # Backend API Service
+  - type: web
+    name: transl8-backend
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: cd packages/backend && npm install && npx prisma generate && npm run build
+    startCommand: cd packages/backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: MISTRAL_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: WORKER_CONCURRENCY
+        value: 2
+    healthCheckPath: /health
+
+  # Workers Service (Optional - can be combined with backend)
+  - type: worker
+    name: transl8-workers
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: cd packages/workers && npm install && npm run build
+    startCommand: cd packages/workers && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: MISTRAL_API_KEY
+        sync: false
+      - key: WORKER_CONCURRENCY
+        value: 2
+
+databases:
+  # Optional: Render-managed Redis
+  - name: transl8-redis
+    plan: starter
+    region: oregon

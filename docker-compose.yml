@@ -1,0 +1,344 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: dubbing-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dubbing_platform
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for sessions and job queue
+  redis:
+    image: redis:7-alpine
+    container_name: dubbing-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MinIO for local S3-compatible storage
+  minio:
+    image: minio/minio:latest
+    container_name: dubbing-minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: packages/backend/Dockerfile
+    container_name: dubbing-backend
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/dubbing_platform
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: dev-secret-key
+      API_PORT: 3001
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./packages/backend:/app/packages/backend
+      - /app/packages/backend/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run dev
+
+  # Frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: packages/frontend/Dockerfile
+    container_name: dubbing-frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./packages/frontend:/app/packages/frontend
+      - /app/packages/frontend/node_modules
+      - /app/packages/frontend/.next
+    depends_on:
+      - backend
+    command: npm run dev
+
+  # Workers
+  workers:
+    build:
+      context: .
+      dockerfile: packages/workers/Dockerfile
+    container_name: dubbing-workers
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/dubbing_platform
+      REDIS_URL: redis://redis:6379
+      WORKER_CONCURRENCY: 2
+      WHISPER_SERVICE_URL: http://whisper:8001
+      PYANNOTE_SERVICE_URL: http://pyannote:8002
+      MARIAN_SERVICE_URL: http://marian:8080
+      STYLETTS_SERVICE_URL: http://styletts:8082
+      XTTS_SERVICE_URL: http://xtts:8083
+      OPENVOICE_SERVICE_URL: http://openvoice:8085
+      WAV2LIP_SERVICE_URL: http://wav2lip:8084
+      SEGMENT_DUBBING_SERVICE_URL: http://segment-dubbing:8010
+    volumes:
+      - ./packages/workers:/app/packages/workers
+      - /app/packages/workers/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      whisper:
+        condition: service_healthy
+      pyannote:
+        condition: service_healthy
+      marian:
+        condition: service_healthy
+      styletts:
+        condition: service_healthy
+      xtts:
+        condition: service_healthy
+      wav2lip:
+        condition: service_healthy
+    command: npm run dev
+
+  # Whisper STT Service
+  whisper:
+    build:
+      context: packages/workers/docker/whisper
+      dockerfile: Dockerfile
+    container_name: dubbing-whisper
+    ports:
+      - "8001:8001"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Pyannote Diarization Service
+  pyannote:
+    build:
+      context: packages/workers/docker/pyannote
+      dockerfile: Dockerfile
+    container_name: dubbing-pyannote
+    environment:
+      HF_TOKEN: ${HF_TOKEN}
+    ports:
+      - "8002:8002"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8002/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Marian NMT Translation Service
+  marian:
+    build:
+      context: packages/workers/docker/marian
+      dockerfile: Dockerfile
+    container_name: dubbing-marian
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # StyleTTS 2 Voice Generation Service
+  styletts:
+    build:
+      context: packages/workers/docker/styletts
+      dockerfile: Dockerfile
+    container_name: dubbing-styletts
+    ports:
+      - "8082:8082"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8082/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # XTTS-v2 Voice Cloning Service
+  xtts:
+    build:
+      context: packages/workers/docker/xtts
+      dockerfile: Dockerfile
+    container_name: dubbing-xtts
+    ports:
+      - "8083:8083"
+    volumes:
+      - xtts_clones:/app/voice_clones
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8083/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Wav2Lip Lip-Sync Service
+  wav2lip:
+    build:
+      context: packages/workers/docker/wav2lip
+      dockerfile: Dockerfile
+    container_name: dubbing-wav2lip
+    ports:
+      - "8084:8084"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8084/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+  # Segment-by-Segment Dubbing Service (PERFECT TIMING)
+  segment-dubbing:
+    build:
+      context: packages/workers/python
+      dockerfile: ../docker/segment-dubbing/Dockerfile
+    container_name: dubbing-segment
+    ports:
+      - "8010:8010"
+    environment:
+      - FLASK_ENV=production
+    volumes:
+      - ./packages/workers/python:/app
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8010/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Emotion Analysis Service (Speech Emotion Recognition)
+  emotion:
+    build:
+      context: packages/workers/docker/emotion
+      dockerfile: Dockerfile
+    container_name: dubbing-emotion
+    ports:
+      - "5007:5007"
+    environment:
+      - MODEL_NAME=ehcalabres/wav2vec2-lg-xlsr-en-speech-emotion-recognition
+      - DEVICE=cuda
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:5007/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # OpenVoice TTS Service (Zero-shot voice cloning with style transfer)
+  openvoice:
+    build:
+      context: packages/workers/docker/openvoice
+      dockerfile: Dockerfile
+    container_name: dubbing-openvoice
+    ports:
+      - "8085:8085"
+    environment:
+      - PORT=8085
+      - DEVICE=cuda
+    volumes:
+      - openvoice_clones:/app/clones
+      - openvoice_models:/app/models
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8085/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+  xtts_clones:
+  openvoice_clones:
+  openvoice_models:

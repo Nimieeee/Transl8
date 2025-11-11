@@ -1,0 +1,137 @@
+{
+  "models": {
+    "stt": [
+      {
+        "name": "whisper-pyannote",
+        "version": "1.0.0",
+        "stage": "stt",
+        "enabled": true,
+        "priority": 100,
+        "capabilities": {
+          "languages": ["en", "es", "fr", "de", "it", "pt", "ru", "ja", "ko", "zh"],
+          "maxDuration": 3600,
+          "requiresGPU": true,
+          "supportsBatch": false
+        },
+        "metadata": {
+          "description": "Whisper large-v3 with pyannote.audio 3.0 for speaker diarization",
+          "author": "OpenAI + pyannote",
+          "license": "MIT",
+          "documentation": "https://github.com/openai/whisper"
+        }
+      }
+    ],
+    "mt": [
+      {
+        "name": "marian-nmt",
+        "version": "1.0.0",
+        "stage": "mt",
+        "enabled": true,
+        "priority": 80,
+        "capabilities": {
+          "languages": ["en", "es", "fr", "de", "it", "pt", "ru", "ja", "ko", "zh"],
+          "maxDuration": null,
+          "requiresGPU": false,
+          "supportsBatch": true
+        },
+        "metadata": {
+          "description": "Helsinki-NLP Marian NMT models for fast translation",
+          "author": "Helsinki-NLP",
+          "license": "Apache-2.0",
+          "documentation": "https://huggingface.co/Helsinki-NLP"
+        }
+      },
+      {
+        "name": "llama-mt",
+        "version": "1.0.0",
+        "stage": "mt",
+        "enabled": false,
+        "priority": 100,
+        "capabilities": {
+          "languages": ["en", "es", "fr", "de", "it", "pt", "ru", "ja", "ko", "zh"],
+          "maxDuration": null,
+          "requiresGPU": true,
+          "supportsBatch": false
+        },
+        "metadata": {
+          "description": "Llama 3.1 fine-tuned for high-quality translation (premium)",
+          "author": "Meta AI",
+          "license": "Llama 3.1 License",
+          "documentation": "https://llama.meta.com/"
+        }
+      }
+    ],
+    "tts": [
+      {
+        "name": "styletts2",
+        "version": "1.0.0",
+        "stage": "tts",
+        "enabled": true,
+        "priority": 100,
+        "capabilities": {
+          "languages": ["en", "es", "fr", "de", "it", "pt", "ru", "ja", "ko", "zh"],
+          "maxDuration": null,
+          "requiresGPU": true,
+          "supportsBatch": false
+        },
+        "metadata": {
+          "description": "StyleTTS 2 for high-quality preset voice generation",
+          "author": "StyleTTS Team",
+          "license": "MIT",
+          "documentation": "https://github.com/yl4579/StyleTTS2"
+        }
+      },
+      {
+        "name": "xtts-v2",
+        "version": "1.0.0",
+        "stage": "tts",
+        "enabled": true,
+        "priority": 90,
+        "capabilities": {
+          "languages": ["en", "es", "fr", "de", "it", "pt", "ru", "ja", "ko", "zh"],
+          "maxDuration": null,
+          "requiresGPU": true,
+          "supportsBatch": false
+        },
+        "metadata": {
+          "description": "XTTS-v2 for zero-shot voice cloning",
+          "author": "Coqui AI",
+          "license": "CPML",
+          "documentation": "https://github.com/coqui-ai/TTS"
+        }
+      }
+    ],
+    "lipsync": [
+      {
+        "name": "wav2lip",
+        "version": "1.0.0",
+        "stage": "lipsync",
+        "enabled": true,
+        "priority": 100,
+        "capabilities": {
+          "languages": null,
+          "maxDuration": 3600,
+          "requiresGPU": true,
+          "supportsBatch": false
+        },
+        "metadata": {
+          "description": "Wav2Lip with GFPGAN for lip-sync and face restoration",
+          "author": "Wav2Lip Team",
+          "license": "Custom",
+          "documentation": "https://github.com/Rudrabha/Wav2Lip"
+        }
+      }
+    ]
+  },
+  "defaults": {
+    "stt": "whisper-pyannote",
+    "mt": "marian-nmt",
+    "tts": "styletts2",
+    "lipsync": "wav2lip"
+  },
+  "healthCheck": {
+    "intervalSeconds": 300,
+    "timeoutSeconds": 5,
+    "retryAttempts": 3
+  }
+}
