@@ -2,11 +2,9 @@
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { ProtectedRoute } from '@/components/auth/protected-route';
 import { ProjectCard } from '@/components/dashboard/project-card';
 import { CreateProjectModal } from '@/components/dashboard/create-project-modal';
 import { useProjects } from '@/hooks/use-projects';
-import { useAuth } from '@/hooks/use-auth';
 import { Project } from '@/types/api';
 
 type StatusFilter = 'all' | Project['status'];
@@ -14,7 +12,6 @@ type SortOption = 'newest' | 'oldest' | 'name';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { user, logout } = useAuth();
   const { projects, isLoading, createProject, deleteProject, isCreating } = useProjects();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
@@ -73,14 +70,11 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-sm text-gray-600 mt-1">Welcome back, {user?.email}</p>
+                <p className="text-sm text-gray-600 mt-1">Your Projects</p>
               </div>
               <div className="flex items-center space-x-4">
                 <button onClick={() => router.push('/settings')} className="btn-secondary">
                   Settings
-                </button>
-                <button onClick={() => logout()} className="btn-outline">
-                  Logout
                 </button>
               </div>
             </div>

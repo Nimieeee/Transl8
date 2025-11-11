@@ -1,17 +1,10 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { ProtectedRoute } from '@/components/auth/protected-route';
-import { useAuth } from '@/hooks/use-auth';
 import { GDPRSection } from '@/components/settings/gdpr-section';
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, logout } = useAuth();
-
-  if (!user) {
-    return null;
-  }
 
   const tierFeatures = {
     free: ['10 minutes/month', 'Watermarked videos', 'Basic voices'],
