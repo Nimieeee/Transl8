@@ -8,7 +8,7 @@ import { logger } from './logger';
 import { AdaptationEngine, AdaptationConfig, AdaptationResult } from './adaptation-engine';
 import { TranslationValidator } from './translation-validator';
 import { MistralClient, getMistralClient } from './mistral-client';
-import { ContextMapSegment } from '@shared/types';
+import { ContextMapSegment } from '../../../shared/src/types';
 
 export class AdaptationService {
   private adaptationEngine: AdaptationEngine;

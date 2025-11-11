@@ -9,7 +9,7 @@
 import { prisma } from './prisma';
 import { logger } from './logger';
 import { storage } from './storage';
-import { ContextMap, ContextMapSegment, EmotionTag, SegmentStatus } from '@shared/types';
+import { ContextMap, ContextMapSegment, EmotionTag, SegmentStatus } from '../../../shared/src/types';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 

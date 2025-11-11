@@ -7,7 +7,7 @@
 
 import { prisma } from './prisma';
 import { logger } from './logger';
-import { ContextMap, SegmentStatus } from '@shared/types';
+import { ContextMap, SegmentStatus } from '../../../shared/src/types';
 
 export interface AdaptationMetrics {
   languagePair: string;

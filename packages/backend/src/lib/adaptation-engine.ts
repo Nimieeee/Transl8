@@ -7,7 +7,7 @@
 
 import { logger } from './logger';
 import { fewShotLoader, FewShotExample } from './few-shot-loader';
-import { ContextMapSegment } from '@shared/types';
+import { ContextMapSegment } from '../../../shared/src/types';
 
 export interface AdaptationConfig {
   sourceLanguage: string;

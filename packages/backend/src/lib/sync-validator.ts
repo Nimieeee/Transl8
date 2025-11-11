@@ -7,7 +7,7 @@
 
 import { prisma } from './prisma';
 import { logger } from './logger';
-import { ContextMap, ContextMapSegment } from '@shared/types';
+import { ContextMap, ContextMapSegment } from '../../../shared/src/types';
 import * as fs from 'fs/promises';
 import * as path from 'path';
 

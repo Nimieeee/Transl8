@@ -6,7 +6,7 @@
  */
 
 import { createAdaptationService } from '../adaptation-service';
-import { ContextMapSegment } from '@shared/types';
+import { ContextMapSegment } from '../../../../shared/src/types';
 
 async function main() {
   console.log('=== Adaptation Engine Example ===\n');
