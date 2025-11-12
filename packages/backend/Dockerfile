@@ -1,22 +1,27 @@
-FROM node:20-alpine
+# Standalone backend Dockerfile
+FROM node:18-alpine
+
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
 
 WORKDIR /app
 
-# Copy root package files
-COPY package*.json ./
-COPY tsconfig.json ./
-
-# Copy backend package
-COPY packages/backend/package*.json ./packages/backend/
+# Copy package files from backend
+COPY packages/backend/package*.json ./
+COPY packages/backend/prisma ./prisma/
 
 # Install dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
-# Copy backend source
-COPY packages/backend ./packages/backend
+# Copy source code
+COPY packages/backend/src ./src
+COPY packages/backend/tsconfig.json ./
 
-WORKDIR /app/packages/backend
+# Generate Prisma Client
+RUN npx prisma generate
 
-EXPOSE 3001
+# Expose port
+EXPOSE 8080
 
-CMD ["npm", "run", "dev"]
+# Start the application
+CMD ["npm", "start"]
