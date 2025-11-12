@@ -55,7 +55,8 @@ dotenv.config();
 
 const app = express();
 const server = createServer(app);
-const PORT = process.env.API_PORT || 3001;
+// Use PORT for Render/Railway compatibility, fallback to API_PORT for local dev
+const PORT = process.env.PORT || process.env.API_PORT || 3001;
 
 // Initialize Sentry (must be first)
 initSentry(app);
