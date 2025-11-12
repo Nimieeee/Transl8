@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import axios from 'axios';
+import { apiClient } from '@/lib/api-client';
 
 interface VideoUploadProps {
   projectId: string;
@@ -123,23 +124,15 @@ export function VideoUpload({ projectId, onUploadComplete, onError }: VideoUploa
     setUploadProgress(0);
 
     try {
-      // Get signed upload URL
-      const { data: signedUrlData } = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/projects/${projectId}/upload`,
-        {
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-          targetLanguage, // Include target language
-        }
-      );
+      // Create FormData for multipart upload
+      const formData = new FormData();
+      formData.append('video', file);
+      formData.append('targetLanguage', targetLanguage);
 
-      const { uploadUrl, videoUrl } = signedUrlData;
-
-      // Upload file to signed URL
-      await axios.put(uploadUrl, file, {
+      // Upload directly to backend
+      const { data } = await apiClient.post(`/projects/${projectId}/upload`, formData, {
         headers: {
-          'Content-Type': file.type,
+          'Content-Type': 'multipart/form-data',
         },
         onUploadProgress: (progressEvent) => {
           const progress = progressEvent.total
@@ -149,10 +142,35 @@ export function VideoUpload({ projectId, onUploadComplete, onError }: VideoUploa
         },
       });
 
-      onUploadComplete(videoUrl);
-    } catch (err) {
+      onUploadComplete(data.videoUrl || data.project?.videoUrl);
+    } catch (err: any) {
       console.error('Upload error:', err);
-      onError('Failed to upload video. Please try again.');
+      console.error('Error response:', err.response);
+      console.error('Error config:', err.config);
+      
+      let errorMessage = 'Failed to upload video. Please try again.';
+      
+      if (err.response?.data?.error) {
+        errorMessage = err.response.data.error;
+        if (err.response.data.details) {
+          console.error('Error details:', err.response.data.details);
+        }
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      // Check for common issues
+      if (err.code === 'ERR_NETWORK' || err.message.includes('Network Error')) {
+        errorMessage = 'Network error. Please check your connection and backend URL.';
+      } else if (err.response?.status === 401) {
+        errorMessage = 'Authentication failed. Please log in again.';
+      } else if (err.response?.status === 403) {
+        errorMessage = 'Insufficient quota or permission denied.';
+      } else if (err.response?.status === 413) {
+        errorMessage = 'File too large. Maximum size is 500MB.';
+      }
+      
+      onError(errorMessage);
     } finally {
       setIsUploading(false);
     }
