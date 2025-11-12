@@ -1,17 +1,17 @@
 services:
-  # Backend API Service
+  # Backend API + Workers (Combined Service)
   - type: web
     name: transl8-backend
-    env: node
+    env: docker
     region: oregon
     plan: starter
-    buildCommand: npm install && npm run prisma:generate
-    startCommand: npm start
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 3001
+        value: 8080
       - key: DATABASE_URL
         sync: false
       - key: REDIS_URL
@@ -19,34 +19,18 @@ services:
       - key: OPENAI_API_KEY
         sync: false
       - key: MISTRAL_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: JWT_SECRET
         sync: false
       - key: FRONTEND_URL
         sync: false
       - key: WORKER_CONCURRENCY
         value: 2
+      - key: USE_OPENAI_WHISPER
+        value: true
     healthCheckPath: /health
-
-  # Workers Service (Optional - can be combined with backend)
-  - type: worker
-    name: transl8-workers
-    env: node
-    region: oregon
-    plan: starter
-    buildCommand: npm install && npm run build:workers
-    startCommand: node packages/workers/dist/index.js
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
-        sync: false
-      - key: REDIS_URL
-        sync: false
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: MISTRAL_API_KEY
-        sync: false
-      - key: WORKER_CONCURRENCY
-        value: 2
 
 databases:
   # Optional: Render-managed Redis
