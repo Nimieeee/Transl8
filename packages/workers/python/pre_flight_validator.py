@@ -20,6 +20,9 @@ try:
     from pydub.generators import Sine
     AUDIO_PACKAGES_AVAILABLE = True
 except ImportError as e:
+    # Create dummy np for type hints
+    class np:  # type: ignore
+        ndarray = object
     AUDIO_PACKAGES_AVAILABLE = False
     MISSING_PACKAGE = str(e)
 

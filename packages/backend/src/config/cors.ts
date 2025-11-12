@@ -55,8 +55,26 @@ function getAllowedOrigins(): string[] {
 
   // Production: Only allow specific domains
   if (env === 'production') {
-    const origins = process.env.ALLOWED_ORIGINS?.split(',') || [];
-    return origins.map((origin) => origin.trim());
+    const origins: string[] = [];
+    
+    // Add FRONTEND_URL if set
+    if (process.env.FRONTEND_URL) {
+      origins.push(process.env.FRONTEND_URL);
+    }
+    
+    // Add ALLOWED_ORIGINS if set (comma-separated list)
+    if (process.env.ALLOWED_ORIGINS) {
+      const additionalOrigins = process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim());
+      origins.push(...additionalOrigins);
+    }
+    
+    // If no origins configured, allow all (not recommended for production)
+    if (origins.length === 0) {
+      console.warn('⚠️  No CORS origins configured. Set FRONTEND_URL or ALLOWED_ORIGINS environment variable.');
+      return ['*'];
+    }
+    
+    return origins;
   }
 
   // Staging: Allow staging domains
