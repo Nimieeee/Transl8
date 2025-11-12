@@ -31,6 +31,8 @@ services:
       - key: USE_OPENAI_WHISPER
         value: true
     healthCheckPath: /health
+    # Run database migrations before starting the service
+    preDeployCommand: cd packages/backend && npx prisma migrate deploy
 
 databases:
   # Optional: Render-managed Redis
