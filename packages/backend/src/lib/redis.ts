@@ -1,6 +1,24 @@
 import Redis from 'ioredis';
 
-const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+// Clean up REDIS_URL if it contains CLI flags (common with Upstash copy-paste)
+let REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
+
+// Remove CLI flags if present (e.g., " --tls -u redis://...")
+if (REDIS_URL.includes('--tls') || REDIS_URL.includes('-u ')) {
+  // Extract just the redis:// URL part
+  const match = REDIS_URL.match(/(rediss?:\/\/[^\s]+)/);
+  if (match) {
+    REDIS_URL = match[1];
+  }
+}
+
+// Decode URL-encoded characters
+REDIS_URL = decodeURIComponent(REDIS_URL);
+
+// Determine if TLS should be enabled
+const useTLS = REDIS_URL.startsWith('rediss://') || 
+               process.env.REDIS_TLS === 'true' ||
+               REDIS_URL.includes('upstash.io');
 
 // Create Redis client
 // Note: maxRetriesPerRequest must be null for BullMQ compatibility
@@ -10,6 +28,11 @@ export const redis = new Redis(REDIS_URL, {
     const delay = Math.min(times * 50, 2000);
     return delay;
   },
+  ...(useTLS && {
+    tls: {
+      rejectUnauthorized: false, // Required for some cloud Redis providers
+    },
+  }),
 });
 
 redis.on('connect', () => {
