@@ -5,7 +5,7 @@ services:
     env: node
     region: oregon
     plan: starter
-    buildCommand: npm install && npm run prisma:generate --workspace=@dubbing/backend && npm run prisma:migrate:deploy --workspace=@dubbing/backend && npm run build --workspace=@dubbing/backend && npm run build --workspace=@dubbing/workers
+    buildCommand: npm install && npm run prisma:generate --workspace=@dubbing/backend && npm run build --workspace=@dubbing/backend && npm run build --workspace=@dubbing/workers
     startCommand: node packages/backend/start-with-workers.js
     envVars:
       - key: NODE_ENV
