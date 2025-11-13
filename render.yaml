@@ -5,7 +5,7 @@ services:
     env: node
     region: oregon
     plan: starter
-    buildCommand: npm install && cd packages/backend && npx prisma generate && cd ../.. && npm run build --workspace=@dubbing/backend && npm run build --workspace=@dubbing/workers
+    buildCommand: npm install && cd packages/backend && npx prisma generate && npx prisma migrate deploy && cd ../.. && npm run build --workspace=@dubbing/backend && npm run build --workspace=@dubbing/workers
     startCommand: node packages/backend/start-with-workers.js
     envVars:
       - key: NODE_ENV
@@ -31,8 +31,6 @@ services:
       - key: USE_OPENAI_WHISPER
         value: true
     healthCheckPath: /health
-    # Run database migrations before starting the service
-    preDeployCommand: cd packages/backend && npx prisma migrate deploy
 
 databases:
   # Optional: Render-managed Redis
