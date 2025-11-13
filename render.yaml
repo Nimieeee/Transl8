@@ -1,5 +1,5 @@
 services:
-  # Backend API + Workers (Combined Service)
+  # Backend API + Workers (Combined Service - Updated)
   - type: web
     name: transl8-backend
     env: node
