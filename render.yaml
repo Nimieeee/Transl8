@@ -2,11 +2,11 @@ services:
   # Backend API + Workers (Combined Service)
   - type: web
     name: transl8-backend
-    env: docker
+    env: node
     region: oregon
     plan: starter
-    dockerfilePath: ./Dockerfile
-    dockerContext: .
+    buildCommand: npm install && cd packages/backend && npx prisma generate && cd ../.. && npm run build --workspace=@dubbing/backend && npm run build --workspace=@dubbing/workers
+    startCommand: node packages/backend/start-with-workers.js
     envVars:
       - key: NODE_ENV
         value: production
