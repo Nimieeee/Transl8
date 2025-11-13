@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "Installing dependencies..."
+echo "==> Installing dependencies..."
 npm install
 
 echo "Generating Prisma client..."
