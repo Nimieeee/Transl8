@@ -49,7 +49,7 @@ Before starting:
 
 **Build Command**:
 ```bash
-cd packages/backend && npm install && cd ../workers && npm install && cd ../backend && npx prisma generate && npm run build && cd ../workers && npm run build
+npm install && cd packages/backend && npm install && npx prisma generate && npm run build && cd ../workers && npm install && npm run build && cd ../..
 ```
 
 **Start Command**:

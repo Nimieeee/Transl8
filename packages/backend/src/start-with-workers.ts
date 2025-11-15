@@ -1,47 +1,31 @@
-import { Worker } from 'bullmq';
-import Redis from 'ioredis';
-import dotenv from 'dotenv';
+import { spawn } from 'child_process';
+import path from 'path';
 
-// Load environment variables
-dotenv.config();
-
-// Import backend server
+// Start backend server
+console.log('Starting backend server...');
 import './index';
 
-// Import worker processors
-import { processStt } from '../../workers/src/stt-worker';
-import { processTranslation } from '../../workers/src/translation-worker';
-import { processTts } from '../../workers/src/tts-worker';
-import { processMuxing } from '../../workers/src/muxing-worker';
-
-// Redis connection for workers
-const connection = new Redis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD,
-  maxRetriesPerRequest: null,
-  enableReadyCheck: false,
-  tls: process.env.REDIS_HOST?.includes('upstash.io') ? {} : undefined
+// Start workers in separate process
+console.log('Starting workers...');
+const workersPath = path.join(__dirname, '../../workers/dist/index.js');
+const workersProcess = spawn('node', [workersPath], {
+  stdio: 'inherit',
+  env: process.env
 });
 
-// Start workers
-console.log('Starting workers...');
+workersProcess.on('error', (error) => {
+  console.error('Failed to start workers:', error);
+});
 
-const sttWorker = new Worker('stt', processStt, { connection });
-const translationWorker = new Worker('translation', processTranslation, { connection });
-const ttsWorker = new Worker('tts', processTts, { connection });
-const muxingWorker = new Worker('muxing', processMuxing, { connection });
+workersProcess.on('exit', (code) => {
+  console.log(`Workers process exited with code ${code}`);
+});
 
-console.log('✅ Workers started alongside backend server');
+console.log('✅ Backend and workers started');
 
 // Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('Shutting down workers...');
-  await Promise.all([
-    sttWorker.close(),
-    translationWorker.close(),
-    ttsWorker.close(),
-    muxingWorker.close()
-  ]);
+process.on('SIGTERM', () => {
+  console.log('Shutting down...');
+  workersProcess.kill('SIGTERM');
   process.exit(0);
 });

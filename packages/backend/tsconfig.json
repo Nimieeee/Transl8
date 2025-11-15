@@ -21,8 +21,7 @@
     "src/lib/prisma.ts",
     "src/lib/queue.ts",
     "src/lib/storage.ts",
-    "src/middleware/**/*.ts",
-    "../workers/src/**/*.ts"
+    "src/middleware/**/*.ts"
   ],
   "exclude": ["node_modules", "dist", "tests", "src/routes_old", "src/lib_old", "src/adapters_old"]
 }
