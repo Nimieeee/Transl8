@@ -1,134 +1,219 @@
-# Transl8 - AI Video Dubbing Platform
+# Video Dubbing Platform
 
-A production-grade AI video dubbing platform that provides superior-quality, natural-sounding video dubbing through a modular pipeline leveraging self-hosted open-source models.
+AI-powered video dubbing platform with speech-to-text, translation, and text-to-speech capabilities.
 
-## 🎯 Key Feature: TTS-Validated Loop
+## 🚀 Quick Start
 
-This platform includes a **revolutionary TTS-validated loop** that guarantees perfect timing:
+### Local Development
 
-- ✅ **Every translation validated with actual TTS** before committing
-- ✅ **Automatic retry with intelligent feedback** (max 3 attempts)
-- ✅ **30% cost savings** through validated audio reuse
-- ✅ **Zero manual timing fixes** required
-- ✅ **93%+ success rate** in production
-
-**How it works:** For each segment, the system generates adapted text with LLM, synthesizes test audio with TTS, measures actual duration, validates against target (±15%), and retries with specific feedback if needed. Validated audio is then reused in the final assembly, eliminating duplicate TTS calls.
-
-📖 **Learn more:** [TTS-Validated Loop Complete Guide](TTS_VALIDATED_LOOP_COMPLETE.md)
-
-## Project Structure
-
-This is a monorepo containing three main packages:
-
-```
-ai-video-dubbing-platform/
-├── packages/
-│   ├── backend/          # Node.js/Express API server
-│   ├── frontend/         # Next.js web application
-│   └── workers/          # Background job processors
-├── .kiro/
-│   └── specs/            # Project specifications and design docs
-├── docker-compose.yml    # Local development environment
-└── package.json          # Root workspace configuration
+1. **Start services**:
+```bash
+docker-compose -f docker-compose.simple.yml up -d
 ```
 
-## Prerequisites
+2. **Setup**:
+```bash
+./START_SIMPLE.sh
+```
 
-- Node.js 20+
-- Docker and Docker Compose
-- npm or yarn
+3. **Configure environment**:
+Edit `.env` files in each package with your API keys.
 
-## Getting Started
+4. **Start development** (3 terminals):
+```bash
+# Terminal 1 - Backend
+cd packages/backend && npm run dev
 
-### 1. Install Dependencies
+# Terminal 2 - Workers
+cd packages/workers && npm run dev
+
+# Terminal 3 - Frontend
+cd packages/frontend && npm run dev
+```
+
+5. **Open**: http://localhost:3000
+
+---
+
+## 🌐 Deployment
+
+### Deploy to Production
+
+**Services**:
+- Backend + Workers: Render
+- Frontend: Vercel
+- Database: Supabase
+- Queue: Upstash Redis
+- Storage: AWS S3
+
+**Quick Deploy** (30 minutes):
+```bash
+cat START_HERE.md
+```
+
+**Deployment Guides**:
+- `START_HERE.md` - Choose your deployment path
+- `DEPLOY_NOW.md` - Quick reference (30 min)
+- `DEPLOY_CHECKLIST.md` - Step-by-step guide
+- `DEPLOYMENT_GUIDE.md` - Complete documentation
+
+---
+
+## 📁 Project Structure
+
+```
+packages/
+├── backend/          # Express.js API
+│   ├── src/
+│   │   ├── routes/   # API endpoints
+│   │   ├── lib/      # Core logic
+│   │   └── middleware/
+│   └── prisma/       # Database schema
+├── workers/          # BullMQ workers
+│   └── src/
+│       ├── stt-worker.ts
+│       ├── translation-worker.ts
+│       ├── tts-worker.ts
+│       └── muxing-worker.ts
+└── frontend/         # Next.js app
+    └── src/
+        ├── app/      # Pages
+        └── lib/      # API client
+```
+
+---
+
+## 🛠 Tech Stack
+
+- **Backend**: Express.js, Prisma, BullMQ, JWT
+- **Workers**: BullMQ, FFmpeg, OpenAI APIs
+- **Frontend**: Next.js 14, React, Tailwind CSS
+- **Database**: PostgreSQL (Supabase)
+- **Queue**: Redis (Upstash)
+- **Storage**: AWS S3
+- **APIs**: OpenAI (Whisper, GPT-4, TTS)
+
+---
+
+## 🔑 Environment Variables
+
+### Backend
+```bash
+DATABASE_URL=postgresql://...
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+JWT_SECRET=your-secret
+OPENAI_API_KEY=sk-...
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+S3_BUCKET=your-bucket
+FRONTEND_URL=http://localhost:3000
+```
+
+### Workers
+```bash
+DATABASE_URL=postgresql://...
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=
+OPENAI_API_KEY=sk-...
+```
+
+### Frontend
+```bash
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+```
+
+---
+
+## 📊 Pipeline
+
+1. **Upload** → Video stored in S3
+2. **STT** → Whisper extracts transcript
+3. **Translation** → GPT-4 translates
+4. **TTS** → OpenAI TTS generates audio
+5. **Muxing** → FFmpeg combines video + audio
+6. **Complete** → Download result
+
+---
+
+## 🧪 Testing
 
 ```bash
-npm install
+# Test API
+./test-simple.sh
+
+# Run builds
+npm run build --workspace=@dubbing/backend
+npm run build --workspace=@dubbing/workers
+npm run build --workspace=@dubbing/frontend
 ```
 
-### 2. Set Up Environment Variables
+---
 
-Copy the example environment files:
+## 💰 Cost
 
-```bash
-cp .env.example .env
-cp packages/backend/.env.example packages/backend/.env
-cp packages/frontend/.env.example packages/frontend/.env
-cp packages/workers/.env.example packages/workers/.env
-```
+### Development
+- Local: Free (PostgreSQL + Redis in Docker)
 
-Edit the `.env` files with your configuration.
+### Production
+- Render Backend: $7/month
+- Render Workers: $7/month
+- Vercel: Free
+- Supabase: Free (up to 500MB)
+- Upstash: Free (10K commands/day)
+- AWS S3: ~$1-5/month
 
-### 3. Start Infrastructure Services
+**Total: ~$15-20/month**
 
-Start PostgreSQL, Redis, and MinIO using Docker Compose:
+---
 
-```bash
-npm run docker:up
-```
+## 📚 Documentation
 
-### 4. Run Development Servers
+- `START_HERE.md` - Deployment entry point
+- `QUICK_START.md` - Local development guide
+- `DEPLOYMENT_GUIDE.md` - Complete deployment docs
+- `README_SIMPLE.md` - Platform overview
 
-Start all services in development mode:
+---
 
-```bash
-npm run dev
-```
+## 🔒 Security
 
-Or start individual services:
+- HTTPS (automatic on Render/Vercel)
+- JWT authentication
+- Bcrypt password hashing
+- Environment variables
+- CORS configured
+- S3 signed URLs
 
-```bash
-npm run dev:backend   # API server on port 3001
-npm run dev:frontend  # Next.js app on port 3000
-npm run dev:workers   # Background workers
-```
+---
 
-## Available Scripts
+## 🤝 Contributing
 
-- `npm run dev` - Start all services in development mode
-- `npm run build` - Build all packages
-- `npm run lint` - Lint all packages
-- `npm run format` - Format code with Prettier
-- `npm run docker:up` - Start Docker services
-- `npm run docker:down` - Stop Docker services
-- `npm run docker:logs` - View Docker logs
+See `CONTRIBUTING.md` for guidelines.
 
-## Architecture
+---
 
-The platform follows a microservices architecture:
+## 📄 License
 
-- **Frontend**: React/Next.js with TypeScript and Tailwind CSS
-- **Backend**: Node.js/Express API with JWT authentication
-- **Workers**: Python-based workers for AI model inference
-- **Database**: PostgreSQL for relational data
-- **Cache/Queue**: Redis for sessions and job queue (BullMQ)
-- **Storage**: S3/GCS for video and audio files
+MIT
 
-## Development
+---
 
-### Code Quality
+## 🆘 Support
 
-The project uses:
-- TypeScript for type safety
-- ESLint for code linting
-- Prettier for code formatting
+### Issues?
+1. Check service logs
+2. Verify environment variables
+3. Test connections
+4. Review deployment guides
 
-Run checks before committing:
+### Documentation
+- Local: `QUICK_START.md`
+- Deploy: `START_HERE.md`
+- Troubleshooting: `DEPLOYMENT_GUIDE.md`
 
-```bash
-npm run lint
-npm run format:check
-```
+---
 
-### Docker Services
-
-Access the services:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:3001
-- MinIO Console: http://localhost:9001 (minioadmin/minioadmin)
-- PostgreSQL: localhost:5432
-- Redis: localhost:6379
-
-## License
-
-Proprietary
+**Ready to deploy?** → `START_HERE.md`

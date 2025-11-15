@@ -1,16 +1,25 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist",
+    "target": "ES2020",
     "module": "commonjs",
-    "target": "ES2022",
-    "lib": ["ES2022"],
-    "types": ["node"],
-    "baseUrl": ".",
-    "paths": {
-      "@backend/*": ["../backend/src/*"]
-    }
+    "lib": ["ES2020"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "node"
   },
-  "include": ["src/**/*", "../backend/src/adapters/**/*", "../backend/src/lib/queue.ts", "src/types/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src/index.ts",
+    "src/stt-worker.ts",
+    "src/translation-worker.ts",
+    "src/tts-worker.ts",
+    "src/muxing-worker.ts",
+    "src/lib/prisma.ts",
+    "src/lib/queue.ts"
+  ],
+  "exclude": ["node_modules", "dist", "src/old", "src/lib/old"]
 }

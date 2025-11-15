@@ -4,9 +4,6 @@ set -e
 echo "==> Installing dependencies..."
 npm install
 
-echo "Generating Prisma client..."
-npx prisma generate --schema=packages/backend/prisma/schema.prisma
-
 echo "Running database migrations..."
 npx prisma migrate deploy --schema=packages/backend/prisma/schema.prisma
 

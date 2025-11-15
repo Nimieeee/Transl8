@@ -9,7 +9,7 @@
   "scripts": {
     "install:all": "npm install && cd packages/backend && npm install && cd ../workers && npm install && cd ../frontend && npm install && cd ../..",
     "build": "npm run build:backend",
-    "build:backend": "npm run prisma:generate && npm run build --workspace=@dubbing/backend",
+    "build:backend": "npm run build --workspace=@dubbing/backend",
     "build:workers": "npm run build --workspace=@dubbing/workers",
     "build:frontend": "npm run build --workspace=@dubbing/frontend",
     "build:all": "npm run build:backend && npm run build:workers && npm run build:frontend",
