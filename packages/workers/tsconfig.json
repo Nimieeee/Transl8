@@ -11,6 +11,6 @@
       "@backend/*": ["../backend/src/*"]
     }
   },
-  "include": ["src/**/*", "../backend/src/adapters/**/*", "../backend/src/lib/queue.ts"],
+  "include": ["src/**/*", "../backend/src/adapters/**/*", "../backend/src/lib/queue.ts", "src/types/**/*"],
   "exclude": ["node_modules", "dist"]
 }
