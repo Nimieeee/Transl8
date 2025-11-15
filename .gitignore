@@ -59,3 +59,9 @@ coverage/
 
 # Local development
 docker-compose.override.yml
+
+# Virtual environments
+venv/
+venv_*/
+env/
+ENV/
