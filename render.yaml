@@ -6,7 +6,7 @@ services:
     region: oregon
     plan: starter
     buildCommand: bash build-render.sh
-    startCommand: cd packages/backend && node start-with-workers.js
+    startCommand: node start-with-workers.js
     envVars:
       - key: NODE_ENV
         value: production
