@@ -10,12 +10,10 @@
 import axios from 'axios';
 import FormData from 'form-data';
 import fs from 'fs';
-import path from 'path';
 import {
   VocalIsolationAdapter,
   VocalIsolationResult,
   HealthCheckResult,
-  AdapterMetadata,
 } from './types';
 import { logger } from '../lib/logger';
 
@@ -65,15 +63,13 @@ export class DemucsAdapter extends VocalIsolationAdapter {
 
       logger.info(`Vocal separation completed in ${processingTime}ms: ${outputPath}`);
 
-      const metadata: AdapterMetadata = {
-        processingTime,
-        modelName: this.name,
-        modelVersion: this.version,
-      };
-
       return {
         vocalsPath: outputPath,
-        metadata,
+        metadata: {
+          processingTime,
+          modelName: this.name,
+          modelVersion: this.version,
+        },
       };
     } catch (error: any) {
       logger.error(`Demucs vocal separation error: ${error.message}`);

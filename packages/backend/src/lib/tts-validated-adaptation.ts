@@ -113,7 +113,6 @@ export class TTSValidatedAdaptationService {
       : this.config.tolerancePercent;
 
     // Use tolerance for validation
-    const _tolerance = effectiveTolerance;
 
     logger.info(`🔄 Starting TTS-validated adaptation for segment ${segment.id}`);
     logger.info(`   Target duration: ${segment.duration}s (±${effectiveTolerance}%)`);
@@ -248,12 +247,10 @@ export class TTSValidatedAdaptationService {
     attempt: number,
     previousFeedback: string | undefined,
     _targetLanguage: string,
-    tolerance: number
+    _tolerance: number
   ): Promise<string> {
     // Calculate character-per-second heuristics
     const sourceChars = segment.text.length;
-    const _sourceCharsPerSecond = sourceChars / segment.duration;
-    const _tolerance = tolerance;
 
     // Language-specific character expansion/contraction factors
     const expansionFactors: Record<string, number> = {
@@ -309,14 +306,12 @@ export class TTSValidatedAdaptationService {
   private async generateTestAudio(
     text: string,
     voiceConfig: VoiceConfig,
-    targetLanguage: string,
+    _targetLanguage: string,
     segmentId: number,
     attempt: number
   ): Promise<string> {
     logger.debug(`   🎤 Generating test audio...`);
 
-    // Extract voice from config (OpenAI TTS expects just the voice name)
-    const voiceId = voiceConfig.voiceId || 'alloy';
     // Synthesize with OpenAI TTS
     const audioBuffer = await this.ttsAdapter.synthesize(text, voiceConfig);
 
@@ -392,7 +387,6 @@ export class TTSValidatedAdaptationService {
     attempt: number = 1
   ): string {
     const isTooShort = actualDuration < targetDuration;
-    const _isTooLong = actualDuration > targetDuration;
     const isVeryOff = Math.abs(validation.percentDiff) > 30;
 
     let feedback = `Your previous adaptation was ${isTooShort ? 'TOO SHORT' : 'TOO LONG'}.\n\n`;

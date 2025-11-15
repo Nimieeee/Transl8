@@ -170,10 +170,9 @@ export class OpenVoiceAdapter extends TTSAdapter {
     text: string,
     cleanPromptPath: string,
     targetLanguage: string,
-    emotion?: string,
-    timestamps?: { start: number; end: number }
+    _emotion?: string,
+    _timestamps?: { start: number; end: number }
   ): Promise<Buffer> {
-    const startTime = Date.now();
 
     try {
       if (!fs.existsSync(cleanPromptPath)) {
@@ -187,7 +186,7 @@ export class OpenVoiceAdapter extends TTSAdapter {
       formData.append('reference_audio', fs.createReadStream(cleanPromptPath));
       formData.append('speed', '1.0');
 
-      // Note: emotion and timestamps are not supported by the current OpenVoice service
+      // Note: _emotion and _timestamps are not supported by the current OpenVoice service
       // They would need to be added to the service implementation
 
       const response = await axios.post(`${this.serviceUrl}/synthesize-with-voice`, formData, {
@@ -196,10 +195,8 @@ export class OpenVoiceAdapter extends TTSAdapter {
         timeout: this.timeout,
       });
 
-      const processingTime = Date.now() - startTime;
-
-      const emotionInfo = emotion ? ` with emotion=${emotion}` : '';
-      console.log(`[OpenVoice] Synthesized with clean prompt in ${processingTime}ms${emotionInfo}`);
+      const emotionInfo = _emotion ? ` with emotion=${_emotion}` : '';
+      console.log(`[OpenVoice] Synthesized with clean prompt${emotionInfo}`);
 
       return Buffer.from(response.data);
     } catch (error: any) {
@@ -289,8 +286,6 @@ export class OpenVoiceAdapter extends TTSAdapter {
     voiceName: string,
     language: string = 'en'
   ): Promise<string> {
-    const startTime = Date.now();
-
     try {
       console.log(`[OpenVoice] Creating voice clone: ${voiceName}`);
 

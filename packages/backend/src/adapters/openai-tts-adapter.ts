@@ -59,7 +59,7 @@ export class OpenAITTSAdapter implements TTSAdapter {
           `[OpenAI TTS] Segment ${i}: "${segment.translatedText.substring(0, 50)}..." (voice: ${voice}, speed: ${speed})`
         );
 
-        const audioData = await this.synthesize(segment.translatedText, voice, speed);
+        const audioData = await this.synthesizeWithVoice(segment.translatedText, voice, speed);
 
         audioSegments.push({
           segmentId: i,
@@ -94,9 +94,22 @@ export class OpenAITTSAdapter implements TTSAdapter {
   }
 
   /**
-   * Synthesize a single text with OpenAI TTS
+   * Synthesize speech from text with specified voice (TTSAdapter interface)
    */
   async synthesize(
+    text: string,
+    voiceConfig: VoiceConfig,
+    timestamps?: { start: number; end: number }
+  ): Promise<Buffer> {
+    const voice = this.getVoiceFromConfig(voiceConfig);
+    const speed = voiceConfig.parameters?.speed || 1.0;
+    return this.synthesizeWithVoice(text, voice, speed);
+  }
+
+  /**
+   * Internal method to synthesize with OpenAI voice
+   */
+  private async synthesizeWithVoice(
     text: string,
     voice: 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer' = 'alloy',
     speed: number = 1.0
@@ -148,17 +161,25 @@ export class OpenAITTSAdapter implements TTSAdapter {
   }
 
   /**
+   * Create a voice clone (not supported by OpenAI TTS)
+   */
+  async createVoiceClone(audioPath: string, voiceName: string): Promise<string> {
+    throw new Error('Voice cloning is not supported by OpenAI TTS. Use preset voices instead.');
+  }
+
+  /**
    * Health check for OpenAI TTS service
    */
-  async healthCheck(): Promise<{ healthy: boolean; error?: string }> {
+  async healthCheck(): Promise<{ healthy: boolean; error?: string; timestamp: Date }> {
     try {
       // Try a minimal synthesis to check if API is working
-      await this.synthesize('test', this.defaultVoice, 1.0);
-      return { healthy: true };
+      await this.synthesizeWithVoice('test', this.defaultVoice, 1.0);
+      return { healthy: true, timestamp: new Date() };
     } catch (error: any) {
       return {
         healthy: false,
         error: error.message,
+        timestamp: new Date(),
       };
     }
   }

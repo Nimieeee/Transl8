@@ -27,17 +27,15 @@ export class VocalIsolationWorker {
   private worker: Worker;
   private vocalIsolationService: VocalIsolationService;
   private ttsQueue: Queue;
-  private redisConnection: any;
 
-  constructor(redisConnection: any) {
-    this.redisConnection = redisConnection;
+  constructor(_redisConnection: any) {
     this.vocalIsolationService = new VocalIsolationService({
       tempDir: process.env.VOCAL_ISOLATION_TEMP_DIR || '/tmp/vocal-isolation',
     });
 
     // Create TTS queue for triggering next stage
     this.ttsQueue = new Queue('tts', {
-      connection: redisConnection,
+      connection: _redisConnection,
     });
 
     // Create BullMQ worker
@@ -45,7 +43,7 @@ export class VocalIsolationWorker {
       'vocal-isolation',
       async (job: Job<VocalIsolationJobData>) => this.processJob(job),
       {
-        connection: redisConnection,
+        connection: _redisConnection,
         concurrency: parseInt(process.env.VOCAL_ISOLATION_CONCURRENCY || '1'),
         limiter: {
           max: 5, // Max 5 jobs
@@ -182,8 +180,8 @@ export class VocalIsolationWorker {
     jobId: string,
     status: string,
     progress: number,
-    result?: any,
-    errorMessage?: string
+    _result?: any,
+    _errorMessage?: string
   ): Promise<void> {
     // In Context Map flow, job status is tracked in BullMQ, not Prisma
     logger.debug(`Job ${jobId} status: ${status} (${progress}%)`);
@@ -218,7 +216,7 @@ export class VocalIsolationWorker {
       // Enqueue TTS job
       const ttsJobData: TTSJobData = {
         projectId,
-        userId: contextMap.user_id || 'system',
+        userId: 'system', // User ID not stored in Context Map
         stage: 'TTS',
         translationId: projectId,
         voiceConfig: {},

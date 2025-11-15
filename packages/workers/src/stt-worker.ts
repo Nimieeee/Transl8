@@ -30,11 +30,8 @@ export class STTWorker {
   private worker: Worker;
   private adapter: STTAdapter;
   private adaptationQueue: Queue;
-  private redisConnection: any;
 
-  constructor(redisConnection: any) {
-    this.redisConnection = redisConnection;
-
+  constructor(_redisConnection: any) {
     // Use OpenAI Whisper API adapter
     logger.info('[STT Worker] Using OpenAI Whisper API adapter');
     this.adapter = new OpenAIWhisperAdapter();
@@ -43,7 +40,7 @@ export class STTWorker {
 
     // Create adaptation queue for triggering translation
     this.adaptationQueue = new Queue('adaptation', {
-      connection: redisConnection,
+      connection: _redisConnection,
     });
 
     // Create BullMQ worker
@@ -51,7 +48,7 @@ export class STTWorker {
       'stt',
       async (job: Job<STTJobData>) => this.processJob(job),
       {
-        connection: redisConnection,
+        connection: _redisConnection,
         concurrency: parseInt(process.env.WORKER_CONCURRENCY || '2'),
         limiter: {
           max: 10, // Max 10 jobs
@@ -295,7 +292,7 @@ export class STTWorker {
     jobId: string,
     status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED',
     progress: number,
-    metadata?: any,
+    _metadata?: any,
     errorMessage?: string
   ) {
     const updateData: any = {

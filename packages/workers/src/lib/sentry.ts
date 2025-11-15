@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/node';
-import { ProfilingIntegration } from '@sentry/profiling-node';
+// Note: nodeProfilingIntegration is available in @sentry/profiling-node v8+
+// For older versions, profiling integration is included in @sentry/node
 
 /**
  * Initialize Sentry for worker error tracking
@@ -20,10 +21,8 @@ export function initSentry(): void {
     // Profiling
     profilesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
 
-    integrations: [new ProfilingIntegration()],
-
     // Filter out sensitive data
-    beforeSend(event, hint) {
+    beforeSend(event, _hint) {
       return event;
     },
   });
@@ -74,11 +73,11 @@ export function addBreadcrumb(
 /**
  * Start a transaction for performance monitoring
  */
-export function startTransaction(name: string, op: string): Sentry.Transaction {
-  return Sentry.startTransaction({
+export function startTransaction(name: string, op: string): void {
+  Sentry.startSpan({
     name,
     op,
-  });
+  }, () => {});
 }
 
 /**

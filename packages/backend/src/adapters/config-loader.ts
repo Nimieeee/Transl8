@@ -19,12 +19,14 @@ interface ConfigFile {
     mt: ModelConfig[];
     tts: ModelConfig[];
     lipsync: ModelConfig[];
+    vocal_isolation: ModelConfig[];
   };
   defaults: {
     stt: string;
     mt: string;
     tts: string;
     lipsync: string;
+    vocal_isolation: string;
   };
   healthCheck: {
     intervalSeconds: number;
@@ -64,7 +66,7 @@ function validateConfig(config: ConfigFile): void {
     throw new Error('Configuration missing "models" section');
   }
 
-  const stages: PipelineStage[] = ['stt', 'mt', 'tts', 'lipsync'];
+  const stages: PipelineStage[] = ['stt', 'mt', 'tts', 'lipsync', 'vocal_isolation'];
 
   for (const stage of stages) {
     if (!Array.isArray(config.models[stage])) {

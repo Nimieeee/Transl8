@@ -121,13 +121,35 @@
           "documentation": "https://github.com/Rudrabha/Wav2Lip"
         }
       }
+    ],
+    "vocal_isolation": [
+      {
+        "name": "demucs",
+        "version": "1.0.0",
+        "stage": "vocal_isolation",
+        "enabled": true,
+        "priority": 100,
+        "capabilities": {
+          "languages": null,
+          "maxDuration": 3600,
+          "requiresGPU": true,
+          "supportsBatch": false
+        },
+        "metadata": {
+          "description": "Demucs v4 for high-quality vocal isolation",
+          "author": "Facebook Research",
+          "license": "MIT",
+          "documentation": "https://github.com/facebookresearch/demucs"
+        }
+      }
     ]
   },
   "defaults": {
     "stt": "whisper-pyannote",
     "mt": "marian-nmt",
     "tts": "styletts2",
-    "lipsync": "wav2lip"
+    "lipsync": "wav2lip",
+    "vocal_isolation": "demucs"
   },
   "healthCheck": {
     "intervalSeconds": 300,

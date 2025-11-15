@@ -12,9 +12,7 @@ import { Worker, Job, Queue } from 'bullmq';
 import { PrismaClient } from '@prisma/client';
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
 import { OpenAITTSAdapter } from '../../backend/src/adapters/openai-tts-adapter';
-import { uploadFile } from '../../backend/src/lib/storage';
 import { logger } from './lib/logger';
 import type { TTSJobData } from '../../backend/src/lib/queue';
 import type { TTSResult, SpeakerVoiceMapping, VoiceConfig } from '../../backend/src/adapters/types';
@@ -31,11 +29,8 @@ export class TTSWorker {
   private worker: Worker;
   private ttsAdapter: OpenAITTSAdapter;
   private finalAssemblyQueue: Queue;
-  private redisConnection: any;
 
-  constructor(redisConnection: any) {
-    this.redisConnection = redisConnection;
-
+  constructor(_redisConnection: any) {
     // Initialize OpenAI TTS adapter
     this.ttsAdapter = new OpenAITTSAdapter({
       model: 'tts-1', // Use faster model for development
@@ -44,7 +39,7 @@ export class TTSWorker {
 
     // Create final assembly queue for triggering next stage
     this.finalAssemblyQueue = new Queue('final-assembly', {
-      connection: redisConnection,
+      connection: _redisConnection,
     });
 
     // Create BullMQ worker
@@ -52,7 +47,7 @@ export class TTSWorker {
       'tts',
       async (job: Job<TTSJobData>) => this.processJob(job),
       {
-        connection: redisConnection,
+        connection: _redisConnection,
         concurrency: parseInt(process.env.WORKER_CONCURRENCY || '2'),
         limiter: {
           max: 10, // Max 10 jobs
@@ -68,7 +63,7 @@ export class TTSWorker {
    * Process a TTS job
    */
   private async processJob(job: Job<TTSJobData>): Promise<any> {
-    const { projectId, translationId, voiceConfig, targetLanguage } = job.data;
+    const { projectId, translationId, voiceConfig } = job.data;
     const jobId = projectId; // Use projectId as jobId for MVP
 
     console.log(`[TTS Worker] Processing job ${jobId} for project ${projectId}`);
@@ -241,7 +236,7 @@ export class TTSWorker {
     // Process each segment individually
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
-      const voiceConfig = speakerVoiceMapping[segment.speaker];
+      const speakerVoice = speakerVoiceMapping[segment.speaker];
 
       try {
         // Get translated text from segment
@@ -299,7 +294,7 @@ export class TTSWorker {
         }
 
         // No validated audio - synthesize with TTS
-        const voice = this.getOpenAIVoice(voiceConfig);
+        const voice = this.getOpenAIVoice(speakerVoice);
         const speed = 1.0; // Always use normal speed for natural speech
 
         const segmentDuration = (segment.end_ms - segment.start_ms) / 1000;
@@ -317,8 +312,17 @@ export class TTSWorker {
           `[TTS Worker] Synthesizing segment ${i}: "${translatedText.substring(0, 50)}..." (voice: ${voice}, speed: ${speed.toFixed(2)}x)`
         );
 
+        // Create voice config for TTS adapter
+        const voiceConfig: VoiceConfig = {
+          type: 'preset',
+          voiceId: voice,
+          parameters: {
+            speed,
+          },
+        };
+
         // Synthesize using OpenAI TTS with calculated speed
-        const audioData = await this.ttsAdapter.synthesize(translatedText, voice, speed);
+        const audioData = await this.ttsAdapter.synthesize(translatedText, voiceConfig);
 
         await fs.promises.writeFile(segmentAudioPath, audioData);
 
@@ -420,17 +424,17 @@ export class TTSWorker {
   }
 
   /**
-   * Concatenate audio buffers
+   * Concatenate audio buffers (currently unused - kept for future use)
    */
-  private async concatenateAudioBuffers(audioSegments: any[]): Promise<Buffer> {
-    const allBuffers: Buffer[] = [];
+  // private async concatenateAudioBuffers(audioSegments: any[]): Promise<Buffer> {
+  //   const allBuffers: Buffer[] = [];
 
-    for (const segment of audioSegments) {
-      allBuffers.push(segment.audioData);
-    }
+  //   for (const segment of audioSegments) {
+  //     allBuffers.push(segment.audioData);
+  //   }
 
-    return Buffer.concat(allBuffers);
-  }
+  //   return Buffer.concat(allBuffers);
+  // }
 
   /**
    * Trigger final assembly stage after TTS completion
@@ -498,19 +502,19 @@ export class TTSWorker {
   }
 
   /**
-   * Clean up temporary audio file
+   * Clean up temporary audio file (currently unused - kept for future use)
    */
-  private async cleanupTempFile(filePath: string): Promise<void> {
-    try {
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-        console.log(`[TTS Worker] Cleaned up temp file: ${filePath}`);
-      }
-    } catch (error) {
-      console.error(`[TTS Worker] Failed to cleanup temp file:`, error);
-      // Don't throw - cleanup failure shouldn't fail the job
-    }
-  }
+  // private async cleanupTempFile(filePath: string): Promise<void> {
+  //   try {
+  //     if (fs.existsSync(filePath)) {
+  //       fs.unlinkSync(filePath);
+  //       console.log(`[TTS Worker] Cleaned up temp file: ${filePath}`);
+  //     }
+  //   } catch (error) {
+  //     console.error(`[TTS Worker] Failed to cleanup temp file:`, error);
+  //     // Don't throw - cleanup failure shouldn't fail the job
+  //   }
+  // }
 
   /**
    * Setup event handlers for the worker

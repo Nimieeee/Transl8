@@ -14,7 +14,6 @@ import {
   EmotionAnalysisResult,
   EmotionTag,
   HealthCheckResult,
-  AdapterMetadata,
 } from './types';
 import { logger } from '../lib/logger';
 
@@ -30,14 +29,12 @@ export class Wav2Vec2EmotionAdapter extends EmotionAnalysisAdapter {
 
   private client: AxiosInstance;
   private serviceUrl: string;
-  private retries: number;
 
   constructor(config: EmotionAdapterConfig = {}) {
     super();
 
     this.serviceUrl =
       config.serviceUrl || process.env.EMOTION_SERVICE_URL || 'http://localhost:8010';
-    this.retries = config.retries || 3;
 
     this.client = axios.create({
       baseURL: this.serviceUrl,

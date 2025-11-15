@@ -12,6 +12,7 @@ import { TTSValidatedAdaptationService } from '../../backend/src/lib/tts-validat
 import { OpenAITTSAdapter } from '../../backend/src/adapters/openai-tts-adapter';
 import { AdaptationConfig } from '../../backend/src/lib/adaptation-engine';
 import type { TTSJobData } from '../../backend/src/lib/queue';
+import type { VoiceConfig } from '../../backend/src/adapters/types';
 import path from 'path';
 
 const prisma = new PrismaClient();
@@ -71,7 +72,7 @@ export class AdaptationWorker {
     summary: string;
     stats: any;
   }> {
-    const { projectId, sourceLanguage, targetLanguage, glossary, concurrency = 3 } = job.data;
+    const { projectId, sourceLanguage, targetLanguage, glossary } = job.data;
 
     logger.info(`Starting adaptation for project ${projectId}`);
     logger.info(`Language pair: ${sourceLanguage} → ${targetLanguage}`);
@@ -161,9 +162,12 @@ export class AdaptationWorker {
 
         try {
           // Voice config (basic for now)
-          const voiceConfig = {
-            voice: 'alloy',
-            emotion: segment.emotion || 'neutral',
+          const voiceConfig: VoiceConfig = {
+            type: 'preset' as const,
+            voiceId: 'alloy',
+            parameters: {
+              emotion: segment.emotion || 'neutral',
+            },
           };
 
           const result = await ttsValidatedService.adaptSegmentWithTTSValidation(
@@ -189,14 +193,14 @@ export class AdaptationWorker {
           await job.updateProgress(progress);
         } catch (error) {
           logger.error(`   ❌ ERROR in segment ${i}:`, error);
-          // Use fallback
+          // Use fallback with proper type
           results.push({
             adaptedText: segment.text,
             audioPath: '',
             actualDuration: segment.duration,
             targetDuration: segment.duration,
             attempts: 1,
-            status: 'failed',
+            status: 'failed' as const,
             validationHistory: [],
           });
         }
@@ -228,22 +232,7 @@ export class AdaptationWorker {
         // Store validated audio path if available
         if (result.audioPath && result.status === 'success') {
           // Update segment with validated audio path
-          const contextMap = await contextMapClient.get(projectId);
-          if (contextMap && contextMap.content) {
-            const content =
-              typeof contextMap.content === 'string'
-                ? JSON.parse(contextMap.content)
-                : contextMap.content;
-
-            if (content.segments && Array.isArray(content.segments)) {
-              const segmentToUpdate = content.segments.find((s: any) => s.id === segment.id);
-              if (segmentToUpdate) {
-                segmentToUpdate.validatedAudioPath = result.audioPath;
-                segmentToUpdate.actualDuration = result.actualDuration;
-                await contextMapClient.update(projectId, content);
-              }
-            }
-          }
+          await contextMapClient.addGeneratedAudioPath(projectId, segment.id, result.audioPath);
         }
       }
 

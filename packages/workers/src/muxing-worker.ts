@@ -29,7 +29,7 @@ export class MuxingWorker {
    * Process muxing job
    */
   async process(job: Job<MuxingJobData>): Promise<void> {
-    const { projectId, userId, videoPath, finalAudioPath, applyWatermark, subscriptionTier } =
+    const { projectId, videoPath, finalAudioPath, applyWatermark, subscriptionTier } =
       job.data;
 
     try {
@@ -139,17 +139,8 @@ export class MuxingWorker {
       await job.updateProgress(95);
 
       // Step 8: Store result in job data and database
-      await job.updateData({
-        ...job.data,
-        outputPath,
-        outputMetadata: {
-          duration: metadata.duration,
-          width: metadata.width,
-          height: metadata.height,
-          codec: metadata.codec,
-          format: metadata.format,
-        },
-      });
+      // Note: outputPath stored in database, not in job data type
+      logger.info(`Output path for database: ${outputPath}`);
 
       // Update database with output file path
       await prisma.dubbingJob.update({

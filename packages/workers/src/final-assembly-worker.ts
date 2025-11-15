@@ -7,14 +7,12 @@
 
 import { Job, Queue } from 'bullmq';
 import { PrismaClient } from '@prisma/client';
-import axios from 'axios';
 import { promises as fs } from 'fs';
 import path from 'path';
 import { contextMapClient } from './lib/context-map-client';
 import { logger } from './lib/logger';
 
 const prisma = new PrismaClient();
-const ABSOLUTE_SYNC_SERVICE_URL = process.env.ABSOLUTE_SYNC_SERVICE_URL || 'http://localhost:8012';
 
 interface FinalAssemblyJobData {
   projectId: string;
@@ -31,19 +29,19 @@ interface MuxingJobData {
   subscriptionTier?: string;
 }
 
-interface AssemblyResult {
-  success: boolean;
-  output_path?: string;
-  original_duration_ms?: number;
-  final_duration_ms?: number;
-  duration_difference_ms?: number;
-  total_segments?: number;
-  successful_segments?: number;
-  failed_segments?: number;
-  skipped_segments?: number;
-  completion_rate?: number;
-  error?: string;
-}
+// interface AssemblyResult {
+//   success: boolean;
+//   output_path?: string;
+//   original_duration_ms?: number;
+//   final_duration_ms?: number;
+//   duration_difference_ms?: number;
+//   total_segments?: number;
+//   successful_segments?: number;
+//   failed_segments?: number;
+//   skipped_segments?: number;
+//   completion_rate?: number;
+//   error?: string;
+// }
 
 export class FinalAssemblyWorker {
   private muxingQueue: Queue;

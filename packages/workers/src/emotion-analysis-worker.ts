@@ -20,10 +20,8 @@ export interface EmotionAnalysisJobData {
 export class EmotionAnalysisWorker {
   private worker: Worker;
   private emotionService: EmotionAnalysisService;
-  private redisConnection: any;
 
-  constructor(redisConnection: any) {
-    this.redisConnection = redisConnection;
+  constructor(_redisConnection: any) {
     this.emotionService = new EmotionAnalysisService({
       batchSize: parseInt(process.env.EMOTION_BATCH_SIZE || '10'),
       minConfidence: parseFloat(process.env.EMOTION_MIN_CONFIDENCE || '0.3'),
@@ -34,7 +32,7 @@ export class EmotionAnalysisWorker {
       'emotion-analysis',
       async (job: Job<EmotionAnalysisJobData>) => this.processJob(job),
       {
-        connection: redisConnection,
+        connection: _redisConnection,
         concurrency: parseInt(process.env.EMOTION_CONCURRENCY || '1'),
         limiter: {
           max: 10, // Max 10 jobs
@@ -176,8 +174,8 @@ export class EmotionAnalysisWorker {
     jobId: string,
     status: string,
     progress: number,
-    result?: any,
-    errorMessage?: string
+    _result?: any,
+    _errorMessage?: string
   ): Promise<void> {
     // In Context Map flow, job status is tracked in BullMQ, not Prisma
     logger.debug(`Job ${jobId} status: ${status} (${progress}%)`);

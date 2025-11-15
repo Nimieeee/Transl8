@@ -27,10 +27,10 @@ export class VideoProcessor {
         .audioFrequency(16000) // 16kHz sample rate
         .audioChannels(1) // Mono channel
         .format('wav') // WAV container
-        .on('start', (commandLine) => {
+        .on('start', (commandLine: string) => {
           console.log('FFmpeg audio extraction started:', commandLine);
         })
-        .on('progress', (progress) => {
+        .on('progress', (progress: any) => {
           if (progress.percent) {
             console.log(`Audio extraction progress: ${progress.percent.toFixed(2)}%`);
           }
@@ -39,9 +39,8 @@ export class VideoProcessor {
           console.log('Audio extraction completed:', outputPath);
           resolve(outputPath);
         })
-        .on('error', (err, _stdout, stderr) => {
+        .on('error', (err: any) => {
           console.error('FFmpeg audio extraction error:', err.message);
-          console.error('FFmpeg stderr:', stderr);
           reject(new Error(`Audio extraction failed: ${err.message}`));
         })
         .save(outputPath);
@@ -111,10 +110,10 @@ export class VideoProcessor {
       }
 
       command
-        .on('start', (commandLine) => {
+        .on('start', (commandLine: string) => {
           console.log('FFmpeg muxing started:', commandLine);
         })
-        .on('progress', (progress) => {
+        .on('progress', (progress: any) => {
           if (progress.percent) {
             console.log(`Muxing progress: ${progress.percent.toFixed(2)}%`);
           }
@@ -123,9 +122,8 @@ export class VideoProcessor {
           console.log('Video muxing completed:', outputPath);
           resolve(outputPath);
         })
-        .on('error', (err, _stdout, stderr) => {
+        .on('error', (err: any) => {
           console.error('FFmpeg muxing error:', err.message);
-          console.error('FFmpeg stderr:', stderr);
           reject(new Error(`Video muxing failed: ${err.message}`));
         })
         .save(outputPath);
@@ -145,13 +143,13 @@ export class VideoProcessor {
     format: string;
   }> {
     return new Promise((resolve, reject) => {
-      ffmpeg.ffprobe(videoPath, (err, metadata) => {
+      ffmpeg.ffprobe(videoPath, (err: any, metadata: any) => {
         if (err) {
           reject(new Error(`Failed to get video metadata: ${err.message}`));
           return;
         }
 
-        const videoStream = metadata.streams.find((s) => s.codec_type === 'video');
+        const videoStream = metadata.streams.find((s: any) => s.codec_type === 'video');
         if (!videoStream) {
           reject(new Error('No video stream found in file'));
           return;
@@ -174,7 +172,7 @@ export class VideoProcessor {
    */
   async validateFFmpegAvailable(): Promise<boolean> {
     return new Promise((resolve) => {
-      ffmpeg.getAvailableFormats((err, _formats) => {
+      ffmpeg.getAvailableFormats((err: any, _formats: any) => {
         if (err) {
           console.error('FFmpeg not available:', err.message);
           resolve(false);

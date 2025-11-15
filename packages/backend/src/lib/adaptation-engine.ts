@@ -51,7 +51,7 @@ export class AdaptationEngine {
   /**
    * Build dynamic prompt with few-shot examples and context
    */
-  buildPrompt(segment: ContextMapSegment, attempt: number = 0, previousFeedback?: string): string {
+  buildPrompt(segment: ContextMapSegment, _attempt: number = 0, previousFeedback?: string): string {
     const targetLangName = this.getLanguageName(this.config.targetLanguage);
 
     // ============================================================

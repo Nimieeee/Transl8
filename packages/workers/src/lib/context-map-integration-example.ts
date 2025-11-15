@@ -13,7 +13,7 @@ import { logger } from './logger';
  *
  * After transcription completes, create the Context Map from the transcript
  */
-export async function sttWorkerExample(projectId: string, transcript: any) {
+export async function sttWorkerExample(projectId: string, _transcript: any) {
   try {
     // The Context Map is created by the backend service after STT completes
     // The STT worker just needs to ensure the transcript is properly formatted
@@ -232,7 +232,7 @@ export async function batchProcessingExample(projectId: string) {
         batch.map(async (segment) => {
           try {
             // Example: Process segment (replace with actual processing logic)
-            const result = await processSegment(segment);
+            await processSegment(segment);
 
             // Update Context Map with result
             await contextMapClient.updateSegment(projectId, segment.id, {
@@ -269,7 +269,7 @@ export async function batchProcessingExample(projectId: string) {
 }
 
 // Mock function for example
-async function processSegment(segment: any): Promise<any> {
+async function processSegment(_segment: any): Promise<any> {
   // Replace with actual processing logic
   return { processed: true };
 }

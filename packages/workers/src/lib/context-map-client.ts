@@ -5,7 +5,7 @@
  */
 
 import axios from 'axios';
-import { ContextMap, ContextMapSegment, EmotionTag, SegmentStatus } from '@shared/types';
+import type { ContextMap, ContextMapSegment, EmotionTag, SegmentStatus } from '../../../shared/src/types';
 import { logger } from './logger';
 
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:3001';

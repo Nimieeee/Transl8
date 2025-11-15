@@ -9,9 +9,8 @@
  */
 
 import { Wav2Vec2EmotionAdapter } from '../adapters/emotion-adapter';
-import { EmotionTag, EmotionAnalysisResult } from '../adapters/types';
+import { EmotionTag } from '../adapters/types';
 import { logger } from './logger';
-import path from 'path';
 import fs from 'fs';
 
 export interface EmotionSegmentInfo {
