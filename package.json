@@ -20,7 +20,6 @@
     "start:backend": "npm run start --workspace=@dubbing/backend",
     "start:workers": "npm run start --workspace=@dubbing/workers",
     "start:frontend": "npm run start --workspace=@dubbing/frontend",
-    "start:root": "node start-with-workers.js",
     "deploy:frontend": "cd packages/frontend && vercel --prod",
     "prisma:migrate": "npm run prisma:migrate:deploy --workspace=@dubbing/backend",
     "prisma:migrate:deploy": "npm run prisma:migrate:deploy --workspace=@dubbing/backend",
