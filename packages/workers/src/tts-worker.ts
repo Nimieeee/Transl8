@@ -4,6 +4,7 @@ import fs from 'fs';
 import path from 'path';
 import prisma from './lib/prisma';
 import { addJob } from './lib/queue';
+import { uploadToStorage } from './lib/storage';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -37,17 +38,18 @@ export async function processTts(job: Job) {
 
     const buffer = Buffer.from(await mp3.arrayBuffer());
 
-    // In a real scenario, upload 'buffer' to Supabase Storage or S3.
-    // For now, we'll simulate an upload or save locally if needed, but the original code
-    // just generated a fake URL. We will keep the fake URL logic but acknowledge the buffer exists.
-    // TODO: Implement actual upload to Supabase Storage
+    // Save buffer to temp file for upload
+    const tempFilePath = path.join('/tmp', `${projectId}_audio.mp3`);
+    fs.writeFileSync(tempFilePath, buffer);
 
-    const audioUrl = `https://storage.example.com/${projectId}/audio.mp3`;
+    // Upload to Supabase Storage
+    // WAIT: The previous plan said "Use the storage utility".
+    // I should check if I can import it or if I need to copy it to workers.
+    // The Dockerfile copies packages/backend/src/adapters to packages/backend/src/adapters.
+    // But workers/src/lib is where we are.
 
-    await prisma.project.update({
-      where: { id: projectId },
-      data: { audioUrl }
-    });
+    // Let's assume we need to implement/copy the storage logic to workers/src/lib/storage.ts first.
+    // I will abort this specific edit and create the file first.
 
     await prisma.job.updateMany({
       where: { projectId, stage: 'TTS' },
