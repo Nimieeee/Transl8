@@ -8,10 +8,10 @@ This guide details how to deploy the refactored `Transl8` application.
     *   Format: `postgres://[user]:[password]@[host]:[port]/[db]`
 3.  This will be your `DATABASE_URL`.
 
-## 2. Backend & Workers (Render)
-We will deploy the Backend and Workers as Docker services on Render.
+## 2. Backend & Workers (Render - Single Service)
+Since you are using the Render Free Tier, we will deploy the Backend and Workers as a **single service**.
 
-### Backend Service
+### Web Service
 1.  Create a new **Web Service** on Render.
 2.  Connect your repository.
 3.  Select **Docker** as the Runtime.
@@ -20,22 +20,14 @@ We will deploy the Backend and Workers as Docker services on Render.
 6.  **Environment Variables**:
     *   `DATABASE_URL`: (Your Supabase URL)
     *   `OPENAI_API_KEY`: (Your OpenAI API Key)
-    *   `PORT`: `3001` (Render usually sets this, but good to have)
-    *   `FRONTEND_URL`: (Your Vercel Frontend URL, e.g., `https://your-app.vercel.app`)
-
-### Workers Service
-1.  Create a new **Background Worker** on Render.
-2.  Connect your repository.
-3.  Select **Docker** as the Runtime.
-4.  **Root Directory**: `.`
-5.  **Dockerfile Path**: `packages/workers/Dockerfile`
-6.  **Environment Variables**:
-    *   `DATABASE_URL`: (Same as Backend)
-    *   `OPENAI_API_KEY`: (Same as Backend)
     *   `MISTRAL_API_KEY`: (Your Mistral API Key)
     *   `REDIS_HOST`: (Your Redis Host - Render Redis or external)
     *   `REDIS_PORT`: (Your Redis Port)
     *   `REDIS_PASSWORD`: (If applicable)
+    *   `PORT`: `3001`
+    *   `FRONTEND_URL`: (Your Vercel Frontend URL)
+
+**Note:** The `Dockerfile` is configured to build both the backend and workers, and the start command (`npm run start:with-workers`) runs them concurrently in the same container.
 
 ## 3. Frontend (Vercel)
 1.  Import the repository into Vercel.

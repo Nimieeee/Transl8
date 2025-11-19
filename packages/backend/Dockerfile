@@ -29,8 +29,11 @@ RUN npx prisma generate
 # Build the backend
 RUN npm run build
 
+# Build the workers
+RUN cd ../workers && npm run build
+
 # Expose port
 EXPOSE 3001
 
-# Start the server
-CMD ["npm", "start"]
+# Start the server with workers
+CMD ["npm", "run", "start:with-workers"]
