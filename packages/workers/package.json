@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\""
   },
   "dependencies": {
+    "@mistralai/mistralai": "^1.10.0",
     "@prisma/client": "^5.9.1",
     "@sentry/node": "^10.22.0",
     "@sentry/profiling-node": "^10.22.0",
@@ -19,6 +20,7 @@
     "dotenv": "^16.4.1",
     "fluent-ffmpeg": "^2.1.2",
     "ioredis": "^5.3.2",
+    "openai": "^4.28.0",
     "winston": "^3.11.0"
   },
   "devDependencies": {

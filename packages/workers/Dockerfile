@@ -1,6 +1,9 @@
 # Workers Service Dockerfile
 FROM node:20-alpine
 
+# Install dependencies required for ffmpeg and others
+RUN apk add --no-cache openssl ffmpeg
+
 WORKDIR /app
 
 # Copy package files
