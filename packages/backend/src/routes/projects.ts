@@ -2,7 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 import { authenticate, AuthRequest } from '../middleware/auth';
 import { asyncHandler, AppError } from '../middleware/error-handler';
-import prisma from '../lib/prisma';
+import supabase from '../lib/supabase';
 import { uploadToStorage } from '../lib/storage';
 
 const router = Router();
@@ -11,52 +11,66 @@ const upload = multer({ dest: 'uploads/' });
 router.use(authenticate);
 
 router.get('/', asyncHandler(async (req: AuthRequest, res: any) => {
-  const projects = await prisma.project.findMany({
-    where: { userId: req.userId },
-    orderBy: { createdAt: 'desc' }
-  });
+  const { data: projects, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('user_id', req.userId)
+    .order('created_at', { ascending: false });
+    
+  if (error) throw new AppError(500, 'Failed to fetch projects');
   res.json(projects);
 }));
 
 router.post('/', asyncHandler(async (req: AuthRequest, res: any) => {
   const { name, sourceLanguage, targetLanguage } = req.body;
   
-  const project = await prisma.project.create({
-    data: {
-      userId: req.userId!,
+  const { data: project, error } = await supabase
+    .from('projects')
+    .insert({
+      user_id: req.userId!,
       name,
-      sourceLanguage,
-      targetLanguage,
+      source_language: sourceLanguage,
+      target_language: targetLanguage,
       status: 'DRAFT'
-    }
-  });
-  
+    })
+    .select()
+    .single();
+    
+  if (error) throw new AppError(500, 'Failed to create project');
   res.json(project);
 }));
 
 router.get('/:id', asyncHandler(async (req: AuthRequest, res: any) => {
-  const project = await prisma.project.findFirst({
-    where: { id: req.params.id, userId: req.userId }
-  });
+  const { data: project, error } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('id', req.params.id)
+    .eq('user_id', req.userId)
+    .single();
   
-  if (!project) throw new AppError(404, 'Project not found');
+  if (error || !project) throw new AppError(404, 'Project not found');
   res.json(project);
 }));
 
 router.post('/:id/upload', upload.single('video'), asyncHandler(async (req: AuthRequest, res: any) => {
-  const project = await prisma.project.findFirst({
-    where: { id: req.params.id, userId: req.userId }
-  });
+  const { data: project, error: fetchError } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('id', req.params.id)
+    .eq('user_id', req.userId)
+    .single();
   
-  if (!project) throw new AppError(404, 'Project not found');
+  if (fetchError || !project) throw new AppError(404, 'Project not found');
   if (!req.file) throw new AppError(400, 'No file uploaded');
 
   const videoUrl = await uploadToStorage(req.file.path, `projects/${project.id}/video`);
   
-  await prisma.project.update({
-    where: { id: project.id },
-    data: { videoUrl, status: 'UPLOADING' }
-  });
+  const { error: updateError } = await supabase
+    .from('projects')
+    .update({ video_url: videoUrl, status: 'UPLOADING' })
+    .eq('id', project.id);
+    
+  if (updateError) throw new AppError(500, 'Failed to update project');
 
   res.json({ videoUrl });
 }));

@@ -1,20 +1,22 @@
 import { Job } from 'bullmq';
 import ffmpeg from 'fluent-ffmpeg';
-import prisma from './lib/prisma';
+import supabase from './lib/supabase';
 
 export async function processMuxing(job: Job) {
   const { projectId } = job.data;
 
-  await prisma.job.create({
-    data: { projectId, stage: 'MUXING', status: 'PROCESSING' }
-  });
+  await supabase
+    .from('jobs')
+    .insert({ project_id: projectId, stage: 'MUXING', status: 'PROCESSING' });
 
   try {
-    const project = await prisma.project.findUnique({
-      where: { id: projectId }
-    });
+    const { data: project } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('id', projectId)
+      .single();
 
-    if (!project || !project.videoUrl || !project.audioUrl) {
+    if (!project || !project.video_url || !project.audio_url) {
       throw new Error('Missing video or audio');
     }
 
@@ -22,8 +24,8 @@ export async function processMuxing(job: Job) {
 
     await new Promise((resolve, reject) => {
       ffmpeg()
-        .input(project.videoUrl!)
-        .input(project.audioUrl!)
+        .input(project.video_url!)
+        .input(project.audio_url!)
         .outputOptions('-c:v copy')
         .outputOptions('-c:a aac')
         .outputOptions('-map 0:v:0')
@@ -35,29 +37,31 @@ export async function processMuxing(job: Job) {
 
     const outputVideoUrl = `https://storage.example.com/${projectId}/output.mp4`;
 
-    await prisma.project.update({
-      where: { id: projectId },
-      data: { 
-        outputVideoUrl,
+    await supabase
+      .from('projects')
+      .update({ 
+        output_video_url: outputVideoUrl,
         status: 'COMPLETED'
-      }
-    });
+      })
+      .eq('id', projectId);
 
-    await prisma.job.updateMany({
-      where: { projectId, stage: 'MUXING' },
-      data: { status: 'COMPLETED', progress: 100 }
-    });
+    await supabase
+      .from('jobs')
+      .update({ status: 'COMPLETED', progress: 100 })
+      .eq('project_id', projectId)
+      .eq('stage', 'MUXING');
 
   } catch (error: any) {
-    await prisma.job.updateMany({
-      where: { projectId, stage: 'MUXING' },
-      data: { status: 'FAILED', errorMessage: error.message }
-    });
+    await supabase
+      .from('jobs')
+      .update({ status: 'FAILED', error_message: error.message })
+      .eq('project_id', projectId)
+      .eq('stage', 'MUXING');
     
-    await prisma.project.update({
-      where: { id: projectId },
-      data: { status: 'FAILED' }
-    });
+    await supabase
+      .from('projects')
+      .update({ status: 'FAILED' })
+      .eq('id', projectId);
     
     throw error;
   }

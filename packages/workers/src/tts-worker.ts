@@ -2,7 +2,7 @@ import { Job } from 'bullmq';
 import OpenAI from 'openai';
 import fs from 'fs';
 import path from 'path';
-import prisma from './lib/prisma';
+import supabase from './lib/supabase';
 import { addJob } from './lib/queue';
 import { uploadToStorage } from './lib/storage';
 
@@ -13,21 +13,27 @@ const openai = new OpenAI({
 export async function processTts(job: Job) {
   const { projectId } = job.data;
 
-  await prisma.job.create({
-    data: { projectId, stage: 'TTS', status: 'PROCESSING' }
-  });
+  await supabase
+    .from('jobs')
+    .insert({ project_id: projectId, stage: 'TTS', status: 'PROCESSING' });
 
   try {
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-      include: { translations: true }
-    });
+    const { data: project } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('id', projectId)
+      .single();
 
-    if (!project || !project.translations[0]) {
+    const { data: translations } = await supabase
+      .from('translations')
+      .select('*')
+      .eq('project_id', projectId);
+
+    if (!project || !translations || translations.length === 0) {
       throw new Error('No translation found');
     }
 
-    const text = JSON.stringify(project.translations[0].content); // Ensure this extracts the actual text properly
+    const text = JSON.stringify(translations[0].content);
 
     // Call TTS API (OpenAI TTS)
     const mp3 = await openai.audio.speech.create({
@@ -51,19 +57,21 @@ export async function processTts(job: Job) {
     // Let's assume we need to implement/copy the storage logic to workers/src/lib/storage.ts first.
     // I will abort this specific edit and create the file first.
 
-    await prisma.job.updateMany({
-      where: { projectId, stage: 'TTS' },
-      data: { status: 'COMPLETED', progress: 100 }
-    });
+    await supabase
+      .from('jobs')
+      .update({ status: 'COMPLETED', progress: 100 })
+      .eq('project_id', projectId)
+      .eq('stage', 'TTS');
 
     await addJob('muxing', { projectId });
 
   } catch (error: any) {
     console.error('TTS Error:', error);
-    await prisma.job.updateMany({
-      where: { projectId, stage: 'TTS' },
-      data: { status: 'FAILED', errorMessage: error.message }
-    });
+    await supabase
+      .from('jobs')
+      .update({ status: 'FAILED', error_message: error.message })
+      .eq('project_id', projectId)
+      .eq('stage', 'TTS');
     throw error;
   }
 }

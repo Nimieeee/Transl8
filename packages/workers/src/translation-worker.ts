@@ -1,6 +1,6 @@
 import { Job } from 'bullmq';
 import { Mistral } from '@mistralai/mistralai';
-import prisma from './lib/prisma';
+import supabase from './lib/supabase';
 import { addJob } from './lib/queue';
 
 const mistral = new Mistral({
@@ -12,21 +12,27 @@ const MAX_RETRIES = 3;
 export async function processTranslation(job: Job) {
   const { projectId } = job.data;
 
-  await prisma.job.create({
-    data: { projectId, stage: 'MT', status: 'PROCESSING' }
-  });
+  await supabase
+    .from('jobs')
+    .insert({ project_id: projectId, stage: 'MT', status: 'PROCESSING' });
 
   try {
-    const project = await prisma.project.findUnique({
-      where: { id: projectId },
-      include: { transcripts: true }
-    });
+    const { data: project } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('id', projectId)
+      .single();
 
-    if (!project || !project.transcripts[0]) {
+    const { data: transcripts } = await supabase
+      .from('transcripts')
+      .select('*')
+      .eq('project_id', projectId);
+
+    if (!project || !transcripts || transcripts.length === 0) {
       throw new Error('No transcript found');
     }
 
-    const transcript = project.transcripts[0];
+    const transcript = transcripts[0];
     let attempts = 0;
     let translationContent: any = null;
     let lastError: any = null;
@@ -44,7 +50,7 @@ export async function processTranslation(job: Job) {
             content: 'You are an expert translator and dubbing adapter. Your task is to translate the content and adapt it for dubbing, ensuring natural flow and matching the approximate duration of the original speech where possible. Return ONLY valid JSON.'
           }, {
             role: 'user',
-            content: `Translate this from ${project.sourceLanguage} to ${project.targetLanguage}: ${JSON.stringify(transcript.content)}`
+            content: `Translate this from ${project.source_language} to ${project.target_language}: ${JSON.stringify(transcript.content)}`
           }],
           responseFormat: { type: 'json_object' }
         });
@@ -83,41 +89,44 @@ export async function processTranslation(job: Job) {
     }
 
     // Save metrics (optional, based on schema)
-    await prisma.adaptationMetrics.create({
-      data: {
-        projectId,
-        languagePair: `${project.sourceLanguage}-${project.targetLanguage}`,
-        totalSegments: 0, // TODO: Calculate from content
-        successfulSegments: 0, // TODO: Calculate
-        failedSegments: 0,
-        successRate: 100,
-        averageAttempts: attempts,
-        validationFailureReasons: lastError ? { error: lastError.message } : {},
-      }
-    }).catch(err => console.error('Failed to save metrics:', err));
+    await supabase
+      .from('adaptation_metrics')
+      .insert({
+        project_id: projectId,
+        language_pair: `${project.source_language}-${project.target_language}`,
+        total_segments: 0,
+        successful_segments: 0,
+        failed_segments: 0,
+        success_rate: 100,
+        average_attempts: attempts,
+        validation_failure_reasons: lastError ? { error: lastError.message } : {},
+      })
+      .catch(err => console.error('Failed to save metrics:', err));
 
-    await prisma.translation.create({
-      data: {
-        projectId,
-        targetLanguage: project.targetLanguage,
+    await supabase
+      .from('translations')
+      .insert({
+        project_id: projectId,
+        target_language: project.target_language,
         content: translationContent,
         approved: false
-      }
-    });
+      });
 
-    await prisma.job.updateMany({
-      where: { projectId, stage: 'MT' },
-      data: { status: 'COMPLETED', progress: 100 }
-    });
+    await supabase
+      .from('jobs')
+      .update({ status: 'COMPLETED', progress: 100 })
+      .eq('project_id', projectId)
+      .eq('stage', 'MT');
 
     await addJob('tts', { projectId });
 
   } catch (error: any) {
     console.error('Translation Error:', error);
-    await prisma.job.updateMany({
-      where: { projectId, stage: 'MT' },
-      data: { status: 'FAILED', errorMessage: error.message }
-    });
+    await supabase
+      .from('jobs')
+      .update({ status: 'FAILED', error_message: error.message })
+      .eq('project_id', projectId)
+      .eq('stage', 'MT');
     throw error;
   }
 }

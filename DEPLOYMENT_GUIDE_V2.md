@@ -29,6 +29,13 @@ Since you are using the Render Free Tier, we will deploy the Backend and Workers
 
 **Note:** The `Dockerfile` is configured to build both the backend and workers, and the start command (`npm run start:with-workers`) runs them concurrently in the same container.
 
+### Option B: Node Runtime (Alternative)
+If you prefer to use the **Node** runtime instead of Docker:
+1.  **Runtime**: Node
+2.  **Build Command**: `npm install && npm run build:backend && npm run build:workers`
+3.  **Start Command**: `node packages/backend/start-with-workers.js`
+4.  **Environment Variables**: Same as above.
+
 ## 3. Frontend (Vercel)
 1.  Import the repository into Vercel.
 2.  **Framework Preset**: Next.js

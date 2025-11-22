@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import axios from 'axios';
 import fs from 'fs';
 import path from 'path';
-import prisma from './lib/prisma';
+import supabase from './lib/supabase';
 import { addJob } from './lib/queue';
 
 const openai = new OpenAI({
@@ -13,9 +13,9 @@ const openai = new OpenAI({
 export async function processStt(job: Job) {
   const { projectId, videoUrl } = job.data;
 
-  await prisma.job.create({
-    data: { projectId, stage: 'STT', status: 'PROCESSING' }
-  });
+  await supabase
+    .from('jobs')
+    .insert({ project_id: projectId, stage: 'STT', status: 'PROCESSING' });
 
   const tempFilePath = path.join('/tmp', `${projectId}_input.mp4`);
 
@@ -36,28 +36,30 @@ export async function processStt(job: Job) {
       model: 'whisper-1',
     });
 
-    await prisma.transcript.create({
-      data: {
-        projectId,
-        content: transcription as any, // Cast to any to match Json type if needed, or structure it
+    await supabase
+      .from('transcripts')
+      .insert({
+        project_id: projectId,
+        content: transcription as any,
         approved: false
-      }
-    });
+      });
 
-    await prisma.job.updateMany({
-      where: { projectId, stage: 'STT' },
-      data: { status: 'COMPLETED', progress: 100 }
-    });
+    await supabase
+      .from('jobs')
+      .update({ status: 'COMPLETED', progress: 100 })
+      .eq('project_id', projectId)
+      .eq('stage', 'STT');
 
     // Trigger next stage
     await addJob('translation', { projectId });
 
   } catch (error: any) {
     console.error('STT Error:', error);
-    await prisma.job.updateMany({
-      where: { projectId, stage: 'STT' },
-      data: { status: 'FAILED', errorMessage: error.message }
-    });
+    await supabase
+      .from('jobs')
+      .update({ status: 'FAILED', error_message: error.message })
+      .eq('project_id', projectId)
+      .eq('stage', 'STT');
     throw error;
   } finally {
     // Cleanup

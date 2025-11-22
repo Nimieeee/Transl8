@@ -1,51 +1,20 @@
 services:
-  # Backend API
+  # Backend + Workers (Combined for Free Tier)
   - type: web
-    name: transl8-backend
+    name: transl8-app
     env: node
     region: oregon
-    plan: starter
-    buildCommand: cd packages/backend && npm install && npx prisma generate && npm run build
-    startCommand: cd packages/backend && node dist/index.js
+    plan: free
+    buildCommand: npm install && cd packages/backend && npm install && npm run build && cd ../workers && npm install && npm run build
+    startCommand: cd packages/backend && npm run start:with-workers
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 8080
-      - key: DATABASE_URL
+      - key: SUPABASE_URL
         sync: false
-      - key: REDIS_HOST
-        sync: false
-      - key: REDIS_PORT
-        value: 6379
-      - key: JWT_SECRET
-        sync: false
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: AWS_ACCESS_KEY_ID
-        sync: false
-      - key: AWS_SECRET_ACCESS_KEY
-        sync: false
-      - key: AWS_REGION
-        value: us-east-1
-      - key: S3_BUCKET
-        sync: false
-      - key: FRONTEND_URL
-        sync: false
-    healthCheckPath: /health
-
-  # Workers
-  - type: worker
-    name: transl8-workers
-    env: node
-    region: oregon
-    plan: starter
-    buildCommand: cd packages/workers && npm install && npm run build
-    startCommand: cd packages/workers && node dist/index.js
-    envVars:
-      - key: NODE_ENV
-        value: production
-      - key: DATABASE_URL
+      - key: SUPABASE_SERVICE_KEY
         sync: false
       - key: REDIS_HOST
         sync: false
@@ -53,5 +22,12 @@ services:
         value: 6379
       - key: REDIS_PASSWORD
         sync: false
+      - key: JWT_SECRET
+        sync: false
       - key: OPENAI_API_KEY
         sync: false
+      - key: MISTRAL_API_KEY
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+    healthCheckPath: /health

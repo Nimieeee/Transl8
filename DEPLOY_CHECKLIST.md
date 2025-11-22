@@ -1,193 +1,219 @@
 # Deployment Checklist
 
-Quick checklist to deploy to Render + Vercel + Supabase.
-
-## Pre-Deployment
-
-- [ ] Code is pushed to GitHub
-- [ ] All builds pass locally
-- [ ] Environment variables are documented
-
-## 1. Supabase Setup (5 minutes)
-
-- [ ] Create Supabase project
-- [ ] Set database password (save it!)
-- [ ] Run `supabase-schema.sql` in SQL Editor
-- [ ] Copy connection string (Transaction mode)
-- [ ] Format: `postgresql://postgres.xxx:[PASSWORD]@...pooler.supabase.com:6543/postgres?pgbouncer=true`
-
-## 2. Upstash Redis Setup (3 minutes)
-
-- [ ] Create Upstash account
-- [ ] Create new Redis database
-- [ ] Copy connection details:
-  - REDIS_HOST: `xxx.upstash.io`
-  - REDIS_PORT: `6379`
-  - REDIS_PASSWORD: (from dashboard)
-
-## 3. AWS S3 Setup (5 minutes)
-
-- [ ] Create S3 bucket (e.g., `transl8-videos`)
-- [ ] Uncheck "Block all public access"
-- [ ] Create IAM user with S3 access
-- [ ] Save Access Key ID and Secret Access Key
-- [ ] Add CORS policy to bucket
-
-## 4. Get API Keys (2 minutes)
-
-- [ ] OpenAI API key from https://platform.openai.com/api-keys
-- [ ] Generate JWT secret (32+ random characters)
-
-## 5. Deploy Backend to Render (10 minutes)
-
-- [ ] Go to Render.com → New Web Service
-- [ ] Connect GitHub repository
-- [ ] Configure:
-  - Name: `transl8-backend`
-  - Build: `cd packages/backend && npm install && npx prisma generate && npm run build`
-  - Start: `cd packages/backend && node dist/index.js`
-  - Plan: Starter
-
-- [ ] Add environment variables:
-```bash
-NODE_ENV=production
-PORT=8080
-DATABASE_URL=<supabase-connection-string>
-REDIS_HOST=<upstash-host>
-REDIS_PORT=6379
-REDIS_PASSWORD=<upstash-password>
-JWT_SECRET=<random-32-char-string>
-OPENAI_API_KEY=<openai-key>
-AWS_ACCESS_KEY_ID=<aws-key>
-AWS_SECRET_ACCESS_KEY=<aws-secret>
-AWS_REGION=us-east-1
-S3_BUCKET=<your-bucket-name>
-FRONTEND_URL=https://your-app.vercel.app
-```
-
-- [ ] Deploy and wait
-- [ ] Test: `curl https://transl8-backend.onrender.com/health`
-
-## 6. Deploy Workers to Render (5 minutes)
-
-- [ ] Go to Render.com → New Background Worker
-- [ ] Connect same repository
-- [ ] Configure:
-  - Name: `transl8-workers`
-  - Build: `cd packages/workers && npm install && npm run build`
-  - Start: `cd packages/workers && node dist/index.js`
-  - Plan: Starter
-
-- [ ] Add environment variables:
-```bash
-NODE_ENV=production
-DATABASE_URL=<supabase-connection-string>
-REDIS_HOST=<upstash-host>
-REDIS_PORT=6379
-REDIS_PASSWORD=<upstash-password>
-OPENAI_API_KEY=<openai-key>
-```
-
-- [ ] Deploy and check logs
-
-## 7. Deploy Frontend to Vercel (5 minutes)
-
-- [ ] Go to Vercel.com → New Project
-- [ ] Import GitHub repository
-- [ ] Configure:
-  - Framework: Next.js
-  - Root Directory: `packages/frontend`
-  - Build Command: `npm run build`
-
-- [ ] Add environment variable:
-```bash
-NEXT_PUBLIC_API_URL=https://transl8-backend.onrender.com/api
-```
-
-- [ ] Deploy
-- [ ] Copy Vercel URL
-
-## 8. Update Backend FRONTEND_URL (2 minutes)
-
-- [ ] Go back to Render backend service
-- [ ] Update `FRONTEND_URL` to your Vercel URL
-- [ ] Redeploy backend
-
-## 9. Test Everything (5 minutes)
-
-- [ ] Open Vercel URL
-- [ ] Sign up with test account
-- [ ] Create a project
-- [ ] Upload a small video
-- [ ] Check Render logs for processing
-- [ ] Verify video processes successfully
-
-## 10. Post-Deployment
-
-- [ ] Set up custom domains (optional)
-- [ ] Configure monitoring
-- [ ] Set up backups
-- [ ] Document any issues
+Quick checklist to deploy your app to Render free tier with Supabase.
 
 ---
 
-## Quick Reference
+## Prerequisites
 
-### Backend URL
-`https://transl8-backend.onrender.com`
+- [ ] GitHub account with code pushed
+- [ ] Supabase account
+- [ ] Upstash account  
+- [ ] Render account
+- [ ] Vercel account
+- [ ] OpenAI API key
 
-### Frontend URL
-`https://your-app.vercel.app`
+---
 
-### Database
-Supabase Dashboard → Your Project
+## 1. Supabase Setup (5 min)
 
-### Redis
-Upstash Dashboard → Your Database
+- [ ] Create new Supabase project
+- [ ] Copy Project URL
+- [ ] Copy service_role key (NOT anon key!)
+- [ ] Go to SQL Editor
+- [ ] Run `supabase-schema.sql`
+- [ ] Verify tables created in Table Editor
+- [ ] Create storage buckets: `videos`, `audio`, `thumbnails`
 
-### Storage
-AWS S3 Console → Your Bucket
+---
+
+## 2. Upstash Redis Setup (2 min)
+
+- [ ] Create new Redis database
+- [ ] Copy endpoint (e.g., `xxx.upstash.io`)
+- [ ] Copy password
+- [ ] Note: Port is always `6379`
+
+---
+
+## 3. Generate JWT Secret (1 min)
+
+Run in terminal:
+```bash
+openssl rand -base64 32
+```
+
+- [ ] Copy the output
+
+---
+
+## 4. Deploy to Render (10 min)
+
+- [ ] Go to Render dashboard
+- [ ] Click "New +" → "Web Service"
+- [ ] Connect GitHub repo
+- [ ] Name: `transl8-app`
+- [ ] Runtime: Node
+- [ ] Build command:
+  ```
+  npm install && cd packages/backend && npm install && npm run build && cd ../workers && npm install && npm run build
+  ```
+- [ ] Start command:
+  ```
+  cd packages/backend && npm run start:with-workers
+  ```
+- [ ] Plan: **Free**
+- [ ] Add environment variables (see below)
+- [ ] Click "Create Web Service"
+- [ ] Wait for deployment
+- [ ] Test: `curl https://your-app.onrender.com/health`
+
+### Environment Variables for Render
+
+```bash
+NODE_ENV=production
+PORT=8080
+SUPABASE_URL=https://xxx.supabase.co
+SUPABASE_SERVICE_KEY=your-service-role-key
+REDIS_HOST=xxx.upstash.io
+REDIS_PORT=6379
+REDIS_PASSWORD=your-redis-password
+JWT_SECRET=your-generated-secret
+OPENAI_API_KEY=sk-proj-your-key
+MISTRAL_API_KEY=your-mistral-key
+FRONTEND_URL=https://your-app.vercel.app
+```
+
+---
+
+## 5. Deploy Frontend to Vercel (5 min)
+
+- [ ] Go to Vercel dashboard
+- [ ] Click "Add New" → "Project"
+- [ ] Import GitHub repo
+- [ ] Framework: Next.js
+- [ ] Root Directory: `packages/frontend`
+- [ ] Add environment variable:
+  ```
+  NEXT_PUBLIC_API_URL=https://your-app.onrender.com
+  ```
+- [ ] Click "Deploy"
+- [ ] Wait for deployment
+- [ ] Copy your Vercel URL
+
+---
+
+## 6. Update Backend with Frontend URL
+
+- [ ] Go back to Render dashboard
+- [ ] Open your `transl8-app` service
+- [ ] Click "Environment"
+- [ ] Update `FRONTEND_URL` to your Vercel URL
+- [ ] Click "Save Changes" (will trigger redeploy)
+
+---
+
+## 7. Test Everything (5 min)
+
+### Test Backend Health
+```bash
+curl https://your-app.onrender.com/health
+```
+
+Expected: `{"status":"ok","timestamp":"..."}`
+
+### Test Registration
+```bash
+curl -X POST https://your-app.onrender.com/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"test123"}'
+```
+
+Expected: `{"token":"...","user":{...}}`
+
+### Check Supabase
+- [ ] Go to Supabase Table Editor
+- [ ] Open `users` table
+- [ ] Verify test user exists
+
+### Test Frontend
+- [ ] Open your Vercel URL
+- [ ] Try to register/login
+- [ ] Check if UI loads correctly
+
+---
+
+## 8. Optional: Keep Warm (2 min)
+
+To prevent cold starts:
+
+- [ ] Go to https://uptimerobot.com
+- [ ] Create free account
+- [ ] Add monitor:
+  - Type: HTTP(s)
+  - URL: `https://your-app.onrender.com/health`
+  - Interval: 5 minutes
+- [ ] Save
 
 ---
 
 ## Troubleshooting
 
 ### Backend won't start
-- Check Render logs
-- Verify DATABASE_URL format
-- Test Redis connection
+- Check Render logs for errors
+- Verify all environment variables are set
+- Make sure SUPABASE_SERVICE_KEY is the service_role key
 
-### Workers not processing
-- Check worker logs
-- Verify OPENAI_API_KEY
-- Check Redis connection
+### "Connection refused" errors
+- Check Redis credentials
+- Verify REDIS_HOST doesn't include `redis://` prefix
+- Test Redis connection in Upstash dashboard
 
 ### Frontend can't connect
-- Verify NEXT_PUBLIC_API_URL
-- Check CORS (FRONTEND_URL in backend)
-- Check backend is running
+- Verify NEXT_PUBLIC_API_URL in Vercel
+- Check FRONTEND_URL in Render
+- Look for CORS errors in browser console
+
+### Workers not processing
+- Check Render logs for "✅ Backend and workers started"
+- Verify OPENAI_API_KEY is valid
+- Check Redis connection
 
 ---
 
-## Costs
+## You're Done! 🎉
 
-- Render Backend: $7/month
-- Render Workers: $7/month
-- Vercel: Free
-- Supabase: Free (up to 500MB)
-- Upstash: Free (10K commands/day)
-- AWS S3: ~$1-5/month
+Your app is now deployed on:
+- ✅ Render (backend + workers)
+- ✅ Vercel (frontend)
+- ✅ Supabase (database + storage)
+- ✅ Upstash (Redis queue)
 
-**Total: ~$15-20/month**
+**Total cost: $0/month**
+
+### Important Notes
+
+- First request after 15 min will be slow (cold start)
+- Free tier is for testing/demos only
+- Monitor usage in each dashboard
+- Upgrade to paid plans when ready for production
+
+### URLs to Bookmark
+
+- Backend: `https://your-app.onrender.com`
+- Frontend: `https://your-app.vercel.app`
+- Supabase: `https://app.supabase.com`
+- Upstash: `https://console.upstash.com`
+- Render: `https://dashboard.render.com`
 
 ---
 
-## Support
+## Next Steps
 
-Full guide: `DEPLOYMENT_GUIDE.md`
+1. Test video upload and processing
+2. Monitor logs for errors
+3. Check Supabase storage usage
+4. Monitor Redis command usage
+5. Plan for scaling when needed
 
-Need help? Check:
-- Render logs
-- Vercel deployment logs
-- Supabase logs
-- Browser console
+See `DEPLOY_SUPABASE_RENDER.md` for detailed instructions!
