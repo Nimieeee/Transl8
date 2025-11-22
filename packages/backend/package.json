@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "prisma generate && tsc",
+    "build": "tsc",
     "start": "node dist/index.js",
     "start:with-workers": "node start-with-workers.js",
     "start:dev": "tsx src/index.ts",
@@ -31,13 +31,9 @@
     "process-grace-periods": "tsx scripts/process-grace-periods.ts",
     "cleanup-expired": "tsx scripts/cleanup-expired-videos.ts"
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.922.0",
     "@aws-sdk/s3-request-presigner": "^3.922.0",
-    "@prisma/client": "^5.9.1",
     "@sentry/node": "^10.22.0",
     "@sentry/profiling-node": "^10.22.0",
     "@supabase/supabase-js": "^2.81.1",
@@ -79,7 +75,6 @@
     "@types/uuid": "^10.0.0",
     "@types/ws": "^8.18.1",
     "jest": "^30.2.0",
-    "prisma": "^5.9.1",
     "supertest": "^7.1.4",
     "ts-jest": "^29.4.5"
   }
