@@ -27,7 +27,7 @@ export default function Home() {
           {/* Logo/Brand */}
           <div className={`text-center mb-12 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
             <div className="inline-block relative">
-              <h1 className="text-8xl md:text-9xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-[#ff3366] via-[#00d9ff] to-[#ffcc00] mb-4">
+              <h1 className="text-8xl md:text-9xl font-black tracking-tighter text-white mb-4">
                 TRANSL8
               </h1>
               <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[#ff3366] via-[#00d9ff] to-[#ffcc00] rounded-full" />

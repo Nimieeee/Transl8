@@ -19,6 +19,21 @@
   --glow-secondary: rgba(0, 217, 255, 0.3);
 }
 
+[data-theme="light"] {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8f9fa;
+  --bg-tertiary: #f0f1f3;
+  --accent-primary: #ff3366;
+  --accent-secondary: #00d9ff;
+  --accent-tertiary: #ffcc00;
+  --text-primary: #0a0a0f;
+  --text-secondary: #4a4a5e;
+  --text-muted: #8b8b9f;
+  --border-color: #e0e0e8;
+  --glow-primary: rgba(255, 51, 102, 0.2);
+  --glow-secondary: rgba(0, 217, 255, 0.2);
+}
+
 * {
   box-sizing: border-box;
   margin: 0;

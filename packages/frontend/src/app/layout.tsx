@@ -1,4 +1,5 @@
 import './globals.css';
+import ThemeToggle from '@/components/ThemeToggle';
 
 export const metadata = {
   title: 'TRANSL8 — AI Video Dubbing Studio',
@@ -12,7 +13,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <ThemeToggle />
+        {children}
+      </body>
     </html>
   );
 }

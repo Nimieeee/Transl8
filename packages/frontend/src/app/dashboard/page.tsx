@@ -86,17 +86,17 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen relative">
       {/* Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#2a2a38_1px,transparent_1px),linear-gradient(to_bottom,#2a2a38_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--border-color)_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
       
       {/* Header */}
-      <div className="relative z-10 border-b border-[#2a2a38] bg-[#0a0a0f]/80 backdrop-blur-xl">
+      <div className="relative z-10 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-4xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-[#ff3366] to-[#00d9ff]">
+              <h1 className="text-4xl font-black tracking-tight text-white">
                 STUDIO
               </h1>
-              <p className="text-[#6b6b7f] mt-1 font-mono text-sm">
+              <p className="text-[var(--text-muted)] mt-1 font-mono text-sm">
                 {projects.length} {projects.length === 1 ? 'project' : 'projects'}
               </p>
             </div>
@@ -284,9 +284,14 @@ export default function Dashboard() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-fade-in">
           <div 
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={() => setShowDeleteConfirm(false)}
+            onClick={() => {
+              if (deletingId === null) {
+                setShowDeleteConfirm(false);
+                setProjectToDelete(null);
+              }
+            }}
           />
-          <div className="relative bg-[#13131a] border border-red-500/30 rounded-3xl max-w-md w-full p-8 animate-slide-up">
+          <div className="relative bg-[#13131a] border border-red-500/30 rounded-3xl max-w-md w-full p-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-6">
               <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/30">
                 <Trash2 className="w-6 h-6 text-red-400" />
@@ -300,7 +305,12 @@ export default function Dashboard() {
             </p>
             <div className="flex gap-3">
               <button
-                onClick={confirmDelete}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  confirmDelete();
+                }}
                 disabled={deletingId !== null}
                 className="flex-1 py-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl font-bold text-white hover:scale-105 transition-transform duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
@@ -317,7 +327,15 @@ export default function Dashboard() {
                 )}
               </button>
               <button
-                onClick={() => setShowDeleteConfirm(false)}
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (deletingId === null) {
+                    setShowDeleteConfirm(false);
+                    setProjectToDelete(null);
+                  }
+                }}
                 disabled={deletingId !== null}
                 className="flex-1 py-3 bg-[#1a1a24] border border-[#2a2a38] rounded-xl font-bold text-[#a0a0b8] hover:border-[#6b6b7f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
