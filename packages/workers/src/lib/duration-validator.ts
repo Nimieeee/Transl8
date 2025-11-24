@@ -134,13 +134,12 @@ Original text: "${text}"
     const difference = actual - target;
     const toleranceSeconds = target * this.tolerance;
     
-    // Translation must be equal to or SHORTER than target, never longer
-    // Allow up to tolerance% shorter, but 0% longer
-    const isValid = difference <= 0 && Math.abs(difference) <= toleranceSeconds;
+    // Allow ±5% tolerance (can be slightly shorter or slightly longer)
+    const isValid = Math.abs(difference) <= toleranceSeconds;
 
     console.log(
       `Validation: ${actual.toFixed(2)}s vs ${target.toFixed(2)}s ` +
-      `(must be ≤ target, tolerance: -${toleranceSeconds.toFixed(2)}s) - ${isValid ? 'PASS' : 'FAIL'}`
+      `(tolerance: ±${toleranceSeconds.toFixed(2)}s) - ${isValid ? 'PASS' : 'FAIL'}`
     );
 
     return { isValid, difference };
@@ -150,26 +149,24 @@ Original text: "${text}"
     const absDiff = Math.abs(difference);
 
     if (difference > 0) {
-      // Too long - CRITICAL, must fix
+      // Too long
       return (
-        `CRITICAL: Your translation was ${absDiff.toFixed(2)} seconds TOO LONG. ` +
-        `The translation MUST NOT exceed the original duration. ` +
+        `Your translation was ${absDiff.toFixed(2)} seconds TOO LONG. ` +
         `Please condense the text by:\n` +
         `- Using shorter synonyms\n` +
-        `- Removing ALL filler words\n` +
-        `- Making sentences very concise\n` +
-        `- Eliminating redundancy\n` +
-        `- Speaking faster/more efficiently`
+        `- Removing filler words\n` +
+        `- Making sentences more concise\n` +
+        `- Eliminating redundancy`
       );
     } else {
-      // Too short - acceptable if within tolerance, but try to get closer
+      // Too short
       return (
-        `Your translation was ${absDiff.toFixed(2)} seconds shorter than target. ` +
-        `Try to get closer to the target duration by:\n` +
-        `- Adding natural pauses\n` +
-        `- Using slightly more descriptive phrases\n` +
-        `- Speaking at a natural pace\n` +
-        `Note: Being shorter is acceptable, but closer is better for lip-sync.`
+        `Your translation was ${absDiff.toFixed(2)} seconds TOO SHORT. ` +
+        `Please extend the text by:\n` +
+        `- Adding natural filler words\n` +
+        `- Using more descriptive phrases\n` +
+        `- Adding brief pauses or interjections\n` +
+        `- Being slightly more verbose`
       );
     }
   }
