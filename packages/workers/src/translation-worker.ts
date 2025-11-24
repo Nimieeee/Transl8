@@ -44,7 +44,7 @@ export async function processTranslation(job: Job) {
 
         // Call translation API (using Mistral)
         const completion = await mistral.chat.complete({
-          model: 'mistral-large-latest',
+          model: 'mistral-small-latest',
           messages: [{
             role: 'system',
             content: 'You are an expert translator and dubbing adapter. Your task is to translate the content and adapt it for dubbing, ensuring natural flow and matching the approximate duration of the original speech where possible. Return ONLY valid JSON.'
