@@ -17,7 +17,11 @@ Run this SQL in your Supabase dashboard to make `user_id` nullable.
 ### 2. Copy and Paste This SQL
 
 ```sql
--- Make user_id nullable in projects table
+-- Enable UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Fix projects table: auto-generate IDs and allow nullable user_id
+ALTER TABLE "projects" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
 ALTER TABLE "projects" DROP CONSTRAINT IF EXISTS "projects_user_id_fkey";
 ALTER TABLE "projects" ALTER COLUMN "user_id" DROP NOT NULL;
 ALTER TABLE "projects" 
@@ -26,7 +30,9 @@ FOREIGN KEY ("user_id") REFERENCES "users"("id")
 ON DELETE CASCADE 
 ON UPDATE CASCADE;
 
--- Also fix dubbing_jobs
+-- Fix all other tables to auto-generate UUIDs
+ALTER TABLE "users" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "dubbing_jobs" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
 ALTER TABLE "dubbing_jobs" DROP CONSTRAINT IF EXISTS "dubbing_jobs_user_id_fkey";
 ALTER TABLE "dubbing_jobs" ALTER COLUMN "user_id" DROP NOT NULL;
 ALTER TABLE "dubbing_jobs" 
@@ -34,6 +40,21 @@ ADD CONSTRAINT "dubbing_jobs_user_id_fkey"
 FOREIGN KEY ("user_id") REFERENCES "users"("id") 
 ON DELETE CASCADE 
 ON UPDATE CASCADE;
+
+ALTER TABLE "transcripts" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "translations" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "voice_clones" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "jobs" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "glossaries" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "context_maps" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "adaptation_metrics" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "audio_quality_metrics" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "sync_quality_metrics" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "support_tickets" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "support_ticket_messages" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "abuse_reports" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "feedback" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "analytics_events" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
 ```
 
 ### 3. Click "Run" (or press Cmd/Ctrl + Enter)
