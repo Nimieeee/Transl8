@@ -109,7 +109,7 @@ export default function ProjectPage() {
       
       {/* Header */}
       <div className="relative z-10 border-b border-[#2a2a38] bg-[#0a0a0f]/80 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-6 pl-16 lg:pl-4">
           <button
             onClick={() => router.push('/dashboard')}
             className="flex items-center gap-2 text-[#6b6b7f] hover:text-[#ff3366] transition-colors mb-2 sm:mb-3 md:mb-4 group min-h-[44px]"
@@ -119,23 +119,23 @@ export default function ProjectPage() {
           </button>
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3 md:gap-4">
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight text-white mb-1.5 sm:mb-2 break-words">
+              <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black tracking-tight text-white mb-1.5 sm:mb-2 break-words">
                 {project.name}
               </h1>
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                <div className="flex items-center gap-2 text-[#6b6b7f] font-mono flex-wrap">
-                  <Languages className="w-4 h-4 flex-shrink-0" />
-                  <span className="px-2 py-1 bg-[#1a1a24] rounded border border-[#2a2a38] text-xs">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 md:gap-4 text-xs">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[#6b6b7f] font-mono flex-wrap">
+                  <Languages className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-[#1a1a24] rounded border border-[#2a2a38] text-[10px] sm:text-xs">
                     {project.source_language.toUpperCase()}
                   </span>
-                  <span className="text-[#ff3366]">→</span>
-                  <span className="px-2 py-1 bg-[#1a1a24] rounded border border-[#2a2a38] text-xs">
+                  <span className="text-[#ff3366] text-xs">→</span>
+                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-[#1a1a24] rounded border border-[#2a2a38] text-[10px] sm:text-xs">
                     {project.target_language.toUpperCase()}
                   </span>
                 </div>
-                <div className="flex items-center gap-2 text-[#6b6b7f] font-mono">
-                  <Clock className="w-4 h-4 flex-shrink-0" />
-                  <span className="text-xs">{new Date(project.created_at).toLocaleDateString()}</span>
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[#6b6b7f] font-mono">
+                  <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
+                  <span className="text-[10px] sm:text-xs">{new Date(project.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
