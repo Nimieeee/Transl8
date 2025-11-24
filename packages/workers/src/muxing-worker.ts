@@ -1,13 +1,21 @@
 import { Job } from 'bullmq';
 import ffmpeg from 'fluent-ffmpeg';
+import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
 import supabase from './lib/supabase';
+import { uploadToStorage } from './lib/storage';
 
 export async function processMuxing(job: Job) {
-  const { projectId } = job.data;
+  const { projectId, audioUrl } = job.data;
 
   await supabase
     .from('jobs')
     .insert({ project_id: projectId, stage: 'MUXING', status: 'PROCESSING' });
+
+  const tempVideoPath = path.join('/tmp', `${projectId}_original.mp4`);
+  const tempAudioPath = path.join('/tmp', `${projectId}_dubbed.mp3`);
+  const outputPath = path.join('/tmp', `${projectId}_output.mp4`);
 
   try {
     const { data: project } = await supabase
@@ -20,23 +28,59 @@ export async function processMuxing(job: Job) {
       throw new Error('Missing video or audio');
     }
 
-    const outputPath = `/tmp/${projectId}-output.mp4`;
+    console.log('Downloading original video...');
+    
+    // Download original video
+    const videoResponse = await axios.get(project.video_url, { responseType: 'stream' });
+    const videoWriter = fs.createWriteStream(tempVideoPath);
+    videoResponse.data.pipe(videoWriter);
+    await new Promise<void>((resolve, reject) => {
+      videoWriter.on('finish', () => resolve());
+      videoWriter.on('error', reject);
+    });
 
+    console.log('Downloading dubbed audio...');
+    
+    // Download dubbed audio
+    const audioResponse = await axios.get(project.audio_url, { responseType: 'stream' });
+    const audioWriter = fs.createWriteStream(tempAudioPath);
+    audioResponse.data.pipe(audioWriter);
+    await new Promise<void>((resolve, reject) => {
+      audioWriter.on('finish', () => resolve());
+      audioWriter.on('error', reject);
+    });
+
+    console.log('Muxing video and audio...');
+
+    // Combine video and audio using ffmpeg
     await new Promise((resolve, reject) => {
       ffmpeg()
-        .input(project.video_url!)
-        .input(project.audio_url!)
+        .input(tempVideoPath)
+        .input(tempAudioPath)
         .outputOptions('-c:v copy')
         .outputOptions('-c:a aac')
         .outputOptions('-map 0:v:0')
         .outputOptions('-map 1:a:0')
+        .outputOptions('-shortest') // Match shortest stream duration
         .save(outputPath)
-        .on('end', resolve)
-        .on('error', reject);
+        .on('end', () => {
+          console.log('Muxing completed');
+          resolve(null);
+        })
+        .on('error', (err) => {
+          console.error('FFmpeg error:', err);
+          reject(err);
+        });
     });
 
-    const outputVideoUrl = `https://storage.example.com/${projectId}/output.mp4`;
+    console.log('Uploading final video...');
 
+    // Upload final video to storage
+    const outputVideoUrl = await uploadToStorage(outputPath, `projects/${projectId}/output`);
+
+    console.log('Final video uploaded:', outputVideoUrl);
+
+    // Update project with final video URL and mark as completed
     await supabase
       .from('projects')
       .update({ 
@@ -52,6 +96,8 @@ export async function processMuxing(job: Job) {
       .eq('stage', 'MUXING');
 
   } catch (error: any) {
+    console.error('Muxing Error:', error);
+    
     await supabase
       .from('jobs')
       .update({ status: 'FAILED', error_message: error.message })
@@ -64,5 +110,12 @@ export async function processMuxing(job: Job) {
       .eq('id', projectId);
     
     throw error;
+  } finally {
+    // Cleanup temp files
+    [tempVideoPath, tempAudioPath, outputPath].forEach(filePath => {
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+    });
   }
 }

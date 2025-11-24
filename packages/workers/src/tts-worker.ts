@@ -44,18 +44,27 @@ export async function processTts(job: Job) {
 
     const buffer = Buffer.from(await mp3.arrayBuffer());
 
-    // Save buffer to temp file for upload
+    // Save buffer to temp file
     const tempFilePath = path.join('/tmp', `${projectId}_audio.mp3`);
     fs.writeFileSync(tempFilePath, buffer);
 
-    // Upload to Supabase Storage
-    // WAIT: The previous plan said "Use the storage utility".
-    // I should check if I can import it or if I need to copy it to workers.
-    // The Dockerfile copies packages/backend/src/adapters to packages/backend/src/adapters.
-    // But workers/src/lib is where we are.
+    console.log('Audio generated, uploading to storage...');
 
-    // Let's assume we need to implement/copy the storage logic to workers/src/lib/storage.ts first.
-    // I will abort this specific edit and create the file first.
+    // Upload to Supabase Storage
+    const audioUrl = await uploadToStorage(tempFilePath, `projects/${projectId}/audio`);
+
+    console.log('Audio uploaded:', audioUrl);
+
+    // Update project with audio URL
+    await supabase
+      .from('projects')
+      .update({ audio_url: audioUrl })
+      .eq('id', projectId);
+
+    // Clean up temp file
+    if (fs.existsSync(tempFilePath)) {
+      fs.unlinkSync(tempFilePath);
+    }
 
     await supabase
       .from('jobs')
@@ -63,7 +72,7 @@ export async function processTts(job: Job) {
       .eq('project_id', projectId)
       .eq('stage', 'TTS');
 
-    await addJob('muxing', { projectId });
+    await addJob('muxing', { projectId, audioUrl });
 
   } catch (error: any) {
     console.error('TTS Error:', error);
