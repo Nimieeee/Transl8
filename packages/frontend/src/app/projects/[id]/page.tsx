@@ -59,9 +59,15 @@ export default function ProjectPage() {
       setProject(data);
       
       // Also fetch jobs for stage tracking
-      const { data: jobsData } = await apiClient.get(`/projects/${params.id}/jobs`);
-      if (jobsData) {
-        setJobs(jobsData);
+      try {
+        const { data: jobsData } = await apiClient.get(`/projects/${params.id}/jobs`);
+        if (jobsData && Array.isArray(jobsData)) {
+          setJobs(jobsData);
+          console.log('Jobs loaded:', jobsData.length, jobsData);
+        }
+      } catch (jobError) {
+        console.error('Failed to load jobs:', jobError);
+        // Don't fail the whole load if jobs fail
       }
     } catch (error) {
       console.error('Failed to load project', error);
@@ -69,8 +75,33 @@ export default function ProjectPage() {
   };
 
   const getStageStatus = (stage: string) => {
+    // First try to get from jobs table
     const job = jobs.find(j => j.stage === stage);
-    return job?.status || 'PENDING';
+    if (job) {
+      console.log(`Stage ${stage}: ${job.status} (from jobs table)`);
+      return job.status;
+    }
+    
+    // Fallback: infer from project status if jobs not available
+    if (!project) return 'PENDING';
+    
+    if (project.status === 'DRAFT') return 'PENDING';
+    if (project.status === 'FAILED') return 'FAILED';
+    
+    // For PROCESSING or COMPLETED, infer based on what exists
+    if (project.status === 'PROCESSING') {
+      // Assume stages complete in order
+      if (stage === 'STT' && project.video_url) return 'COMPLETED';
+      if (stage === 'MT' && project.video_url) return 'PROCESSING';
+      if (stage === 'TTS') return 'PENDING';
+      if (stage === 'MUXING') return 'PENDING';
+    }
+    
+    if (project.status === 'COMPLETED') {
+      return 'COMPLETED'; // All stages complete
+    }
+    
+    return 'PENDING';
   };
 
   const handleUpload = async () => {
