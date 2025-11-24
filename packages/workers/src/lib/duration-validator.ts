@@ -85,7 +85,16 @@ Original text: "${text}"
       ]
     });
 
-    const adaptedText = response.choices[0].message.content.trim();
+    const messageContent = response.choices?.[0]?.message?.content;
+    if (!messageContent) {
+      throw new Error('No content returned from Mistral AI');
+    }
+
+    // Handle both string and array responses
+    const adaptedText = typeof messageContent === 'string' 
+      ? messageContent.trim() 
+      : JSON.stringify(messageContent);
+    
     console.log(`Mistral AI returned: ${adaptedText.substring(0, 100)}...`);
     return adaptedText;
   }
