@@ -17,20 +17,37 @@ export async function processTranslation(job: Job) {
     .insert({ project_id: projectId, stage: 'MT', status: 'PROCESSING' });
 
   try {
-    const { data: project } = await supabase
+    console.log(`Translation worker started for project ${projectId}`);
+
+    const { data: project, error: projectError } = await supabase
       .from('projects')
       .select('*')
       .eq('id', projectId)
       .single();
 
-    const { data: transcripts } = await supabase
+    if (projectError || !project) {
+      console.error('Project fetch error:', projectError);
+      throw new Error(`Project not found: ${projectError?.message || 'Unknown error'}`);
+    }
+
+    console.log('Project found, fetching transcripts...');
+
+    const { data: transcripts, error: transcriptError } = await supabase
       .from('transcripts')
       .select('*')
       .eq('project_id', projectId);
 
-    if (!project || !transcripts || transcripts.length === 0) {
-      throw new Error('No transcript found');
+    if (transcriptError) {
+      console.error('Transcript fetch error:', transcriptError);
+      throw new Error(`Failed to fetch transcripts: ${transcriptError.message}`);
     }
+
+    if (!transcripts || transcripts.length === 0) {
+      console.error('No transcripts found for project:', projectId);
+      throw new Error('No transcript found - STT may have failed');
+    }
+
+    console.log(`Found ${transcripts.length} transcript(s)`);
 
     const transcript = transcripts[0];
     let attempts = 0;

@@ -52,19 +52,38 @@ export async function processStt(job: Job) {
       response_format: 'verbose_json',
     });
 
-    await supabase
+    console.log('Transcription received:', JSON.stringify(transcription).substring(0, 200));
+
+    // Save transcript to database
+    const { data: savedTranscript, error: transcriptError } = await supabase
       .from('transcripts')
       .insert({
         project_id: projectId,
         content: transcription as any,
         approved: false
-      });
+      })
+      .select()
+      .single();
 
-    await supabase
+    if (transcriptError) {
+      console.error('Failed to save transcript:', transcriptError);
+      throw new Error(`Failed to save transcript: ${transcriptError.message}`);
+    }
+
+    console.log('Transcript saved successfully:', savedTranscript.id);
+
+    // Update job status
+    const { error: jobError } = await supabase
       .from('jobs')
       .update({ status: 'COMPLETED', progress: 100 })
       .eq('project_id', projectId)
       .eq('stage', 'STT');
+
+    if (jobError) {
+      console.error('Failed to update job status:', jobError);
+    }
+
+    console.log('STT completed, triggering translation...');
 
     // Trigger next stage
     await addJob('translation', { projectId });
