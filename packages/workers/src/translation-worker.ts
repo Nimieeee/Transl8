@@ -42,6 +42,11 @@ export async function processTranslation(job: Job) {
       try {
         console.log(`Translation attempt ${attempts} for project ${projectId}`);
 
+        // Add delay to respect rate limits (1 req/sec for free tier)
+        if (attempts > 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
         // Call translation API (using Mistral)
         const completion = await mistral.chat.complete({
           model: 'mistral-small-latest',
@@ -79,8 +84,14 @@ export async function processTranslation(job: Job) {
       } catch (error: any) {
         console.error(`Attempt ${attempts} failed:`, error);
         lastError = error;
-        // Wait briefly before retry
-        await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
+        
+        // Handle rate limiting - wait longer between retries
+        // Mistral free tier: 1 request per second
+        const isRateLimitError = error.message?.includes('rate limit') || error.status === 429;
+        const waitTime = isRateLimitError ? 2000 : (1000 * attempts);
+        
+        console.log(`Waiting ${waitTime}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
       }
     }
 
