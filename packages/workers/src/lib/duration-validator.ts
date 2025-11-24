@@ -30,7 +30,7 @@ export class DurationValidator {
   private mistralModel: string;
 
   constructor(
-    tolerance: number = 0.15, // 15% tolerance
+    tolerance: number = 0.05, // 5% tolerance (default)
     maxRetries: number = 3,
     ttsVoice: string = 'alloy',
     mistralModel: string = 'mistral-small-latest'

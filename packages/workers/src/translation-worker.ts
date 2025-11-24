@@ -12,7 +12,7 @@ const MAX_RETRIES = 3;
 
 // Initialize duration validator
 const validator = new DurationValidator(
-  0.15, // 15% tolerance
+  0.05, // 5% tolerance (very strict for accurate lip-sync)
   3,    // max 3 retries
   'alloy', // OpenAI TTS voice
   'mistral-small-latest'
