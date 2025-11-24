@@ -1,6 +1,5 @@
-import { Router } from 'express';
+import { Router, Request } from 'express';
 import multer from 'multer';
-import { authenticate, AuthRequest } from '../middleware/auth';
 import { asyncHandler, AppError } from '../middleware/error-handler';
 import supabase from '../lib/supabase';
 import { uploadToStorage } from '../lib/storage';
@@ -8,26 +7,25 @@ import { uploadToStorage } from '../lib/storage';
 const router = Router();
 const upload = multer({ dest: 'uploads/' });
 
-router.use(authenticate);
+// No authentication required - open access
 
-router.get('/', asyncHandler(async (req: AuthRequest, res: any) => {
+router.get('/', asyncHandler(async (req: Request, res: any) => {
   const { data: projects, error } = await supabase
     .from('projects')
     .select('*')
-    .eq('user_id', req.userId)
     .order('created_at', { ascending: false });
     
   if (error) throw new AppError(500, 'Failed to fetch projects');
   res.json(projects);
 }));
 
-router.post('/', asyncHandler(async (req: AuthRequest, res: any) => {
+router.post('/', asyncHandler(async (req: Request, res: any) => {
   const { name, sourceLanguage, targetLanguage } = req.body;
   
   const { data: project, error } = await supabase
     .from('projects')
     .insert({
-      user_id: req.userId!,
+      user_id: null, // No user authentication
       name,
       source_language: sourceLanguage,
       target_language: targetLanguage,
@@ -40,24 +38,22 @@ router.post('/', asyncHandler(async (req: AuthRequest, res: any) => {
   res.json(project);
 }));
 
-router.get('/:id', asyncHandler(async (req: AuthRequest, res: any) => {
+router.get('/:id', asyncHandler(async (req: Request, res: any) => {
   const { data: project, error } = await supabase
     .from('projects')
     .select('*')
     .eq('id', req.params.id)
-    .eq('user_id', req.userId)
     .single();
   
   if (error || !project) throw new AppError(404, 'Project not found');
   res.json(project);
 }));
 
-router.post('/:id/upload', upload.single('video'), asyncHandler(async (req: AuthRequest, res: any) => {
+router.post('/:id/upload', upload.single('video'), asyncHandler(async (req: Request, res: any) => {
   const { data: project, error: fetchError } = await supabase
     .from('projects')
     .select('*')
     .eq('id', req.params.id)
-    .eq('user_id', req.userId)
     .single();
   
   if (fetchError || !project) throw new AppError(404, 'Project not found');

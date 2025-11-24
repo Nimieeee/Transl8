@@ -1,21 +1,19 @@
-import { Router } from 'express';
-import { authenticate, AuthRequest } from '../middleware/auth';
+import { Router, Request } from 'express';
 import { asyncHandler, AppError } from '../middleware/error-handler';
 import supabase from '../lib/supabase';
 import { addJob } from '../lib/queue';
 
 const router = Router();
 
-router.use(authenticate);
+// No authentication required - open access
 
-router.post('/start', asyncHandler(async (req: AuthRequest, res: any) => {
+router.post('/start', asyncHandler(async (req: Request, res: any) => {
   const { projectId } = req.body;
   
   const { data: project, error: fetchError } = await supabase
     .from('projects')
     .select('*')
     .eq('id', projectId)
-    .eq('user_id', req.userId)
     .single();
   
   if (fetchError || !project) throw new AppError(404, 'Project not found');
@@ -34,12 +32,11 @@ router.post('/start', asyncHandler(async (req: AuthRequest, res: any) => {
   res.json({ message: 'Dubbing started', projectId });
 }));
 
-router.get('/status/:projectId', asyncHandler(async (req: AuthRequest, res: any) => {
+router.get('/status/:projectId', asyncHandler(async (req: Request, res: any) => {
   const { data: project, error: projectError } = await supabase
     .from('projects')
     .select('*')
     .eq('id', req.params.projectId)
-    .eq('user_id', req.userId)
     .single();
   
   if (projectError || !project) throw new AppError(404, 'Project not found');
