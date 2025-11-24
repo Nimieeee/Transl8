@@ -100,4 +100,24 @@ router.post('/:id/upload', upload.single('video'), asyncHandler(async (req: Requ
   });
 }));
 
+router.delete('/:id', asyncHandler(async (req: Request, res: any) => {
+  const { data: project, error: fetchError } = await supabase
+    .from('projects')
+    .select('*')
+    .eq('id', req.params.id)
+    .single();
+  
+  if (fetchError || !project) throw new AppError(404, 'Project not found');
+
+  // Delete the project (cascade will delete related records)
+  const { error: deleteError } = await supabase
+    .from('projects')
+    .delete()
+    .eq('id', req.params.id);
+    
+  if (deleteError) throw new AppError(500, 'Failed to delete project');
+
+  res.json({ message: 'Project deleted successfully' });
+}));
+
 export default router;

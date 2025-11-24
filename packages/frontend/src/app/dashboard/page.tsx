@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
+import { Film, Trash2, MoreVertical } from 'lucide-react';
 
 interface Project {
   id: string;
@@ -21,6 +22,9 @@ export default function Dashboard() {
   const [sourceLanguage, setSourceLanguage] = useState('en');
   const [targetLanguage, setTargetLanguage] = useState('es');
   const [mounted, setMounted] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -45,6 +49,28 @@ export default function Dashboard() {
       loadProjects();
     } catch (error) {
       console.error('Failed to create project', error);
+    }
+  };
+
+  const handleDeleteClick = (e: React.MouseEvent, projectId: string) => {
+    e.stopPropagation();
+    setProjectToDelete(projectId);
+    setShowDeleteConfirm(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!projectToDelete) return;
+    
+    setDeletingId(projectToDelete);
+    try {
+      await apiClient.delete(`/projects/${projectToDelete}`);
+      setShowDeleteConfirm(false);
+      setProjectToDelete(null);
+      loadProjects();
+    } catch (error) {
+      console.error('Failed to delete project', error);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -92,9 +118,7 @@ export default function Dashboard() {
         {projects.length === 0 ? (
           <div className={`text-center py-24 ${mounted ? 'animate-fade-in opacity-0' : 'opacity-0'}`}>
             <div className="inline-flex p-6 bg-gradient-to-br from-[#ff3366]/20 to-[#ff3366]/5 rounded-3xl mb-6">
-              <svg className="w-16 h-16 text-[#ff3366]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
+              <Film className="w-16 h-16 text-[#ff3366]" strokeWidth={1.5} />
             </div>
             <h3 className="text-2xl font-bold text-[#a0a0b8] mb-2">No projects yet</h3>
             <p className="text-[#6b6b7f] mb-8">Create your first dubbing project to get started</p>
@@ -110,19 +134,33 @@ export default function Dashboard() {
             {projects.map((project, i) => (
               <div
                 key={project.id}
-                onClick={() => router.push(`/projects/${project.id}`)}
-                className={`group relative p-6 bg-[#13131a] border border-[#2a2a38] rounded-2xl cursor-pointer hover:border-[#ff3366] transition-all duration-300 hover:transform hover:-translate-y-2 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}
+                className={`group relative p-6 bg-[#13131a] border border-[#2a2a38] rounded-2xl hover:border-[#ff3366] transition-all duration-300 hover:transform hover:-translate-y-2 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}
                 style={{ animationDelay: `${i * 0.1}s` }}
               >
                 {/* Status indicator */}
-                <div className="absolute top-4 right-4">
+                <div className="absolute top-4 right-4 flex items-center gap-2">
                   <div className={`px-3 py-1 rounded-full text-xs font-mono font-semibold border bg-gradient-to-r ${getStatusColor(project.status)}`}>
                     {project.status}
                   </div>
+                  <button
+                    onClick={(e) => handleDeleteClick(e, project.id)}
+                    disabled={deletingId === project.id}
+                    className="p-2 bg-[#1a1a24] border border-[#2a2a38] rounded-lg hover:border-red-500/50 hover:bg-red-500/10 transition-colors group/delete"
+                    title="Delete project"
+                  >
+                    {deletingId === project.id ? (
+                      <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <Trash2 className="w-4 h-4 text-[#6b6b7f] group-hover/delete:text-red-400 transition-colors" />
+                    )}
+                  </button>
                 </div>
 
-                {/* Content */}
-                <div className="mt-8">
+                {/* Content - clickable */}
+                <div 
+                  onClick={() => router.push(`/projects/${project.id}`)}
+                  className="cursor-pointer mt-8"
+                >
                   <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#ff3366] transition-colors">
                     {project.name}
                   </h3>
@@ -154,7 +192,7 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Modal */}
+      {/* Create Project Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-fade-in">
           <div 
@@ -237,6 +275,55 @@ export default function Dashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-fade-in">
+          <div 
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowDeleteConfirm(false)}
+          />
+          <div className="relative bg-[#13131a] border border-red-500/30 rounded-3xl max-w-md w-full p-8 animate-slide-up">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/30">
+                <Trash2 className="w-6 h-6 text-red-400" />
+              </div>
+              <h2 className="text-2xl font-black text-white">
+                Delete Project?
+              </h2>
+            </div>
+            <p className="text-[#a0a0b8] mb-6">
+              This action cannot be undone. All project data, including uploaded videos and processing results, will be permanently deleted.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={confirmDelete}
+                disabled={deletingId !== null}
+                className="flex-1 py-3 bg-gradient-to-r from-red-500 to-red-600 rounded-xl font-bold text-white hover:scale-105 transition-transform duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {deletingId ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-5 h-5" />
+                    Delete
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deletingId !== null}
+                className="flex-1 py-3 bg-[#1a1a24] border border-[#2a2a38] rounded-xl font-bold text-[#a0a0b8] hover:border-[#6b6b7f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
