@@ -15,7 +15,10 @@ router.get('/', asyncHandler(async (req: Request, res: any) => {
     .select('*')
     .order('created_at', { ascending: false });
     
-  if (error) throw new AppError(500, 'Failed to fetch projects');
+  if (error) {
+    console.error('Supabase error fetching projects:', error);
+    throw new AppError(500, `Failed to fetch projects: ${error.message}`);
+  }
   res.json(projects);
 }));
 
@@ -34,7 +37,10 @@ router.post('/', asyncHandler(async (req: Request, res: any) => {
     .select()
     .single();
     
-  if (error) throw new AppError(500, 'Failed to create project');
+  if (error) {
+    console.error('Supabase error creating project:', error);
+    throw new AppError(500, `Failed to create project: ${error.message}`);
+  }
   res.json(project);
 }));
 
