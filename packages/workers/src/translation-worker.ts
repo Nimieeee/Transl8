@@ -2,12 +2,21 @@ import { Job } from 'bullmq';
 import { Mistral } from '@mistralai/mistralai';
 import supabase from './lib/supabase';
 import { addJob } from './lib/queue';
+import { DurationValidator } from './lib/duration-validator';
 
 const mistral = new Mistral({
   apiKey: process.env.MISTRAL_API_KEY,
 });
 
 const MAX_RETRIES = 3;
+
+// Initialize duration validator
+const validator = new DurationValidator(
+  0.15, // 15% tolerance
+  3,    // max 3 retries
+  'alloy', // OpenAI TTS voice
+  'mistral-small-latest'
+);
 
 export async function processTranslation(job: Job) {
   const { projectId } = job.data;
