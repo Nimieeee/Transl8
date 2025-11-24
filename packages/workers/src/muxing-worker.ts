@@ -53,19 +53,19 @@ export async function processMuxing(job: Job) {
     console.log('Muxing video and audio...');
 
     // Combine video and audio using ffmpeg
-    // Use video duration as reference, pad audio if needed
+    // Keep full video duration, loop/pad audio if shorter
     await new Promise((resolve, reject) => {
       ffmpeg()
         .input(tempVideoPath)
         .input(tempAudioPath)
-        .outputOptions('-c:v copy') // Copy video stream without re-encoding
-        .outputOptions('-c:a aac') // Encode audio as AAC
-        .outputOptions('-map 0:v:0') // Use video from first input
-        .outputOptions('-map 1:a:0') // Use audio from second input
-        .outputOptions('-shortest:v 0') // Don't shorten video
-        .outputOptions('-shortest:a 0') // Don't shorten audio
-        .outputOptions('-fflags +shortest') // Use longest stream
-        .outputOptions('-max_interleave_delta 0') // Better sync
+        .outputOptions([
+          '-c:v copy',           // Copy video without re-encoding
+          '-c:a aac',            // Encode audio as AAC
+          '-map 0:v:0',          // Map video from first input
+          '-map 1:a:0',          // Map audio from second input
+          '-af apad',            // Pad audio with silence if shorter than video
+          '-strict experimental' // Allow experimental features
+        ])
         .save(outputPath)
         .on('end', () => {
           console.log('Muxing completed - video duration preserved');
