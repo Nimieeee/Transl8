@@ -67,14 +67,37 @@ router.post('/:id/upload', upload.single('video'), asyncHandler(async (req: Requ
 
   const videoUrl = await uploadToStorage(req.file.path, `projects/${project.id}/video`);
   
+  // Update project with video URL and set to PROCESSING status
   const { error: updateError } = await supabase
     .from('projects')
-    .update({ video_url: videoUrl, status: 'UPLOADING' })
+    .update({ 
+      video_url: videoUrl, 
+      status: 'PROCESSING' 
+    })
     .eq('id', project.id);
     
   if (updateError) throw new AppError(500, 'Failed to update project');
 
-  res.json({ videoUrl });
+  // Automatically start dubbing process
+  try {
+    const { addJob } = await import('../lib/queue');
+    await addJob('stt', { 
+      projectId: project.id, 
+      videoUrl,
+      sourceLanguage: project.source_language,
+      targetLanguage: project.target_language
+    });
+    console.log(`✅ Dubbing started automatically for project ${project.id}`);
+  } catch (queueError: any) {
+    console.error('Failed to start dubbing:', queueError);
+    // Don't fail the upload if queue fails - just log it
+  }
+
+  res.json({ 
+    videoUrl,
+    status: 'PROCESSING',
+    message: 'Upload successful, dubbing started'
+  });
 }));
 
 export default router;

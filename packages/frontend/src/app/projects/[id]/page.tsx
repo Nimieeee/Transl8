@@ -39,23 +39,15 @@ export default function ProjectPage() {
     formData.append('video', file);
 
     try {
-      await apiClient.post(`/projects/${params.id}/upload`, formData, {
+      const response = await apiClient.post(`/projects/${params.id}/upload`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
+      console.log('Upload response:', response.data);
       loadProject();
     } catch (error) {
       console.error('Upload failed', error);
     } finally {
       setUploading(false);
-    }
-  };
-
-  const startDubbing = async () => {
-    try {
-      await apiClient.post('/dub/start', { projectId: params.id });
-      loadProject();
-    } catch (error) {
-      console.error('Failed to start dubbing', error);
     }
   };
 
@@ -83,15 +75,13 @@ export default function ProjectPage() {
           </button>
         </div>
 
-        {project.videoUrl && (
+        {project.videoUrl && project.status === 'PROCESSING' && (
           <div className="bg-white p-6 rounded-lg shadow mb-6">
-            <h2 className="text-xl font-semibold mb-4">Start Dubbing</h2>
-            <button
-              onClick={startDubbing}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-            >
-              Start Processing
-            </button>
+            <h2 className="text-xl font-semibold mb-4">Processing</h2>
+            <div className="flex items-center gap-3">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <p className="text-gray-600">Your video is being dubbed...</p>
+            </div>
           </div>
         )}
 
