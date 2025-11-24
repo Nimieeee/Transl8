@@ -62,16 +62,45 @@ export default function Home() {
           {/* Features grid */}
           <div className={`grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 ${mounted ? 'animate-fade-in opacity-0 delay-500' : 'opacity-0'}`}>
             {[
-              { icon: '🎬', title: 'Cinema Quality', desc: 'Professional-grade dubbing' },
-              { icon: '⚡', title: 'Lightning Fast', desc: 'Process in minutes' },
-              { icon: '🌍', title: 'Any Language', desc: '100+ languages supported' }
+              { 
+                icon: (
+                  <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                  </svg>
+                ),
+                title: 'Cinema Quality', 
+                desc: 'Professional-grade dubbing',
+                color: 'from-[#ff3366] to-[#ff4477]'
+              },
+              { 
+                icon: (
+                  <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                ),
+                title: 'Lightning Fast', 
+                desc: 'Process in minutes',
+                color: 'from-[#ffcc00] to-[#ffdd33]'
+              },
+              { 
+                icon: (
+                  <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                  </svg>
+                ),
+                title: 'Any Language', 
+                desc: '100+ languages supported',
+                color: 'from-[#00d9ff] to-[#00eeff]'
+              }
             ].map((feature, i) => (
               <div 
                 key={i}
                 className="group relative p-8 bg-[#13131a] border border-[#2a2a38] rounded-2xl hover:border-[#ff3366] transition-all duration-300 hover:transform hover:-translate-y-2"
               >
-                <div className="text-5xl mb-4 group-hover:scale-110 transition-transform duration-300">
-                  {feature.icon}
+                <div className={`inline-flex p-4 bg-gradient-to-br ${feature.color} bg-opacity-10 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <div className={`bg-gradient-to-br ${feature.color} bg-clip-text text-transparent`}>
+                    {feature.icon}
+                  </div>
                 </div>
                 <h3 className="text-xl font-bold mb-2 text-white">
                   {feature.title}

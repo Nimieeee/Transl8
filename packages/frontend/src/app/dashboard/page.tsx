@@ -91,7 +91,11 @@ export default function Dashboard() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
         {projects.length === 0 ? (
           <div className={`text-center py-24 ${mounted ? 'animate-fade-in opacity-0' : 'opacity-0'}`}>
-            <div className="text-6xl mb-6">🎬</div>
+            <div className="inline-flex p-6 bg-gradient-to-br from-[#ff3366]/20 to-[#ff3366]/5 rounded-3xl mb-6">
+              <svg className="w-16 h-16 text-[#ff3366]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+            </div>
             <h3 className="text-2xl font-bold text-[#a0a0b8] mb-2">No projects yet</h3>
             <p className="text-[#6b6b7f] mb-8">Create your first dubbing project to get started</p>
             <button
