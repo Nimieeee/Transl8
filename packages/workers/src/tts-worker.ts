@@ -50,7 +50,33 @@ export async function processTts(job: Job) {
 
     console.log(`Found ${translations.length} translation(s)`);
 
-    const text = JSON.stringify(translations[0].content);
+    // Extract only the translated text, not the entire JSON structure
+    const translationContent = translations[0].content;
+    let text = '';
+
+    // Handle different possible structures
+    if (typeof translationContent === 'string') {
+      text = translationContent;
+    } else if (translationContent.text) {
+      // If it has a 'text' field, use that
+      text = translationContent.text;
+    } else if (translationContent.segments && Array.isArray(translationContent.segments)) {
+      // If it has segments, concatenate them
+      text = translationContent.segments.map((seg: any) => seg.text || '').join(' ');
+    } else {
+      // Fallback: stringify but this might include metadata
+      console.warn('Unexpected translation structure, using fallback');
+      text = JSON.stringify(translationContent);
+    }
+
+    // Clean up the text
+    text = text.trim();
+
+    console.log(`TTS input text (first 100 chars): ${text.substring(0, 100)}...`);
+
+    if (!text || text.length < 5) {
+      throw new Error('Extracted text is too short or empty');
+    }
 
     // Call TTS API (OpenAI TTS)
     const mp3 = await openai.audio.speech.create({
