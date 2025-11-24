@@ -59,104 +59,42 @@ export async function processTranslation(job: Job) {
     console.log(`Found ${transcripts.length} transcript(s)`);
 
     const transcript = transcripts[0];
-    let attempts = 0;
-    let translationContent: any = null;
-    let lastError: any = null;
+    const transcriptContent = transcript.content;
+    
+    // Extract original text and duration
+    const originalText = transcriptContent.text || '';
+    const originalDuration = transcriptContent.duration || 0;
+    
+    console.log(`Original text: "${originalText.substring(0, 100)}..."`);
+    console.log(`Original duration: ${originalDuration.toFixed(2)}s`);
 
-    while (attempts < MAX_RETRIES && !translationContent) {
-      attempts++;
-      try {
-        console.log(`Translation attempt ${attempts} for project ${projectId}`);
+    // Use validation loop to ensure translated audio matches original duration
+    console.log('Starting duration validation loop...');
+    const validationResult = await validator.adaptAndValidate(
+      originalText,
+      originalDuration,
+      project.target_language,
+      '/tmp'
+    );
 
-        // Add delay to respect rate limits (1 req/sec for free tier)
-        if (attempts > 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+    console.log(`Validation complete after ${validationResult.attempts} attempts`);
+    console.log(`Final duration: ${validationResult.duration.toFixed(2)}s (target: ${originalDuration.toFixed(2)}s)`);
+    console.log(`Within tolerance: ${validationResult.isValid ? 'YES' : 'NO (using best attempt)'}`);
 
-        // Call translation API with duration-aware prompting
-        const transcriptContent = transcript.content;
-        const segments = transcriptContent.segments || [];
-        
-        // Build duration-aware prompt
-        let durationContext = '';
-        if (segments.length > 0) {
-          const totalDuration = segments[segments.length - 1]?.end || 0;
-          durationContext = `\n\nIMPORTANT: The original audio is ${totalDuration.toFixed(1)} seconds long. Your translation should maintain similar pacing and duration for lip-sync dubbing.`;
-        }
-
-        const completion = await mistral.chat.complete({
-          model: 'mistral-small-latest',
-          messages: [{
-            role: 'system',
-            content: `You are an expert translator and dubbing adapter. Your task is to translate content for video dubbing while:
-1. Maintaining natural flow in the target language
-2. Matching the approximate duration and pacing of the original speech for lip-sync
-3. Using conversational, natural language (avoid overly formal translations)
-4. Preserving the emotional tone and intent
-5. Adapting idioms and cultural references appropriately
-
-Return ONLY valid JSON with the same structure as the input.`
-          }, {
-            role: 'user',
-            content: `Translate this from ${project.source_language} to ${project.target_language} for dubbing:
-
-${JSON.stringify(transcript.content)}${durationContext}
-
-Provide the translation in the same JSON structure, ensuring the translated text matches the timing of the original for lip-sync.`
-          }],
-          responseFormat: { type: 'json_object' }
-        });
-
-        const translation = completion.choices?.[0]?.message?.content;
-
-        if (!translation) {
-          throw new Error('No translation content returned');
-        }
-
-        const rawContent = typeof translation === 'string' ? translation : JSON.stringify(translation);
-
-        // Validate JSON
-        try {
-          translationContent = JSON.parse(rawContent);
-        } catch (e) {
-          throw new Error('Invalid JSON returned from translation API');
-        }
-
-        // Basic structure validation
-        if (!translationContent || typeof translationContent !== 'object') {
-          throw new Error('Translation content is not a valid object');
-        }
-
-        // Clean up translation: ensure text field is in target language
-        if (translationContent.text) {
-          const text = translationContent.text.trim();
-          
-          // Log for debugging
-          console.log(`Translation preview: ${text.substring(0, 100)}...`);
-          
-          // Basic validation: check if translation is suspiciously short or empty
-          if (text.length < 10) {
-            console.warn('Translation seems too short, may need retry');
-          }
-        }
-
-      } catch (error: any) {
-        console.error(`Attempt ${attempts} failed:`, error);
-        lastError = error;
-        
-        // Handle rate limiting - wait longer between retries
-        // Mistral free tier: 1 request per second
-        const isRateLimitError = error.message?.includes('rate limit') || error.status === 429;
-        const waitTime = isRateLimitError ? 2000 : (1000 * attempts);
-        
-        console.log(`Waiting ${waitTime}ms before retry...`);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
+    // Build translation content with validated text
+    const translationContent = {
+      ...transcriptContent,
+      text: validationResult.text,
+      language: project.target_language,
+      duration: validationResult.duration,
+      validation: {
+        attempts: validationResult.attempts,
+        isValid: validationResult.isValid,
+        targetDuration: originalDuration,
+        actualDuration: validationResult.duration,
+        difference: validationResult.duration - originalDuration
       }
-    }
-
-    if (!translationContent) {
-      throw lastError || new Error('Failed to generate valid translation after retries');
-    }
+    };
 
     // Save metrics (optional, based on schema)
     const { error: metricsError } = await supabase
@@ -164,12 +102,15 @@ Provide the translation in the same JSON structure, ensuring the translated text
       .insert({
         project_id: projectId,
         language_pair: `${project.source_language}-${project.target_language}`,
-        total_segments: 0,
-        successful_segments: 0,
-        failed_segments: 0,
-        success_rate: 100,
-        average_attempts: attempts,
-        validation_failure_reasons: lastError ? { error: lastError.message } : {},
+        total_segments: 1,
+        successful_segments: validationResult.isValid ? 1 : 0,
+        failed_segments: validationResult.isValid ? 0 : 1,
+        success_rate: validationResult.isValid ? 100 : 0,
+        average_attempts: validationResult.attempts,
+        validation_failure_reasons: validationResult.isValid ? {} : { 
+          reason: 'Duration tolerance not met',
+          difference: validationResult.duration - originalDuration
+        },
       });
     
     if (metricsError) {
