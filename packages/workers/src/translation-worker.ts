@@ -135,13 +135,16 @@ export async function processTranslation(job: Job) {
     }
 
     console.log('Saving translation to database...');
+    const now = new Date().toISOString();
     const { data: savedTranslation, error: translationError } = await supabase
       .from('translations')
       .insert({
         project_id: projectId,
         target_language: project.target_language,
         content: translationContent,
-        approved: false
+        approved: false,
+        created_at: now,
+        updated_at: now
       })
       .select()
       .single();
