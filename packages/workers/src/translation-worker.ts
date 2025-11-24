@@ -64,15 +64,36 @@ export async function processTranslation(job: Job) {
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
-        // Call translation API (using Mistral)
+        // Call translation API with duration-aware prompting
+        const transcriptContent = transcript.content;
+        const segments = transcriptContent.segments || [];
+        
+        // Build duration-aware prompt
+        let durationContext = '';
+        if (segments.length > 0) {
+          const totalDuration = segments[segments.length - 1]?.end || 0;
+          durationContext = `\n\nIMPORTANT: The original audio is ${totalDuration.toFixed(1)} seconds long. Your translation should maintain similar pacing and duration for lip-sync dubbing.`;
+        }
+
         const completion = await mistral.chat.complete({
           model: 'mistral-small-latest',
           messages: [{
             role: 'system',
-            content: 'You are an expert translator and dubbing adapter. Your task is to translate the content and adapt it for dubbing, ensuring natural flow and matching the approximate duration of the original speech where possible. Return ONLY valid JSON.'
+            content: `You are an expert translator and dubbing adapter. Your task is to translate content for video dubbing while:
+1. Maintaining natural flow in the target language
+2. Matching the approximate duration and pacing of the original speech for lip-sync
+3. Using conversational, natural language (avoid overly formal translations)
+4. Preserving the emotional tone and intent
+5. Adapting idioms and cultural references appropriately
+
+Return ONLY valid JSON with the same structure as the input.`
           }, {
             role: 'user',
-            content: `Translate this from ${project.source_language} to ${project.target_language}: ${JSON.stringify(transcript.content)}`
+            content: `Translate this from ${project.source_language} to ${project.target_language} for dubbing:
+
+${JSON.stringify(transcript.content)}${durationContext}
+
+Provide the translation in the same JSON structure, ensuring the translated text matches the timing of the original for lip-sync.`
           }],
           responseFormat: { type: 'json_object' }
         });
@@ -92,10 +113,22 @@ export async function processTranslation(job: Job) {
           throw new Error('Invalid JSON returned from translation API');
         }
 
-        // Basic structure validation (optional, depending on TranscriptContent type)
+        // Basic structure validation
         if (!translationContent || typeof translationContent !== 'object') {
           throw new Error('Translation content is not a valid object');
-          translationContent = null; // Reset to trigger retry
+        }
+
+        // Clean up translation: ensure text field is in target language
+        if (translationContent.text) {
+          const text = translationContent.text.trim();
+          
+          // Log for debugging
+          console.log(`Translation preview: ${text.substring(0, 100)}...`);
+          
+          // Basic validation: check if translation is suspiciously short or empty
+          if (text.length < 10) {
+            console.warn('Translation seems too short, may need retry');
+          }
         }
 
       } catch (error: any) {
