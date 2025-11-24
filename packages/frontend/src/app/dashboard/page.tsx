@@ -90,23 +90,24 @@ export default function Dashboard() {
       
       {/* Header */}
       <div className="relative z-10 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-4xl font-black tracking-tight text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          <div className="flex justify-between items-center gap-4">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white truncate">
                 STUDIO
               </h1>
-              <p className="text-[var(--text-muted)] mt-1 font-mono text-sm">
+              <p className="text-[var(--text-muted)] mt-1 font-mono text-xs sm:text-sm">
                 {projects.length} {projects.length === 1 ? 'project' : 'projects'}
               </p>
             </div>
             <button
               onClick={() => setShowModal(true)}
-              className="group relative px-6 py-3 bg-gradient-to-r from-[#ff3366] to-[#ff4477] rounded-xl font-bold text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,51,102,0.5)]"
+              className="group relative px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-[#ff3366] to-[#ff4477] rounded-xl font-bold text-sm sm:text-base text-white overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-[0_0_30px_rgba(255,51,102,0.5)] whitespace-nowrap"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                <span className="text-2xl">+</span>
-                New Project
+              <span className="relative z-10 flex items-center gap-1 sm:gap-2">
+                <span className="text-xl sm:text-2xl">+</span>
+                <span className="hidden xs:inline">New Project</span>
+                <span className="xs:hidden">New</span>
               </span>
             </button>
           </div>
@@ -114,44 +115,44 @@ export default function Dashboard() {
       </div>
 
       {/* Projects Grid */}
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         {projects.length === 0 ? (
-          <div className={`text-center py-24 ${mounted ? 'animate-fade-in opacity-0' : 'opacity-0'}`}>
-            <div className="inline-flex p-6 bg-gradient-to-br from-[#ff3366]/20 to-[#ff3366]/5 rounded-3xl mb-6">
-              <Film className="w-16 h-16 text-[#ff3366]" strokeWidth={1.5} />
+          <div className={`text-center py-16 sm:py-24 px-4 ${mounted ? 'animate-fade-in opacity-0' : 'opacity-0'}`}>
+            <div className="inline-flex p-5 sm:p-6 bg-gradient-to-br from-[#ff3366]/20 to-[#ff3366]/5 rounded-3xl mb-4 sm:mb-6">
+              <Film className="w-12 h-12 sm:w-16 sm:h-16 text-[#ff3366]" strokeWidth={1.5} />
             </div>
-            <h3 className="text-2xl font-bold text-[#a0a0b8] mb-2">No projects yet</h3>
-            <p className="text-[#6b6b7f] mb-8">Create your first dubbing project to get started</p>
+            <h3 className="text-xl sm:text-2xl font-bold text-[#a0a0b8] mb-2">No projects yet</h3>
+            <p className="text-sm sm:text-base text-[#6b6b7f] mb-6 sm:mb-8">Create your first dubbing project to get started</p>
             <button
               onClick={() => setShowModal(true)}
-              className="px-8 py-4 bg-gradient-to-r from-[#ff3366] to-[#ff4477] rounded-xl font-bold text-white hover:scale-105 transition-transform duration-300"
+              className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#ff3366] to-[#ff4477] rounded-xl font-bold text-sm sm:text-base text-white hover:scale-105 transition-transform duration-300"
             >
               Create Project
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {projects.map((project, i) => (
               <div
                 key={project.id}
-                className={`group relative p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl hover:border-[var(--accent-primary)] transition-all duration-300 hover:transform hover:-translate-y-2 shadow-lg ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}
+                className={`group relative p-4 sm:p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl hover:border-[var(--accent-primary)] transition-all duration-300 hover:transform hover:-translate-y-2 shadow-lg ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}
                 style={{ animationDelay: `${i * 0.1}s` }}
               >
                 {/* Status indicator */}
-                <div className="absolute top-4 right-4 flex items-center gap-2">
-                  <div className={`px-3 py-1 rounded-full text-xs font-mono font-semibold border bg-gradient-to-r ${getStatusColor(project.status)}`}>
+                <div className="absolute top-3 sm:top-4 right-3 sm:right-4 flex items-center gap-1 sm:gap-2">
+                  <div className={`px-2 sm:px-3 py-1 rounded-full text-[10px] sm:text-xs font-mono font-semibold border bg-gradient-to-r ${getStatusColor(project.status)}`}>
                     {project.status}
                   </div>
                   <button
                     onClick={(e) => handleDeleteClick(e, project.id)}
                     disabled={deletingId === project.id}
-                    className="p-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg hover:border-red-500/50 hover:bg-red-500/10 transition-colors group/delete"
+                    className="p-1.5 sm:p-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg hover:border-red-500/50 hover:bg-red-500/10 transition-colors group/delete"
                     title="Delete project"
                   >
                     {deletingId === project.id ? (
-                      <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
+                      <div className="w-3.5 h-3.5 sm:w-4 sm:h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <Trash2 className="w-4 h-4 text-[var(--text-muted)] group-hover/delete:text-red-400 transition-colors" />
+                      <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[var(--text-muted)] group-hover/delete:text-red-400 transition-colors" />
                     )}
                   </button>
                 </div>
@@ -159,13 +160,13 @@ export default function Dashboard() {
                 {/* Content - clickable */}
                 <div 
                   onClick={() => router.push(`/projects/${project.id}`)}
-                  className="cursor-pointer mt-8"
+                  className="cursor-pointer mt-6 sm:mt-8"
                 >
-                  <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3 group-hover:text-[var(--accent-primary)] transition-colors">
+                  <h3 className="text-lg sm:text-xl font-bold text-[var(--text-primary)] mb-2 sm:mb-3 group-hover:text-[var(--accent-primary)] transition-colors line-clamp-2">
                     {project.name}
                   </h3>
                   
-                  <div className="flex items-center gap-2 text-[var(--text-muted)] font-mono text-sm mb-4">
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-[var(--text-muted)] font-mono text-xs sm:text-sm mb-3 sm:mb-4">
                     <span className="px-2 py-1 bg-[var(--bg-tertiary)] rounded border border-[var(--border-color)]">
                       {project.source_language.toUpperCase()}
                     </span>
@@ -194,16 +195,16 @@ export default function Dashboard() {
 
       {/* Create Project Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-fade-in">
           <div 
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setShowModal(false)}
           />
-          <div className="relative bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-3xl max-w-md w-full p-8 animate-slide-up shadow-2xl">
-            <h2 className="text-3xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]">
+          <div className="relative bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl sm:rounded-3xl max-w-md w-full p-6 sm:p-8 animate-slide-up shadow-2xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl sm:text-3xl font-black mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]">
               New Project
             </h2>
-            <form onSubmit={createProject} className="space-y-6">
+            <form onSubmit=createProject} className="space-y-4 sm:space-y-6">
               <div>
                 <label className="block text-sm font-bold text-[var(--text-secondary)] mb-2 font-mono">
                   PROJECT NAME
