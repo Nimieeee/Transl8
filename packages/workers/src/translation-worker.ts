@@ -63,10 +63,15 @@ export async function processTranslation(job: Job) {
     
     // Extract original text and duration
     const originalText = transcriptContent.text || '';
-    const originalDuration = transcriptContent.duration || 0;
+    
+    // Use speech duration (excluding silence) if available, otherwise use total duration
+    const silenceInfo = transcriptContent.silence;
+    const originalDuration = silenceInfo?.speechDuration || transcriptContent.duration || 0;
+    const startSilence = silenceInfo?.startSilence || 0;
+    const endSilence = silenceInfo?.endSilence || 0;
     
     console.log(`Original text: "${originalText.substring(0, 100)}..."`);
-    console.log(`Original duration: ${originalDuration.toFixed(2)}s`);
+    console.log(`Speech duration: ${originalDuration.toFixed(2)}s (excluding ${startSilence.toFixed(2)}s start + ${endSilence.toFixed(2)}s end silence)`);
 
     // Use validation loop to ensure translated audio matches original duration
     console.log('Starting duration validation loop...');

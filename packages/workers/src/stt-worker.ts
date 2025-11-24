@@ -7,6 +7,7 @@ import { exec } from 'child_process';
 import { promisify } from 'util';
 import supabase from './lib/supabase';
 import { addJob } from './lib/queue';
+import { AudioAnalyzer } from './lib/audio-analyzer';
 
 const execAsync = promisify(exec);
 
@@ -42,7 +43,13 @@ export async function processStt(job: Job) {
     // Extract audio using ffmpeg
     await execAsync(`ffmpeg -i "${tempVideoPath}" -vn -acodec libmp3lame -q:a 2 "${tempAudioPath}"`);
 
-    console.log('Audio extracted, sending to OpenAI Whisper...');
+    console.log('Audio extracted, analyzing for silence...');
+
+    // Detect silence at beginning and end
+    const analyzer = new AudioAnalyzer();
+    const silenceInfo = await analyzer.detectSilence(tempAudioPath);
+
+    console.log('Silence analysis complete, sending to OpenAI Whisper...');
 
     // Call OpenAI Whisper API with audio file
     const transcription = await openai.audio.transcriptions.create({
@@ -54,12 +61,27 @@ export async function processStt(job: Job) {
 
     console.log('Transcription received:', JSON.stringify(transcription).substring(0, 200));
 
+    // Add silence information to transcription
+    const transcriptionWithSilence = {
+      ...transcription,
+      silence: {
+        startSilence: silenceInfo.startSilence,
+        endSilence: silenceInfo.endSilence,
+        speechStart: silenceInfo.speechStart,
+        speechEnd: silenceInfo.speechEnd,
+        speechDuration: silenceInfo.speechDuration,
+        totalDuration: silenceInfo.totalDuration
+      }
+    };
+
+    console.log(`Speech duration: ${silenceInfo.speechDuration.toFixed(2)}s (excluding ${silenceInfo.startSilence.toFixed(2)}s start + ${silenceInfo.endSilence.toFixed(2)}s end silence)`);
+
     // Save transcript to database
     const { data: savedTranscript, error: transcriptError } = await supabase
       .from('transcripts')
       .insert({
         project_id: projectId,
-        content: transcription as any,
+        content: transcriptionWithSilence as any,
         approved: false
       })
       .select()

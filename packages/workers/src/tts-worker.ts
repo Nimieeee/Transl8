@@ -5,6 +5,7 @@ import path from 'path';
 import supabase from './lib/supabase';
 import { addJob } from './lib/queue';
 import { uploadToStorage } from './lib/storage';
+import { AudioAnalyzer } from './lib/audio-analyzer';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -91,10 +92,31 @@ export async function processTts(job: Job) {
     const tempFilePath = path.join('/tmp', `${projectId}_audio.mp3`);
     fs.writeFileSync(tempFilePath, buffer);
 
-    console.log('Audio generated, uploading to storage...');
+    console.log('Audio generated, adding silence padding...');
+
+    // Get silence information from original transcript
+    const { data: transcripts } = await supabase
+      .from('transcripts')
+      .select('*')
+      .eq('project_id', projectId);
+
+    const silenceInfo = transcripts?.[0]?.content?.silence;
+    const startSilence = silenceInfo?.startSilence || 0;
+    const endSilence = silenceInfo?.endSilence || 0;
+
+    // Add silence to match original timing
+    let finalAudioPath = tempFilePath;
+    if (startSilence > 0 || endSilence > 0) {
+      const analyzer = new AudioAnalyzer();
+      const paddedAudioPath = path.join('/tmp', `${projectId}_audio_padded.mp3`);
+      finalAudioPath = await analyzer.addSilence(tempFilePath, paddedAudioPath, startSilence, endSilence);
+      console.log(`Added ${startSilence.toFixed(2)}s start + ${endSilence.toFixed(2)}s end silence`);
+    }
+
+    console.log('Audio ready, uploading to storage...');
 
     // Upload to Supabase Storage
-    const audioUrl = await uploadToStorage(tempFilePath, `projects/${projectId}/audio`);
+    const audioUrl = await uploadToStorage(finalAudioPath, `projects/${projectId}/audio`);
 
     console.log('Audio uploaded:', audioUrl);
 
