@@ -13,15 +13,7 @@
     "moduleResolution": "node"
   },
   "include": [
-    "src/index.ts",
-    "src/start-with-workers.ts",
-    "src/routes/auth.ts",
-    "src/routes/projects.ts",
-    "src/routes/dub.ts",
-    "src/lib/prisma.ts",
-    "src/lib/queue.ts",
-    "src/lib/storage.ts",
-    "src/middleware/**/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": ["node_modules", "dist", "tests", "src/routes_old", "src/lib_old", "src/adapters_old"]
 }
