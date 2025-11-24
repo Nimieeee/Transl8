@@ -20,8 +20,9 @@ Run this SQL in your Supabase dashboard to make `user_id` nullable.
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Fix projects table: auto-generate IDs and allow nullable user_id
+-- Fix projects table: auto-generate IDs, timestamps, and allow nullable user_id
 ALTER TABLE "projects" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "projects" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE "projects" DROP CONSTRAINT IF EXISTS "projects_user_id_fkey";
 ALTER TABLE "projects" ALTER COLUMN "user_id" DROP NOT NULL;
 ALTER TABLE "projects" 
@@ -30,8 +31,10 @@ FOREIGN KEY ("user_id") REFERENCES "users"("id")
 ON DELETE CASCADE 
 ON UPDATE CASCADE;
 
--- Fix all other tables to auto-generate UUIDs
+-- Fix all other tables
 ALTER TABLE "users" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "users" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE "dubbing_jobs" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
 ALTER TABLE "dubbing_jobs" DROP CONSTRAINT IF EXISTS "dubbing_jobs_user_id_fkey";
 ALTER TABLE "dubbing_jobs" ALTER COLUMN "user_id" DROP NOT NULL;
@@ -42,19 +45,21 @@ ON DELETE CASCADE
 ON UPDATE CASCADE;
 
 ALTER TABLE "transcripts" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "transcripts" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE "translations" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "translations" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE "voice_clones" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "voice_clones" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE "jobs" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "jobs" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE "glossaries" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "glossaries" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE "context_maps" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
-ALTER TABLE "adaptation_metrics" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
-ALTER TABLE "audio_quality_metrics" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
-ALTER TABLE "sync_quality_metrics" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "context_maps" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE "support_tickets" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
-ALTER TABLE "support_ticket_messages" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
-ALTER TABLE "abuse_reports" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "support_tickets" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE "feedback" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
-ALTER TABLE "analytics_events" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "feedback" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
 ```
 
 ### 3. Click "Run" (or press Cmd/Ctrl + Enter)

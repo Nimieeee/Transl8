@@ -4,8 +4,9 @@
 -- Enable UUID extension if not already enabled
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Add default UUID generation for id column
+-- Add default UUID generation for id column and timestamp defaults
 ALTER TABLE "projects" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "projects" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
 
 -- Make user_id nullable
 ALTER TABLE "projects" DROP CONSTRAINT IF EXISTS "projects_user_id_fkey";
@@ -26,21 +27,44 @@ FOREIGN KEY ("user_id") REFERENCES "users"("id")
 ON DELETE CASCADE 
 ON UPDATE CASCADE;
 
--- Fix all other tables to have UUID defaults
+-- Fix all other tables to have UUID defaults and timestamp defaults
 ALTER TABLE "users" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "users" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE "transcripts" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "transcripts" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE "translations" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "translations" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE "voice_clones" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "voice_clones" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE "jobs" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "jobs" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE "glossaries" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "glossaries" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE "context_maps" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "context_maps" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE "adaptation_metrics" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+
 ALTER TABLE "audio_quality_metrics" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+
 ALTER TABLE "sync_quality_metrics" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+
 ALTER TABLE "support_tickets" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "support_tickets" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE "support_ticket_messages" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+
 ALTER TABLE "abuse_reports" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+
 ALTER TABLE "feedback" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
+ALTER TABLE "feedback" ALTER COLUMN "updated_at" SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE "analytics_events" ALTER COLUMN "id" SET DEFAULT uuid_generate_v4();
 
 -- Verify the changes
