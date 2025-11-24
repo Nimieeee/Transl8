@@ -53,22 +53,25 @@ export class AudioAnalyzer {
       let speechEnd = totalDuration;
       let endSilence = 0;
 
-      // Check if there's silence at the very beginning (starts near 0)
-      if (silenceStarts.length > 0 && silenceStarts[0] < 0.5) {
+      // Check if there's silence at the very beginning (starts at or near 0)
+      if (silenceStarts.length > 0 && silenceStarts[0] < 0.1) {
         // There's silence at the start
-        if (silenceEnds.length > 0) {
+        if (silenceEnds.length > 0 && silenceEnds[0] > 0.1) {
           startSilence = silenceEnds[0];
           speechStart = silenceEnds[0];
+          console.log(`Detected start silence: 0s - ${startSilence.toFixed(2)}s`);
         }
       }
 
       // Check if there's silence at the very end
+      // Look for the last silence period that extends to near the end
       if (silenceStarts.length > 0) {
         const lastSilenceStart = silenceStarts[silenceStarts.length - 1];
-        // If silence starts near the end
-        if (lastSilenceStart > totalDuration - 2) {
+        // If this silence period extends close to the end of the audio
+        if (lastSilenceStart > totalDuration - 3 && lastSilenceStart > speechStart + 1) {
           speechEnd = lastSilenceStart;
           endSilence = totalDuration - lastSilenceStart;
+          console.log(`Detected end silence: ${speechEnd.toFixed(2)}s - ${totalDuration.toFixed(2)}s`);
         }
       }
 
