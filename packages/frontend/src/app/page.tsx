@@ -35,10 +35,10 @@ export default function Home() {
           </div>
 
           {/* Tagline */}
-          <p className={`text-center text-2xl md:text-3xl font-semibold text-[#a0a0b8] mb-4 ${mounted ? 'animate-slide-up opacity-0 delay-200' : 'opacity-0'}`}>
+          <p className={`text-center text-2xl md:text-3xl font-semibold text-[var(--text-secondary)] mb-4 ${mounted ? 'animate-slide-up opacity-0 delay-200' : 'opacity-0'}`}>
             Break Language Barriers
           </p>
-          <p className={`text-center text-lg md:text-xl text-[#6b6b7f] mb-16 max-w-2xl mx-auto ${mounted ? 'animate-slide-up opacity-0 delay-300' : 'opacity-0'}`}>
+          <p className={`text-center text-lg md:text-xl text-[var(--text-muted)] mb-16 max-w-2xl mx-auto ${mounted ? 'animate-slide-up opacity-0 delay-300' : 'opacity-0'}`}>
             AI-powered video dubbing that preserves emotion, timing, and authenticity across any language
           </p>
 
@@ -54,7 +54,7 @@ export default function Home() {
             
             <Link 
               href="/dashboard"
-              className="px-10 py-5 border-2 border-[#2a2a38] rounded-2xl font-bold text-xl text-[#a0a0b8] hover:border-[#00d9ff] hover:text-[#00d9ff] transition-all duration-300 hover:shadow-[0_0_20px_rgba(0,217,255,0.3)]"
+              className="px-10 py-5 border-2 border-[var(--border-color)] rounded-2xl font-bold text-xl text-[var(--text-secondary)] hover:border-[var(--accent-secondary)] hover:text-[var(--accent-secondary)] transition-all duration-300 hover:shadow-[0_0_20px_var(--glow-secondary)]"
             >
               View Demo
             </Link>
@@ -84,18 +84,18 @@ export default function Home() {
             ].map((feature, i) => (
               <div 
                 key={i}
-                className="group relative p-8 bg-[#13131a] border border-[#2a2a38] rounded-2xl hover:border-[#ff3366] transition-all duration-300 hover:transform hover:-translate-y-2"
+                className="group relative p-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl hover:border-[var(--accent-primary)] transition-all duration-300 hover:transform hover:-translate-y-2 shadow-lg"
               >
                 <div className={`inline-flex p-4 bg-gradient-to-br ${feature.color} bg-opacity-10 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <feature.Icon className={`w-12 h-12 bg-gradient-to-br ${feature.color} bg-clip-text text-transparent`} strokeWidth={1.5} />
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-white">
+                <h3 className="text-xl font-bold mb-2 text-[var(--text-primary)]">
                   {feature.title}
                 </h3>
-                <p className="text-[#6b6b7f]">
+                <p className="text-[var(--text-muted)]">
                   {feature.desc}
                 </p>
-                <div className="absolute inset-0 bg-gradient-to-br from-[#ff3366]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
               </div>
             ))}
           </div>

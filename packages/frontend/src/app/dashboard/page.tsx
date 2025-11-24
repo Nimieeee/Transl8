@@ -134,7 +134,7 @@ export default function Dashboard() {
             {projects.map((project, i) => (
               <div
                 key={project.id}
-                className={`group relative p-6 bg-[#13131a] border border-[#2a2a38] rounded-2xl hover:border-[#ff3366] transition-all duration-300 hover:transform hover:-translate-y-2 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}
+                className={`group relative p-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl hover:border-[var(--accent-primary)] transition-all duration-300 hover:transform hover:-translate-y-2 shadow-lg ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}
                 style={{ animationDelay: `${i * 0.1}s` }}
               >
                 {/* Status indicator */}
@@ -145,13 +145,13 @@ export default function Dashboard() {
                   <button
                     onClick={(e) => handleDeleteClick(e, project.id)}
                     disabled={deletingId === project.id}
-                    className="p-2 bg-[#1a1a24] border border-[#2a2a38] rounded-lg hover:border-red-500/50 hover:bg-red-500/10 transition-colors group/delete"
+                    className="p-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg hover:border-red-500/50 hover:bg-red-500/10 transition-colors group/delete"
                     title="Delete project"
                   >
                     {deletingId === project.id ? (
                       <div className="w-4 h-4 border-2 border-red-500 border-t-transparent rounded-full animate-spin" />
                     ) : (
-                      <Trash2 className="w-4 h-4 text-[#6b6b7f] group-hover/delete:text-red-400 transition-colors" />
+                      <Trash2 className="w-4 h-4 text-[var(--text-muted)] group-hover/delete:text-red-400 transition-colors" />
                     )}
                   </button>
                 </div>
@@ -161,21 +161,21 @@ export default function Dashboard() {
                   onClick={() => router.push(`/projects/${project.id}`)}
                   className="cursor-pointer mt-8"
                 >
-                  <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#ff3366] transition-colors">
+                  <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3 group-hover:text-[var(--accent-primary)] transition-colors">
                     {project.name}
                   </h3>
                   
-                  <div className="flex items-center gap-2 text-[#6b6b7f] font-mono text-sm mb-4">
-                    <span className="px-2 py-1 bg-[#1a1a24] rounded border border-[#2a2a38]">
+                  <div className="flex items-center gap-2 text-[var(--text-muted)] font-mono text-sm mb-4">
+                    <span className="px-2 py-1 bg-[var(--bg-tertiary)] rounded border border-[var(--border-color)]">
                       {project.source_language.toUpperCase()}
                     </span>
-                    <span className="text-[#ff3366]">→</span>
-                    <span className="px-2 py-1 bg-[#1a1a24] rounded border border-[#2a2a38]">
+                    <span className="text-[var(--accent-primary)]">→</span>
+                    <span className="px-2 py-1 bg-[var(--bg-tertiary)] rounded border border-[var(--border-color)]">
                       {project.target_language.toUpperCase()}
                     </span>
                   </div>
 
-                  <div className="text-xs text-[#6b6b7f] font-mono">
+                  <div className="text-xs text-[var(--text-muted)] font-mono">
                     {new Date(project.created_at).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -185,7 +185,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* Hover effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-[#ff3366]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent-primary)]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl pointer-events-none" />
               </div>
             ))}
           </div>
@@ -199,33 +199,33 @@ export default function Dashboard() {
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setShowModal(false)}
           />
-          <div className="relative bg-[#13131a] border border-[#2a2a38] rounded-3xl max-w-md w-full p-8 animate-slide-up">
-            <h2 className="text-3xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[#ff3366] to-[#00d9ff]">
+          <div className="relative bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-3xl max-w-md w-full p-8 animate-slide-up shadow-2xl">
+            <h2 className="text-3xl font-black mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]">
               New Project
             </h2>
             <form onSubmit={createProject} className="space-y-6">
               <div>
-                <label className="block text-sm font-bold text-[#a0a0b8] mb-2 font-mono">
+                <label className="block text-sm font-bold text-[var(--text-secondary)] mb-2 font-mono">
                   PROJECT NAME
                 </label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#1a1a24] border border-[#2a2a38] rounded-xl text-white focus:border-[#ff3366] focus:outline-none transition-colors"
+                  className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:outline-none transition-colors"
                   placeholder="My Awesome Video"
                   required
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-bold text-[#a0a0b8] mb-2 font-mono">
+                  <label className="block text-sm font-bold text-[var(--text-secondary)] mb-2 font-mono">
                     FROM
                   </label>
                   <select
                     value={sourceLanguage}
                     onChange={(e) => setSourceLanguage(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#1a1a24] border border-[#2a2a38] rounded-xl text-white focus:border-[#ff3366] focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:outline-none transition-colors"
                   >
                     <option value="en">English</option>
                     <option value="es">Spanish</option>
@@ -239,13 +239,13 @@ export default function Dashboard() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-bold text-[#a0a0b8] mb-2 font-mono">
+                  <label className="block text-sm font-bold text-[var(--text-secondary)] mb-2 font-mono">
                     TO
                   </label>
                   <select
                     value={targetLanguage}
                     onChange={(e) => setTargetLanguage(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#1a1a24] border border-[#2a2a38] rounded-xl text-white focus:border-[#ff3366] focus:outline-none transition-colors"
+                    className="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-[var(--text-primary)] focus:border-[var(--accent-primary)] focus:outline-none transition-colors"
                   >
                     <option value="es">Spanish</option>
                     <option value="en">English</option>
@@ -269,7 +269,7 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="flex-1 py-3 bg-[#1a1a24] border border-[#2a2a38] rounded-xl font-bold text-[#a0a0b8] hover:border-[#6b6b7f] transition-colors"
+                  className="flex-1 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl font-bold text-[var(--text-secondary)] hover:border-[var(--text-muted)] transition-colors"
                 >
                   Cancel
                 </button>
@@ -291,16 +291,16 @@ export default function Dashboard() {
               }
             }}
           />
-          <div className="relative bg-[#13131a] border border-red-500/30 rounded-3xl max-w-md w-full p-8 animate-slide-up" onClick={(e) => e.stopPropagation()}>
+          <div className="relative bg-[var(--bg-secondary)] border border-red-500/30 rounded-3xl max-w-md w-full p-8 animate-slide-up shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-6">
               <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/30">
-                <Trash2 className="w-6 h-6 text-red-400" />
+                <Trash2 className="w-6 h-6 text-red-500" />
               </div>
-              <h2 className="text-2xl font-black text-white">
+              <h2 className="text-2xl font-black text-[var(--text-primary)]">
                 Delete Project?
               </h2>
             </div>
-            <p className="text-[#a0a0b8] mb-6">
+            <p className="text-[var(--text-secondary)] mb-6">
               This action cannot be undone. All project data, including uploaded videos and processing results, will be permanently deleted.
             </p>
             <div className="flex gap-3">
