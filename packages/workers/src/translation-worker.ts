@@ -89,7 +89,7 @@ export async function processTranslation(job: Job) {
     }
 
     // Save metrics (optional, based on schema)
-    await supabase
+    const { error: metricsError } = await supabase
       .from('adaptation_metrics')
       .insert({
         project_id: projectId,
@@ -100,8 +100,11 @@ export async function processTranslation(job: Job) {
         success_rate: 100,
         average_attempts: attempts,
         validation_failure_reasons: lastError ? { error: lastError.message } : {},
-      })
-      .catch(err => console.error('Failed to save metrics:', err));
+      });
+    
+    if (metricsError) {
+      console.error('Failed to save metrics:', metricsError);
+    }
 
     await supabase
       .from('translations')
