@@ -114,15 +114,15 @@ export default function DemoPage() {
         <div className={`mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 ${mounted ? 'animate-fade-in opacity-0 delay-200' : 'opacity-0'}`}>
           <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
             <div className="text-2xl sm:text-3xl font-black text-[#ff3366] mb-2">~19s</div>
-            <p className="text-sm text-[#a0a0b8]">Duration matched within 5% tolerance</p>
+            <p className="text-sm text-[#a0a0b8]">Perfect timing match</p>
           </div>
           <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
-            <div className="text-2xl sm:text-3xl font-black text-[#00d9ff] mb-2">15x</div>
-            <p className="text-sm text-[#a0a0b8]">Validation attempts for perfect timing</p>
+            <div className="text-2xl sm:text-3xl font-black text-[#00d9ff] mb-2">Natural</div>
+            <p className="text-sm text-[#a0a0b8]">Conversational flow</p>
           </div>
           <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
-            <div className="text-2xl sm:text-3xl font-black text-[#ffcc00] mb-2">100%</div>
-            <p className="text-sm text-[#a0a0b8]">AI-powered translation accuracy</p>
+            <div className="text-2xl sm:text-3xl font-black text-[#ffcc00] mb-2">Cinema</div>
+            <p className="text-sm text-[#a0a0b8]">Professional quality</p>
           </div>
         </div>
 
