@@ -18,6 +18,13 @@ const BUCKET_NAME = 'videos';
  */
 export async function uploadToStorage(filePath: string, key: string): Promise<string> {
   try {
+    console.log('Upload attempt:', { 
+      bucket: BUCKET_NAME, 
+      key, 
+      supabaseUrl: supabaseUrl ? 'SET' : 'MISSING',
+      supabaseKey: supabaseKey ? 'SET' : 'MISSING'
+    });
+
     // Read file
     const fileContent = await readFile(filePath);
     const fileName = basename(filePath);
@@ -32,8 +39,11 @@ export async function uploadToStorage(filePath: string, key: string): Promise<st
       });
 
     if (error) {
+      console.error('Supabase storage error:', JSON.stringify(error, null, 2));
       throw new Error(`Supabase upload failed: ${error.message}`);
     }
+
+    console.log('Upload successful:', data);
 
     // Get public URL
     const { data: urlData } = supabase.storage
