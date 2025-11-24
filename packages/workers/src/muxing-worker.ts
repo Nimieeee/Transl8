@@ -53,16 +53,19 @@ export async function processMuxing(job: Job) {
     console.log('Muxing video and audio...');
 
     // Combine video and audio using ffmpeg
-    // Standard muxing - audio should already match video duration from validation loop
+    // Audio already has silence padding from TTS worker, so timestamps should match
     await new Promise((resolve, reject) => {
       ffmpeg()
         .input(tempVideoPath)
         .input(tempAudioPath)
         .outputOptions([
-          '-c:v copy',    // Copy video without re-encoding
-          '-c:a aac',     // Encode audio as AAC
-          '-map 0:v:0',   // Map video from first input
-          '-map 1:a:0'    // Map audio from second input
+          '-c:v copy',              // Copy video without re-encoding
+          '-c:a aac',               // Encode audio as AAC
+          '-map 0:v:0',             // Map video from first input
+          '-map 1:a:0',             // Map audio from second input
+          '-shortest',              // Use shortest stream duration
+          '-async 1',               // Audio sync method
+          '-vsync 2'                // Video sync method
         ])
         .save(outputPath)
         .on('end', () => {
