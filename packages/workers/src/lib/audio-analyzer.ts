@@ -119,30 +119,44 @@ export class AudioAnalyzer {
     try {
       console.log(`Adding silence: ${startSilence.toFixed(2)}s at start, ${endSilence.toFixed(2)}s at end`);
 
-      // Build FFmpeg filter
-      const filters: string[] = [];
-      
-      if (startSilence > 0) {
-        filters.push(`adelay=${Math.round(startSilence * 1000)}|${Math.round(startSilence * 1000)}`);
-      }
-      
-      if (endSilence > 0) {
-        filters.push(`apad=pad_dur=${endSilence}`);
-      }
-
-      if (filters.length === 0) {
+      if (startSilence === 0 && endSilence === 0) {
         // No silence to add, just copy
         await execAsync(`cp "${inputPath}" "${outputPath}"`);
         return outputPath;
       }
 
-      const filterString = filters.join(',');
+      // Use anullsrc to generate silence and concat with audio
+      // This is more reliable than adelay for precise timing
+      let filterComplex = '';
+      
+      if (startSilence > 0 && endSilence > 0) {
+        // Add silence at both start and end
+        filterComplex = `anullsrc=r=44100:cl=stereo:d=${startSilence}[s1];` +
+                       `anullsrc=r=44100:cl=stereo:d=${endSilence}[s2];` +
+                       `[s1][0:a][s2]concat=n=3:v=0:a=1[out]`;
+      } else if (startSilence > 0) {
+        // Add silence only at start
+        filterComplex = `anullsrc=r=44100:cl=stereo:d=${startSilence}[s1];` +
+                       `[s1][0:a]concat=n=2:v=0:a=1[out]`;
+      } else {
+        // Add silence only at end
+        filterComplex = `anullsrc=r=44100:cl=stereo:d=${endSilence}[s2];` +
+                       `[0:a][s2]concat=n=2:v=0:a=1[out]`;
+      }
       
       await execAsync(
-        `ffmpeg -i "${inputPath}" -af "${filterString}" -c:a aac "${outputPath}"`
+        `ffmpeg -i "${inputPath}" -filter_complex "${filterComplex}" -map "[out]" -c:a aac "${outputPath}"`
       );
 
       console.log(`Silence added successfully: ${outputPath}`);
+      
+      // Verify the output duration
+      const { stdout } = await execAsync(
+        `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${outputPath}"`
+      );
+      const finalDuration = parseFloat(stdout.trim());
+      console.log(`Final audio duration: ${finalDuration.toFixed(2)}s`);
+      
       return outputPath;
     } catch (error) {
       console.error('Add silence error:', error);
