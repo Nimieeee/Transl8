@@ -18,20 +18,37 @@ export async function processTts(job: Job) {
     .insert({ project_id: projectId, stage: 'TTS', status: 'PROCESSING' });
 
   try {
-    const { data: project } = await supabase
+    console.log(`TTS worker started for project ${projectId}`);
+
+    const { data: project, error: projectError } = await supabase
       .from('projects')
       .select('*')
       .eq('id', projectId)
       .single();
 
-    const { data: translations } = await supabase
+    if (projectError || !project) {
+      console.error('Project fetch error:', projectError);
+      throw new Error(`Project not found: ${projectError?.message}`);
+    }
+
+    console.log('Project found, fetching translations...');
+
+    const { data: translations, error: translationError } = await supabase
       .from('translations')
       .select('*')
       .eq('project_id', projectId);
 
-    if (!project || !translations || translations.length === 0) {
-      throw new Error('No translation found');
+    if (translationError) {
+      console.error('Translation fetch error:', translationError);
+      throw new Error(`Failed to fetch translations: ${translationError.message}`);
     }
+
+    if (!translations || translations.length === 0) {
+      console.error('No translations found for project:', projectId);
+      throw new Error('No translation found - translation may have failed');
+    }
+
+    console.log(`Found ${translations.length} translation(s)`);
 
     const text = JSON.stringify(translations[0].content);
 

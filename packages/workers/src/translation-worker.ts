@@ -134,14 +134,24 @@ export async function processTranslation(job: Job) {
       console.error('Failed to save metrics:', metricsError);
     }
 
-    await supabase
+    console.log('Saving translation to database...');
+    const { data: savedTranslation, error: translationError } = await supabase
       .from('translations')
       .insert({
         project_id: projectId,
         target_language: project.target_language,
         content: translationContent,
         approved: false
-      });
+      })
+      .select()
+      .single();
+
+    if (translationError) {
+      console.error('Failed to save translation:', translationError);
+      throw new Error(`Translation save failed: ${translationError.message}`);
+    }
+
+    console.log('Translation saved successfully:', savedTranslation?.id);
 
     await supabase
       .from('jobs')
@@ -149,6 +159,7 @@ export async function processTranslation(job: Job) {
       .eq('project_id', projectId)
       .eq('stage', 'MT');
 
+    console.log('Translation completed, triggering TTS...');
     await addJob('tts', { projectId });
 
   } catch (error: any) {
