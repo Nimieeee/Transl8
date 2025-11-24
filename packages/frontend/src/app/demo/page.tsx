@@ -1,0 +1,141 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { ArrowLeft, Play, Pause } from 'lucide-react';
+import MobileNav from '@/components/MobileNav';
+
+export default function DemoPage() {
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const [playingOriginal, setPlayingOriginal] = useState(false);
+  const [playingTranslated, setPlayingTranslated] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return (
+    <div className="min-h-screen relative">
+      {/* Mobile Navigation */}
+      <MobileNav />
+      
+      {/* Background */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#2a2a38_1px,transparent_1px),linear-gradient(to_bottom,#2a2a38_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
+      
+      {/* Header */}
+      <div className="relative z-10 border-b border-[#2a2a38] bg-[#0a0a0f]/80 backdrop-blur-xl">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-6 pl-16 lg:pl-4">
+          <button
+            onClick={() => router.push('/')}
+            className="flex items-center gap-2 text-[#6b6b7f] hover:text-[#ff3366] transition-colors mb-2 sm:mb-3 md:mb-4 group min-h-[44px]"
+          >
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
+            <span className="font-mono text-xs sm:text-sm">Back to Home</span>
+          </button>
+          <div>
+            <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black tracking-tight text-white mb-1.5 sm:mb-2">
+              Live Demo
+            </h1>
+            <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono">
+              See TRANSL8 in action - English to Spanish dubbing
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+          {/* Original Video */}
+          <div className={`bg-[#13131a] border border-[#2a2a38] rounded-xl sm:rounded-2xl p-4 sm:p-6 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-[#00d9ff]/20 to-[#00d9ff]/5 rounded-xl border border-[#00d9ff]/30">
+                <Play className="w-5 h-5 sm:w-6 sm:h-6 text-[#00d9ff]" />
+              </div>
+              <div>
+                <h2 className="text-lg sm:text-xl font-bold text-white">Original</h2>
+                <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono">English</p>
+              </div>
+            </div>
+            
+            <div className="relative aspect-video bg-black rounded-xl overflow-hidden">
+              <video
+                controls
+                className="w-full h-full"
+                onPlay={() => setPlayingOriginal(true)}
+                onPause={() => setPlayingOriginal(false)}
+              >
+                <source src="/demo.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
+            <div className="mt-4 p-3 bg-[#1a1a24] border border-[#2a2a38] rounded-lg">
+              <p className="text-sm text-[#a0a0b8]">
+                <span className="font-semibold text-white">Original Audio:</span> English narration demonstrating the translation capabilities
+              </p>
+            </div>
+          </div>
+
+          {/* Translated Video */}
+          <div className={`bg-[#13131a] border border-[#2a2a38] rounded-xl sm:rounded-2xl p-4 sm:p-6 ${mounted ? 'animate-slide-up opacity-0 delay-100' : 'opacity-0'}`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-[#ff3366]/20 to-[#ff3366]/5 rounded-xl border border-[#ff3366]/30">
+                <Play className="w-5 h-5 sm:w-6 sm:h-6 text-[#ff3366]" />
+              </div>
+              <div>
+                <h2 className="text-lg sm:text-xl font-bold text-white">Translated</h2>
+                <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono">Spanish</p>
+              </div>
+            </div>
+            
+            <div className="relative aspect-video bg-black rounded-xl overflow-hidden">
+              <video
+                controls
+                className="w-full h-full"
+                onPlay={() => setPlayingTranslated(true)}
+                onPause={() => setPlayingTranslated(false)}
+              >
+                <source src="/output.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
+            <div className="mt-4 p-3 bg-[#1a1a24] border border-[#2a2a38] rounded-lg">
+              <p className="text-sm text-[#a0a0b8]">
+                <span className="font-semibold text-white">Dubbed Audio:</span> AI-generated Spanish voice with matched timing and lip-sync
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Features */}
+        <div className={`mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 ${mounted ? 'animate-fade-in opacity-0 delay-200' : 'opacity-0'}`}>
+          <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
+            <div className="text-2xl sm:text-3xl font-black text-[#ff3366] mb-2">~19s</div>
+            <p className="text-sm text-[#a0a0b8]">Duration matched within 5% tolerance</p>
+          </div>
+          <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
+            <div className="text-2xl sm:text-3xl font-black text-[#00d9ff] mb-2">15x</div>
+            <p className="text-sm text-[#a0a0b8]">Validation attempts for perfect timing</p>
+          </div>
+          <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
+            <div className="text-2xl sm:text-3xl font-black text-[#ffcc00] mb-2">100%</div>
+            <p className="text-sm text-[#a0a0b8]">AI-powered translation accuracy</p>
+          </div>
+        </div>
+
+        {/* CTA */}
+        <div className={`mt-8 sm:mt-12 text-center ${mounted ? 'animate-slide-up opacity-0 delay-300' : 'opacity-0'}`}>
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="px-8 sm:px-10 py-4 sm:py-5 bg-gradient-to-r from-[#ff3366] to-[#ff4477] rounded-2xl font-bold text-lg sm:text-xl text-white hover:scale-105 transition-transform duration-300 shadow-[0_0_40px_rgba(255,51,102,0.4)]"
+          >
+            Try It Yourself
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

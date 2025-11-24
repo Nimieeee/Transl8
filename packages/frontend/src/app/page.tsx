@@ -26,7 +26,7 @@ export default function Home() {
       <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-[#ffcc00] rounded-full mix-blend-multiply filter blur-[128px] opacity-10 animate-float" style={{ animationDelay: '4s' }} />
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12 pt-20 lg:pt-12">
+      <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12 pt-24 lg:pt-12">
         <div className="max-w-5xl w-full">
           {/* Logo/Brand */}
           <div className={`text-center mb-6 sm:mb-8 md:mb-12 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
@@ -57,7 +57,7 @@ export default function Home() {
             </Link>
             
             <Link 
-              href="/dashboard"
+              href="/demo"
               className="px-8 sm:px-10 py-4 sm:py-5 border-2 border-[var(--border-color)] rounded-2xl font-bold text-lg sm:text-xl text-[var(--text-secondary)] hover:border-[var(--accent-secondary)] hover:text-[var(--accent-secondary)] transition-all duration-300 hover:shadow-[0_0_20px_var(--glow-secondary)] text-center"
             >
               View Demo
@@ -71,27 +71,30 @@ export default function Home() {
                 Icon: Film,
                 title: 'Cinema Quality', 
                 desc: 'Professional-grade dubbing',
-                color: 'from-[#ff3366] to-[#ff4477]'
+                color: 'from-[#ff3366] to-[#ff4477]',
+                bgColor: 'bg-[#ff3366]'
               },
               { 
                 Icon: Zap,
                 title: 'Lightning Fast', 
                 desc: 'Process in minutes',
-                color: 'from-[#ffcc00] to-[#ffdd33]'
+                color: 'from-[#ffcc00] to-[#ffdd33]',
+                bgColor: 'bg-[#ffcc00]'
               },
               { 
                 Icon: Globe,
                 title: 'Any Language', 
                 desc: '100+ languages supported',
-                color: 'from-[#00d9ff] to-[#00eeff]'
+                color: 'from-[#00d9ff] to-[#00eeff]',
+                bgColor: 'bg-[#00d9ff]'
               }
             ].map((feature, i) => (
               <div 
                 key={i}
                 className="group relative p-6 sm:p-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl hover:border-[var(--accent-primary)] transition-all duration-300 hover:transform hover:-translate-y-2 shadow-lg"
               >
-                <div className={`inline-flex p-3 sm:p-4 bg-gradient-to-br ${feature.color} bg-opacity-10 rounded-2xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.Icon className={`w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br ${feature.color} bg-clip-text text-transparent`} strokeWidth={1.5} />
+                <div className={`inline-flex p-3 sm:p-4 ${feature.bgColor} bg-opacity-20 rounded-2xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                  <feature.Icon className={`w-10 h-10 sm:w-12 sm:h-12 text-white`} strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold mb-2 text-[var(--text-primary)]">
                   {feature.title}
