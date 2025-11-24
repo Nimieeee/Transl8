@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiClient } from '@/lib/api-client';
 import { Film, Trash2, MoreVertical } from 'lucide-react';
+import MobileNav from '@/components/MobileNav';
 
 interface Project {
   id: string;
@@ -85,6 +86,9 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen relative">
+      {/* Mobile Navigation */}
+      <MobileNav onCreateProject={() => setShowModal(true)} />
+      
       {/* Background */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--border-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--border-color)_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
       
@@ -195,16 +199,16 @@ export default function Dashboard() {
 
       {/* Create Project Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in">
           <div 
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setShowModal(false)}
           />
-          <div className="relative bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl sm:rounded-3xl max-w-md w-full p-6 sm:p-8 animate-slide-up shadow-2xl max-h-[90vh] overflow-y-auto">
+          <div className="relative bg-[var(--bg-secondary)] border-t sm:border border-[var(--border-color)] rounded-t-3xl sm:rounded-3xl w-full sm:max-w-md p-6 sm:p-8 animate-slide-up shadow-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl sm:text-3xl font-black mb-4 sm:mb-6 bg-clip-text text-transparent bg-gradient-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)]">
               New Project
             </h2>
-            <form onSubmit=createProject} className="space-y-4 sm:space-y-6">
+            <form onSubmit={createProject} className="space-y-4 sm:space-y-6">
               <div>
                 <label className="block text-sm font-bold text-[var(--text-secondary)] mb-2 font-mono">
                   PROJECT NAME
@@ -282,7 +286,7 @@ export default function Dashboard() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-6 animate-fade-in">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in">
           <div 
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => {
@@ -292,7 +296,7 @@ export default function Dashboard() {
               }
             }}
           />
-          <div className="relative bg-[var(--bg-secondary)] border border-red-500/30 rounded-3xl max-w-md w-full p-8 animate-slide-up shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="relative bg-[var(--bg-secondary)] border-t sm:border border-red-500/30 rounded-t-3xl sm:rounded-3xl w-full sm:max-w-md p-6 sm:p-8 animate-slide-up shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center gap-3 mb-6">
               <div className="p-3 bg-red-500/10 rounded-xl border border-red-500/30">
                 <Trash2 className="w-6 h-6 text-red-500" />

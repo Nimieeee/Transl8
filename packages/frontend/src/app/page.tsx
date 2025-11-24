@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Film, Zap, Globe } from 'lucide-react';
+import MobileNav from '@/components/MobileNav';
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
@@ -13,6 +14,9 @@ export default function Home() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      {/* Mobile Navigation */}
+      <MobileNav />
+      
       {/* Animated background grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#2a2a38_1px,transparent_1px),linear-gradient(to_bottom,#2a2a38_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
       
