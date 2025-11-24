@@ -28,6 +28,15 @@ interface Project {
   created_at: string;
 }
 
+interface Job {
+  id: string;
+  project_id: string;
+  stage: string;
+  status: string;
+  progress: number;
+  error_message?: string;
+}
+
 export default function ProjectPage() {
   const params = useParams();
   const router = useRouter();
@@ -35,6 +44,7 @@ export default function ProjectPage() {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [jobs, setJobs] = useState<Job[]>([]);
 
   useEffect(() => {
     setMounted(true);
@@ -47,9 +57,20 @@ export default function ProjectPage() {
     try {
       const { data } = await apiClient.get(`/projects/${params.id}`);
       setProject(data);
+      
+      // Also fetch jobs for stage tracking
+      const { data: jobsData } = await apiClient.get(`/projects/${params.id}/jobs`);
+      if (jobsData) {
+        setJobs(jobsData);
+      }
     } catch (error) {
       console.error('Failed to load project', error);
     }
+  };
+
+  const getStageStatus = (stage: string) => {
+    const job = jobs.find(j => j.stage === stage);
+    return job?.status || 'PENDING';
   };
 
   const handleUpload = async () => {
@@ -235,22 +256,81 @@ export default function ProjectPage() {
                     <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
                     <span className="text-white font-semibold">Dubbing in progress...</span>
                   </div>
-                  <div className="space-y-2 text-sm text-[#6b6b7f] font-mono">
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                  <div className="space-y-3 text-sm font-mono">
+                    {/* STT Stage */}
+                    <div className={`flex items-center gap-2 transition-all duration-500 ${
+                      getStageStatus('STT') === 'COMPLETED' 
+                        ? 'text-green-400' 
+                        : getStageStatus('STT') === 'PROCESSING'
+                        ? 'text-green-400'
+                        : 'text-[#6b6b7f]'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full ${
+                        getStageStatus('STT') === 'COMPLETED'
+                          ? 'bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]'
+                          : getStageStatus('STT') === 'PROCESSING'
+                          ? 'bg-green-400 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]'
+                          : 'bg-[#6b6b7f]'
+                      }`} />
                       Speech-to-text extraction
+                      {getStageStatus('STT') === 'COMPLETED' && <CheckCircle2 className="w-4 h-4 ml-auto" />}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse" />
+
+                    {/* Translation Stage */}
+                    <div className={`flex items-center gap-2 transition-all duration-500 ${
+                      getStageStatus('MT') === 'COMPLETED' 
+                        ? 'text-blue-400' 
+                        : getStageStatus('MT') === 'PROCESSING'
+                        ? 'text-blue-400'
+                        : 'text-[#6b6b7f]'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full ${
+                        getStageStatus('MT') === 'COMPLETED'
+                          ? 'bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]'
+                          : getStageStatus('MT') === 'PROCESSING'
+                          ? 'bg-blue-400 animate-pulse shadow-[0_0_10px_rgba(96,165,250,0.8)]'
+                          : 'bg-[#6b6b7f]'
+                      }`} />
                       AI translation
+                      {getStageStatus('MT') === 'COMPLETED' && <CheckCircle2 className="w-4 h-4 ml-auto" />}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-yellow-400 rounded-full animate-pulse" />
+
+                    {/* TTS Stage */}
+                    <div className={`flex items-center gap-2 transition-all duration-500 ${
+                      getStageStatus('TTS') === 'COMPLETED' 
+                        ? 'text-yellow-400' 
+                        : getStageStatus('TTS') === 'PROCESSING'
+                        ? 'text-yellow-400'
+                        : 'text-[#6b6b7f]'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full ${
+                        getStageStatus('TTS') === 'COMPLETED'
+                          ? 'bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.8)]'
+                          : getStageStatus('TTS') === 'PROCESSING'
+                          ? 'bg-yellow-400 animate-pulse shadow-[0_0_10px_rgba(250,204,21,0.8)]'
+                          : 'bg-[#6b6b7f]'
+                      }`} />
                       Voice synthesis
+                      {getStageStatus('TTS') === 'COMPLETED' && <CheckCircle2 className="w-4 h-4 ml-auto" />}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />
+
+                    {/* Muxing Stage */}
+                    <div className={`flex items-center gap-2 transition-all duration-500 ${
+                      getStageStatus('MUXING') === 'COMPLETED' 
+                        ? 'text-purple-400' 
+                        : getStageStatus('MUXING') === 'PROCESSING'
+                        ? 'text-purple-400'
+                        : 'text-[#6b6b7f]'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full ${
+                        getStageStatus('MUXING') === 'COMPLETED'
+                          ? 'bg-purple-400 shadow-[0_0_10px_rgba(192,132,252,0.8)]'
+                          : getStageStatus('MUXING') === 'PROCESSING'
+                          ? 'bg-purple-400 animate-pulse shadow-[0_0_10px_rgba(192,132,252,0.8)]'
+                          : 'bg-[#6b6b7f]'
+                      }`} />
                       Video muxing
+                      {getStageStatus('MUXING') === 'COMPLETED' && <CheckCircle2 className="w-4 h-4 ml-auto" />}
                     </div>
                   </div>
                 </div>

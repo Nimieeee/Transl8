@@ -55,6 +55,17 @@ router.get('/:id', asyncHandler(async (req: Request, res: any) => {
   res.json(project);
 }));
 
+router.get('/:id/jobs', asyncHandler(async (req: Request, res: any) => {
+  const { data: jobs, error } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('project_id', req.params.id)
+    .order('created_at', { ascending: true });
+  
+  if (error) throw new AppError(500, 'Failed to fetch jobs');
+  res.json(jobs || []);
+}));
+
 router.post('/:id/upload', upload.single('video'), asyncHandler(async (req: Request, res: any) => {
   const { data: project, error: fetchError } = await supabase
     .from('projects')
