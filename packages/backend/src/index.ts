@@ -3,7 +3,6 @@ import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
 import { createServer } from 'http';
-import authRoutes from './routes/auth';
 import projectRoutes from './routes/projects';
 import dubRoutes from './routes/dub';
 import { errorHandler } from './middleware/error-handler';
@@ -31,7 +30,6 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/health', (req, res) => res.json({ status: 'ok', timestamp: new Date().toISOString() }));
 
 // Routes
-app.use('/api/auth', authRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/dub', dubRoutes);
 
