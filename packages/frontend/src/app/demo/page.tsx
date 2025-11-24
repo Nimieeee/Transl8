@@ -113,7 +113,7 @@ export default function DemoPage() {
         {/* Features */}
         <div className={`mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 ${mounted ? 'animate-fade-in opacity-0 delay-200' : 'opacity-0'}`}>
           <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
-            <div className="text-2xl sm:text-3xl font-black text-[#ff3366] mb-2">~19s</div>
+            <div className="text-2xl sm:text-3xl font-black text-[#ff3366] mb-2">Synced</div>
             <p className="text-sm text-[#a0a0b8]">Perfect timing match</p>
           </div>
           <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
