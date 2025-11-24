@@ -94,13 +94,13 @@ export default function Dashboard() {
       
       {/* Header */}
       <div className="relative z-10 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
-          <div className="flex justify-between items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-6">
+          <div className="flex justify-between items-center gap-3 sm:gap-4">
             <div className="min-w-0 flex-1">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white truncate">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight text-white truncate">
                 STUDIO
               </h1>
-              <p className="text-[var(--text-muted)] mt-1 font-mono text-xs sm:text-sm">
+              <p className="text-[var(--text-muted)] mt-0.5 sm:mt-1 font-mono text-xs sm:text-sm">
                 {projects.length} {projects.length === 1 ? 'project' : 'projects'}
               </p>
             </div>

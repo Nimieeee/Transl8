@@ -109,17 +109,17 @@ export default function ProjectPage() {
       
       {/* Header */}
       <div className="relative z-10 border-b border-[#2a2a38] bg-[#0a0a0f]/80 backdrop-blur-xl">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-6">
           <button
             onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-2 text-[#6b6b7f] hover:text-[#ff3366] transition-colors mb-3 sm:mb-4 group min-h-[44px]"
+            className="flex items-center gap-2 text-[#6b6b7f] hover:text-[#ff3366] transition-colors mb-2 sm:mb-3 md:mb-4 group min-h-[44px]"
           >
-            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="font-mono text-xs sm:text-sm">Back to Studio</span>
           </button>
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
+          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3 md:gap-4">
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white mb-2 break-words">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tight text-white mb-1.5 sm:mb-2 break-words">
                 {project.name}
               </h1>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs sm:text-sm">
@@ -152,12 +152,12 @@ export default function ProjectPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Upload Section */}
           <div className={`bg-[#13131a] border border-[#2a2a38] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
-            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 md:mb-6">
               <div className="p-2 sm:p-3 bg-gradient-to-br from-[#ff3366]/20 to-[#ff3366]/5 rounded-xl border border-[#ff3366]/30 flex-shrink-0">
                 <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-[#ff3366]" />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-lg sm:text-xl font-bold text-white truncate">Upload Video</h2>
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-white truncate">Upload Video</h2>
                 <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono truncate">MP4, MOV, AVI • Max 500MB</p>
               </div>
             </div>
@@ -217,14 +217,14 @@ export default function ProjectPage() {
           </div>
 
           {/* Status Section */}
-          <div className={`bg-[#13131a] border border-[#2a2a38] rounded-2xl p-8 ${mounted ? 'animate-slide-up opacity-0 delay-100' : 'opacity-0'}`}>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-gradient-to-br from-[#00d9ff]/20 to-[#00d9ff]/5 rounded-xl border border-[#00d9ff]/30">
-                <Film className="w-6 h-6 text-[#00d9ff]" />
+          <div className={`bg-[#13131a] border border-[#2a2a38] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 ${mounted ? 'animate-slide-up opacity-0 delay-100' : 'opacity-0'}`}>
+            <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-[#00d9ff]/20 to-[#00d9ff]/5 rounded-xl border border-[#00d9ff]/30 flex-shrink-0">
+                <Film className="w-5 h-5 sm:w-6 sm:h-6 text-[#00d9ff]" />
               </div>
-              <div>
-                <h2 className="text-xl font-bold text-white">Processing Status</h2>
-                <p className="text-sm text-[#6b6b7f] font-mono">Real-time pipeline updates</p>
+              <div className="min-w-0 flex-1">
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-white truncate">Processing Status</h2>
+                <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono truncate">Real-time pipeline updates</p>
               </div>
             </div>
 

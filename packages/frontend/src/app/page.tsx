@@ -29,9 +29,9 @@ export default function Home() {
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 sm:px-6 py-12">
         <div className="max-w-5xl w-full">
           {/* Logo/Brand */}
-          <div className={`text-center mb-8 sm:mb-12 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
+          <div className={`text-center mb-6 sm:mb-8 md:mb-12 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
             <div className="inline-block relative">
-              <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter text-white mb-4">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black tracking-tighter text-white mb-3 sm:mb-4">
                 TRANSL8
               </h1>
               <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[#ff3366] via-[#00d9ff] to-[#ffcc00] rounded-full" />
@@ -39,10 +39,10 @@ export default function Home() {
           </div>
 
           {/* Tagline */}
-          <p className={`text-center text-xl sm:text-2xl md:text-3xl font-semibold text-[var(--text-secondary)] mb-3 sm:mb-4 px-4 ${mounted ? 'animate-slide-up opacity-0 delay-200' : 'opacity-0'}`}>
+          <p className={`text-center text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold text-[var(--text-secondary)] mb-2 sm:mb-3 md:mb-4 px-4 ${mounted ? 'animate-slide-up opacity-0 delay-200' : 'opacity-0'}`}>
             Break Language Barriers
           </p>
-          <p className={`text-center text-base sm:text-lg md:text-xl text-[var(--text-muted)] mb-12 sm:mb-16 max-w-2xl mx-auto px-4 ${mounted ? 'animate-slide-up opacity-0 delay-300' : 'opacity-0'}`}>
+          <p className={`text-center text-sm sm:text-base md:text-lg lg:text-xl text-[var(--text-muted)] mb-8 sm:mb-12 md:mb-16 max-w-2xl mx-auto px-4 ${mounted ? 'animate-slide-up opacity-0 delay-300' : 'opacity-0'}`}>
             AI-powered video dubbing that preserves emotion, timing, and authenticity across any language
           </p>
 
