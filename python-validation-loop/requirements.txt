@@ -5,11 +5,11 @@ librosa>=0.10.0
 soundfile>=0.12.0
 pydub>=0.25.1
 
-# LLM (Gemini)
-google-generativeai>=0.3.0
+# LLM (Mistral AI)
+mistralai>=1.0.0
 
-# Fish Audio TTS (install from their repo)
-# fish-audio-sdk  # Install from: https://github.com/fishaudio/fish-speech
+# TTS (OpenAI)
+openai>=1.0.0
 
 # Optional: Syllable counting
 pyphen>=0.14.0

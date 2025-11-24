@@ -1,12 +1,13 @@
 """
 Audio Duration Validation & Retry Loop for AI Dubbing
-Uses: Gemini LLM + Fish Audio TTS + MPS (Apple Silicon)
+Uses: Mistral AI LLM + OpenAI TTS
 """
 
 import os
 import time
 import librosa
-import google.generativeai as genai
+from mistralai import Mistral
+from openai import OpenAI
 from pathlib import Path
 from typing import Tuple, Optional
 import logging
@@ -15,21 +16,33 @@ import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Configure Gemini
-genai.configure(api_key=os.getenv('GEMINI_API_KEY'))
+# Configure Mistral AI
+mistral_client = Mistral(api_key=os.getenv('MISTRAL_API_KEY'))
+
+# Configure OpenAI
+openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
 
 class DubbingValidator:
-    def __init__(self, tolerance: float = 0.15, max_retries: int = 3):
+    def __init__(
+        self, 
+        tolerance: float = 0.15, 
+        max_retries: int = 3,
+        tts_voice: str = 'alloy',
+        mistral_model: str = 'mistral-small-latest'
+    ):
         """
         Initialize the dubbing validator.
         
         Args:
             tolerance: Acceptable duration variance (default 15% = 0.15)
             max_retries: Maximum retry attempts (default 3)
+            tts_voice: OpenAI TTS voice (alloy, echo, fable, onyx, nova, shimmer)
+            mistral_model: Mistral model to use (mistral-small-latest, mistral-medium-latest)
         """
         self.tolerance = tolerance
         self.max_retries = max_retries
-        self.model = genai.GenerativeModel('gemini-pro')
+        self.tts_voice = tts_voice
+        self.mistral_model = mistral_model
         
     def estimate_syllable_count(self, duration: float) -> int:
         """
@@ -49,97 +62,98 @@ class DubbingValidator:
         self, 
         text: str, 
         target_duration: float,
+        target_language: str = 'Spanish',
         feedback: Optional[str] = None,
         attempt: int = 1
     ) -> str:
         """
-        Use Gemini to adapt text to target duration.
+        Use Mistral AI to adapt text to target duration.
         
         Args:
             text: Original text to translate
             target_duration: Target duration in seconds
+            target_language: Target language for translation
             feedback: Feedback from previous attempt
             attempt: Current attempt number
             
         Returns:
-            Adapted Spanish text
+            Adapted translated text
         """
         target_syllables = self.estimate_syllable_count(target_duration)
         
-        # Build prompt
-        base_prompt = f"""Translate the following text to Spanish for dubbing.
+        # Build system prompt
+        system_prompt = """You are an expert translator and dubbing adapter. Your task is to translate content while matching specific duration constraints for lip-sync dubbing. Always provide ONLY the translation, no explanations."""
+        
+        # Build user prompt
+        user_prompt = f"""Translate the following text to {target_language} for dubbing.
 
 CRITICAL CONSTRAINTS:
 - Target duration: {target_duration:.2f} seconds
 - Target syllable count: approximately {target_syllables} syllables
 - The audio must match the original timing for lip-sync
-- Use natural, conversational Spanish
+- Use natural, conversational {target_language}
 
 Original text: "{text}"
 """
         
         if feedback:
-            base_prompt += f"\n\nFEEDBACK FROM PREVIOUS ATTEMPT #{attempt-1}:\n{feedback}\n"
-            base_prompt += "\nPlease adjust your translation accordingly."
+            user_prompt += f"\n\nFEEDBACK FROM PREVIOUS ATTEMPT #{attempt-1}:\n{feedback}\n"
+            user_prompt += "\nPlease adjust your translation accordingly."
         
-        base_prompt += "\n\nProvide ONLY the Spanish translation, no explanations."
+        user_prompt += f"\n\nProvide ONLY the {target_language} translation, no explanations."
         
-        logger.info(f"Attempt {attempt}: Requesting LLM adaptation...")
+        logger.info(f"Attempt {attempt}: Requesting Mistral AI adaptation...")
         
         try:
-            response = self.model.generate_content(base_prompt)
-            adapted_text = response.text.strip()
-            logger.info(f"LLM returned: {adapted_text}")
+            response = mistral_client.chat.complete(
+                model=self.mistral_model,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt}
+                ]
+            )
+            
+            adapted_text = response.choices[0].message.content.strip()
+            logger.info(f"Mistral AI returned: {adapted_text}")
             return adapted_text
         except Exception as e:
-            logger.error(f"LLM error: {e}")
+            logger.error(f"Mistral AI error: {e}")
             raise
     
-    def generate_audio_fish(
+    def generate_audio_openai(
         self, 
         text: str, 
-        output_path: str,
-        reference_audio: Optional[str] = None
+        output_path: str
     ) -> str:
         """
-        Generate audio using Fish Audio with MPS acceleration.
+        Generate audio using OpenAI TTS.
         
         Args:
             text: Text to synthesize
             output_path: Path to save audio file
-            reference_audio: Optional reference audio for voice cloning
             
         Returns:
             Path to generated audio file
         """
-        logger.info("Generating audio with Fish Audio (MPS)...")
+        logger.info(f"Generating audio with OpenAI TTS (voice: {self.tts_voice})...")
         
         try:
-            # Import Fish Audio (assuming it's installed)
-            from fish_audio_sdk import FishAudioTTS
-            
-            # Initialize with MPS device
-            tts = FishAudioTTS(
-                model_name='S1-Mini',
-                device='mps',  # Apple Silicon GPU
-                compile=False  # Disable torch.compile for M1 compatibility
+            # Generate audio with OpenAI TTS
+            response = openai_client.audio.speech.create(
+                model="tts-1",  # or "tts-1-hd" for higher quality
+                voice=self.tts_voice,
+                input=text,
+                response_format="mp3"
             )
             
-            # Generate audio
-            audio = tts.synthesize(
-                text=text,
-                reference_audio=reference_audio,
-                output_path=output_path
-            )
+            # Save to file
+            response.stream_to_file(output_path)
             
             logger.info(f"Audio generated: {output_path}")
             return output_path
             
-        except ImportError:
-            logger.error("Fish Audio SDK not found. Install with: pip install fish-audio-sdk")
-            raise
         except Exception as e:
-            logger.error(f"TTS generation error: {e}")
+            logger.error(f"OpenAI TTS error: {e}")
             raise
     
     def measure_duration(self, audio_path: str) -> float:
@@ -224,7 +238,7 @@ Original text: "{text}"
         self,
         text: str,
         target_duration: float,
-        original_audio_path: str,
+        target_language: str = 'Spanish',
         output_dir: str = "./output"
     ) -> Tuple[str, float, int]:
         """
@@ -233,7 +247,7 @@ Original text: "{text}"
         Args:
             text: Original text to translate
             target_duration: Target duration in seconds
-            original_audio_path: Path to original audio (for reference)
+            target_language: Target language for translation
             output_dir: Directory to save generated audio
             
         Returns:
@@ -253,24 +267,24 @@ Original text: "{text}"
             logger.info(f"ATTEMPT {attempt}/{self.max_retries}")
             logger.info(f"{'='*60}")
             
-            # Step 1: Adapt text with LLM
+            # Step 1: Adapt text with Mistral AI
             adapted_text = self.adapt_text_with_llm(
                 text=text,
                 target_duration=target_duration,
+                target_language=target_language,
                 feedback=feedback,
                 attempt=attempt
             )
             
-            # Step 2: Generate audio
+            # Step 2: Generate audio with OpenAI TTS
             audio_path = os.path.join(
                 output_dir, 
-                f"attempt_{attempt}_{int(time.time())}.wav"
+                f"attempt_{attempt}_{int(time.time())}.mp3"
             )
             
-            self.generate_audio_fish(
+            self.generate_audio_openai(
                 text=adapted_text,
-                output_path=audio_path,
-                reference_audio=original_audio_path
+                output_path=audio_path
             )
             
             # Step 3: Validate duration
@@ -306,19 +320,23 @@ Original text: "{text}"
 
 # Example usage
 if __name__ == "__main__":
-    # Initialize validator
-    validator = DubbingValidator(tolerance=0.15, max_retries=3)
+    # Initialize validator with OpenAI TTS voice
+    validator = DubbingValidator(
+        tolerance=0.15, 
+        max_retries=3,
+        tts_voice='alloy',  # Options: alloy, echo, fable, onyx, nova, shimmer
+        mistral_model='mistral-small-latest'
+    )
     
     # Example line
     original_text = "Hello, how are you doing today?"
     target_duration = 2.5  # seconds
-    original_audio = "./reference_audio.wav"
     
     # Run validation loop
     audio_path, duration, attempts = validator.adapt_and_validate_line(
         text=original_text,
         target_duration=target_duration,
-        original_audio_path=original_audio,
+        target_language='Spanish',
         output_dir="./dubbed_output"
     )
     
