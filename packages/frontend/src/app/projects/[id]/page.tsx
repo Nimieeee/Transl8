@@ -171,7 +171,7 @@ export default function ProjectPage() {
           </button>
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-3 md:gap-4">
             <div className="flex-1 min-w-0">
-              <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black tracking-tight text-white mb-1.5 sm:mb-2 break-words">
+              <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black tracking-tight text-[var(--text-primary)] mb-1.5 sm:mb-2 break-words">
                 {project.name}
               </h1>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 md:gap-4 text-xs">
@@ -209,8 +209,8 @@ export default function ProjectPage() {
                 <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-[#ff3366]" />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-base sm:text-lg md:text-xl font-bold text-white truncate">Upload Video</h2>
-                <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono truncate">MP4, MOV, AVI • Max 500MB</p>
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] truncate">Upload Video</h2>
+                <p className="text-xs sm:text-sm text-[var(--text-muted)] font-mono truncate">MP4, MOV, AVI • Max 500MB</p>
               </div>
             </div>
 
@@ -258,8 +258,8 @@ export default function ProjectPage() {
                   <div className="flex items-center gap-3">
                     <Play className="w-5 h-5 text-[#00d9ff]" />
                     <div className="flex-1">
-                      <p className="text-white font-semibold">Video uploaded</p>
-                      <p className="text-sm text-[#6b6b7f] font-mono">Processing started automatically</p>
+                      <p className="text-[var(--text-primary)] font-semibold">Video uploaded</p>
+                      <p className="text-sm text-[var(--text-muted)] font-mono">Processing started automatically</p>
                     </div>
                     <CheckCircle2 className="w-5 h-5 text-green-400" />
                   </div>
@@ -275,8 +275,8 @@ export default function ProjectPage() {
                 <Film className="w-5 h-5 sm:w-6 sm:h-6 text-[#00d9ff]" />
               </div>
               <div className="min-w-0 flex-1">
-                <h2 className="text-base sm:text-lg md:text-xl font-bold text-white truncate">Processing Status</h2>
-                <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono truncate">Real-time pipeline updates</p>
+                <h2 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] truncate">Processing Status</h2>
+                <p className="text-xs sm:text-sm text-[var(--text-muted)] font-mono truncate">Real-time pipeline updates</p>
               </div>
             </div>
 
@@ -285,7 +285,7 @@ export default function ProjectPage() {
                 <div className="p-4 bg-[#1a1a24] border border-[#2a2a38] rounded-xl">
                   <div className="flex items-center gap-3 mb-3">
                     <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
-                    <span className="text-white font-semibold">Dubbing in progress...</span>
+                    <span className="text-[var(--text-primary)] font-semibold">Dubbing in progress...</span>
                   </div>
                   <div className="space-y-3 text-sm font-mono">
                     {/* STT Stage */}
@@ -373,7 +373,7 @@ export default function ProjectPage() {
                 <div className="p-4 bg-gradient-to-br from-green-500/10 to-green-600/5 border border-green-500/30 rounded-xl">
                   <div className="flex items-center gap-3 mb-3">
                     <CheckCircle2 className="w-5 h-5 text-green-400" />
-                    <span className="text-white font-semibold">Dubbing complete!</span>
+                    <span className="text-[var(--text-primary)] font-semibold">Dubbing complete!</span>
                   </div>
                   <p className="text-sm text-[#6b6b7f] font-mono mb-4">
                     Your dubbed video is ready to download
@@ -396,8 +396,8 @@ export default function ProjectPage() {
                 <div className="flex items-center gap-3">
                   <XCircle className="w-5 h-5 text-red-400" />
                   <div>
-                    <p className="text-white font-semibold">Processing failed</p>
-                    <p className="text-sm text-[#6b6b7f] font-mono">Please try uploading again</p>
+                    <p className="text-[var(--text-primary)] font-semibold">Processing failed</p>
+                    <p className="text-sm text-[var(--text-muted)] font-mono">Please try uploading again</p>
                   </div>
                 </div>
               </div>

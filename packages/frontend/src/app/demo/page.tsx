@@ -34,7 +34,7 @@ export default function DemoPage() {
             <span className="font-mono text-xs sm:text-sm">Back to Home</span>
           </button>
           <div>
-            <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black tracking-tight text-white mb-1.5 sm:mb-2">
+            <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black tracking-tight text-[var(--text-primary)] mb-1.5 sm:mb-2">
               Live Demo
             </h1>
             <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono">
@@ -54,8 +54,8 @@ export default function DemoPage() {
                 <Play className="w-5 h-5 sm:w-6 sm:h-6 text-[#00d9ff]" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-white">Original</h2>
-                <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono">English</p>
+                <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)]">Original</h2>
+                <p className="text-xs sm:text-sm text-[var(--text-muted)] font-mono">English</p>
               </div>
             </div>
             
@@ -71,9 +71,9 @@ export default function DemoPage() {
               </video>
             </div>
 
-            <div className="mt-4 p-3 bg-[#1a1a24] border border-[#2a2a38] rounded-lg">
-              <p className="text-sm text-[#a0a0b8]">
-                <span className="font-semibold text-white">Original Audio:</span> English narration demonstrating the translation capabilities
+            <div className="mt-4 p-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg">
+              <p className="text-sm text-[var(--text-secondary)]">
+                <span className="font-semibold text-[var(--text-primary)]">Original Audio:</span> English narration demonstrating the translation capabilities
               </p>
             </div>
           </div>
@@ -85,8 +85,8 @@ export default function DemoPage() {
                 <Play className="w-5 h-5 sm:w-6 sm:h-6 text-[#ff3366]" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-bold text-white">Translated</h2>
-                <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono">Spanish</p>
+                <h2 className="text-lg sm:text-xl font-bold text-[var(--text-primary)]">Translated</h2>
+                <p className="text-xs sm:text-sm text-[var(--text-muted)] font-mono">Spanish</p>
               </div>
             </div>
             
@@ -102,9 +102,9 @@ export default function DemoPage() {
               </video>
             </div>
 
-            <div className="mt-4 p-3 bg-[#1a1a24] border border-[#2a2a38] rounded-lg">
-              <p className="text-sm text-[#a0a0b8]">
-                <span className="font-semibold text-white">Dubbed Audio:</span> AI-generated Spanish voice with matched timing and lip-sync
+            <div className="mt-4 p-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-lg">
+              <p className="text-sm text-[var(--text-secondary)]">
+                <span className="font-semibold text-[var(--text-primary)]">Dubbed Audio:</span> AI-generated Spanish voice with matched timing and lip-sync
               </p>
             </div>
           </div>

@@ -31,7 +31,7 @@ export default function Home() {
           {/* Logo/Brand */}
           <div className={`text-center mb-6 sm:mb-8 md:mb-12 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
             <div className="inline-block relative">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter text-white mb-3 sm:mb-4">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter text-[var(--text-primary)] mb-3 sm:mb-4">
                 TRANSL8
               </h1>
               <div className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-[#ff3366] via-[#00d9ff] to-[#ffcc00] rounded-full" />
@@ -94,7 +94,7 @@ export default function Home() {
                 className="group relative p-6 sm:p-8 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-2xl hover:border-[var(--accent-primary)] transition-all duration-300 hover:transform hover:-translate-y-2 shadow-lg"
               >
                 <div className={`inline-flex p-3 sm:p-4 ${feature.bgColor} bg-opacity-20 rounded-2xl mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300`}>
-                  <feature.Icon className={`w-10 h-10 sm:w-12 sm:h-12 text-white`} strokeWidth={1.5} />
+                  <feature.Icon className={`w-10 h-10 sm:w-12 sm:h-12 text-[var(--text-primary)]`} strokeWidth={1.5} />
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold mb-2 text-[var(--text-primary)]">
                   {feature.title}
