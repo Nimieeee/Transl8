@@ -18,7 +18,7 @@ export default function Home() {
       <MobileNav />
       
       {/* Animated background grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#2a2a38_1px,transparent_1px),linear-gradient(to_bottom,#2a2a38_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--grid-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-color)_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-[var(--grid-opacity)] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
       
       {/* Gradient orbs */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#ff3366] rounded-full mix-blend-multiply filter blur-[128px] opacity-20 animate-float" />

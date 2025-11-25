@@ -157,14 +157,14 @@ export default function ProjectPage() {
       <MobileNav />
       
       {/* Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#2a2a38_1px,transparent_1px),linear-gradient(to_bottom,#2a2a38_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--grid-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-color)_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-[var(--grid-opacity)]" />
       
       {/* Header */}
-      <div className="relative z-10 border-b border-[#2a2a38] bg-[#0a0a0f]/80 backdrop-blur-xl">
+      <div className="relative z-10 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-6 pl-16 lg:pl-4">
           <button
             onClick={() => router.push('/dashboard')}
-            className="flex items-center gap-2 text-[#6b6b7f] hover:text-[#ff3366] transition-colors mb-2 sm:mb-3 md:mb-4 group min-h-[44px]"
+            className="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors mb-2 sm:mb-3 md:mb-4 group min-h-[44px]"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="font-mono text-xs sm:text-sm">Back to Studio</span>
@@ -175,17 +175,17 @@ export default function ProjectPage() {
                 {project.name}
               </h1>
               <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 md:gap-4 text-xs">
-                <div className="flex items-center gap-1.5 sm:gap-2 text-[#6b6b7f] font-mono flex-wrap">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[var(--text-muted)] font-mono flex-wrap">
                   <Languages className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-[#1a1a24] rounded border border-[#2a2a38] text-[10px] sm:text-xs">
+                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-[var(--bg-tertiary)] rounded border border-[var(--border-color)] text-[10px] sm:text-xs">
                     {project.source_language.toUpperCase()}
                   </span>
-                  <span className="text-[#ff3366] text-xs">→</span>
-                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-[#1a1a24] rounded border border-[#2a2a38] text-[10px] sm:text-xs">
+                  <span className="text-[var(--accent-primary)] text-xs">→</span>
+                  <span className="px-1.5 py-0.5 sm:px-2 sm:py-1 bg-[var(--bg-tertiary)] rounded border border-[var(--border-color)] text-[10px] sm:text-xs">
                     {project.target_language.toUpperCase()}
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 sm:gap-2 text-[#6b6b7f] font-mono">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[var(--text-muted)] font-mono">
                   <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                   <span className="text-[10px] sm:text-xs">{new Date(project.created_at).toLocaleDateString()}</span>
                 </div>

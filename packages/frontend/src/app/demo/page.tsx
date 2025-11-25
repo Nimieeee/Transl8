@@ -21,14 +21,14 @@ export default function DemoPage() {
       <MobileNav />
       
       {/* Background */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#2a2a38_1px,transparent_1px),linear-gradient(to_bottom,#2a2a38_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-30" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,var(--grid-color)_1px,transparent_1px),linear-gradient(to_bottom,var(--grid-color)_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-[var(--grid-opacity)]" />
       
       {/* Header */}
-      <div className="relative z-10 border-b border-[#2a2a38] bg-[#0a0a0f]/80 backdrop-blur-xl">
+      <div className="relative z-10 border-b border-[var(--border-color)] bg-[var(--bg-primary)]/80 backdrop-blur-xl">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-6 pl-16 lg:pl-4">
           <button
             onClick={() => router.push('/')}
-            className="flex items-center gap-2 text-[#6b6b7f] hover:text-[#ff3366] transition-colors mb-2 sm:mb-3 md:mb-4 group min-h-[44px]"
+            className="flex items-center gap-2 text-[var(--text-muted)] hover:text-[var(--accent-primary)] transition-colors mb-2 sm:mb-3 md:mb-4 group min-h-[44px]"
           >
             <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
             <span className="font-mono text-xs sm:text-sm">Back to Home</span>
@@ -37,7 +37,7 @@ export default function DemoPage() {
             <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl font-black tracking-tight text-[var(--text-primary)] mb-1.5 sm:mb-2">
               Live Demo
             </h1>
-            <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono">
+            <p className="text-xs sm:text-sm text-[var(--text-muted)] font-mono">
               See TRANSL8 in action - English to Spanish dubbing
             </p>
           </div>
@@ -48,7 +48,7 @@ export default function DemoPage() {
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Original Video */}
-          <div className={`bg-[#13131a] border border-[#2a2a38] rounded-xl sm:rounded-2xl p-4 sm:p-6 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
+          <div className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl sm:rounded-2xl p-4 sm:p-6 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 sm:p-3 bg-gradient-to-br from-[#00d9ff]/20 to-[#00d9ff]/5 rounded-xl border border-[#00d9ff]/30">
                 <Play className="w-5 h-5 sm:w-6 sm:h-6 text-[#00d9ff]" />
@@ -79,7 +79,7 @@ export default function DemoPage() {
           </div>
 
           {/* Translated Video */}
-          <div className={`bg-[#13131a] border border-[#2a2a38] rounded-xl sm:rounded-2xl p-4 sm:p-6 ${mounted ? 'animate-slide-up opacity-0 delay-100' : 'opacity-0'}`}>
+          <div className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl sm:rounded-2xl p-4 sm:p-6 ${mounted ? 'animate-slide-up opacity-0 delay-100' : 'opacity-0'}`}>
             <div className="flex items-center gap-3 mb-4">
               <div className="p-2 sm:p-3 bg-gradient-to-br from-[#ff3366]/20 to-[#ff3366]/5 rounded-xl border border-[#ff3366]/30">
                 <Play className="w-5 h-5 sm:w-6 sm:h-6 text-[#ff3366]" />
@@ -112,17 +112,17 @@ export default function DemoPage() {
 
         {/* Features */}
         <div className={`mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-3 gap-4 ${mounted ? 'animate-fade-in opacity-0 delay-200' : 'opacity-0'}`}>
-          <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
-            <div className="text-2xl sm:text-3xl font-black text-[#ff3366] mb-2">Synced</div>
-            <p className="text-sm text-[#a0a0b8]">Perfect timing match</p>
+          <div className="p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl">
+            <div className="text-2xl sm:text-3xl font-black text-[var(--accent-primary)] mb-2">Synced</div>
+            <p className="text-sm text-[var(--text-secondary)]">Perfect timing match</p>
           </div>
-          <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
-            <div className="text-2xl sm:text-3xl font-black text-[#00d9ff] mb-2">Natural</div>
-            <p className="text-sm text-[#a0a0b8]">Conversational flow</p>
+          <div className="p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl">
+            <div className="text-2xl sm:text-3xl font-black text-[var(--accent-secondary)] mb-2">Natural</div>
+            <p className="text-sm text-[var(--text-secondary)]">Conversational flow</p>
           </div>
-          <div className="p-4 bg-[#13131a] border border-[#2a2a38] rounded-xl">
-            <div className="text-2xl sm:text-3xl font-black text-[#ffcc00] mb-2">Cinema</div>
-            <p className="text-sm text-[#a0a0b8]">Professional quality</p>
+          <div className="p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl">
+            <div className="text-2xl sm:text-3xl font-black text-[var(--accent-tertiary)] mb-2">Cinema</div>
+            <p className="text-sm text-[var(--text-secondary)]">Professional quality</p>
           </div>
         </div>
 

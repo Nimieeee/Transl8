@@ -97,7 +97,7 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4 md:py-6 pl-16 lg:pl-4">
           <div className="flex justify-between items-center gap-3 sm:gap-4">
             <div className="min-w-0 flex-1">
-              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black tracking-tight text-white truncate">
+              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black tracking-tight text-[var(--text-primary)] truncate">
                 STUDIO
               </h1>
               <p className="text-[var(--text-muted)] mt-0.5 sm:mt-1 font-mono text-xs sm:text-sm">
@@ -125,8 +125,8 @@ export default function Dashboard() {
             <div className="inline-flex p-5 sm:p-6 bg-gradient-to-br from-[#ff3366]/20 to-[#ff3366]/5 rounded-3xl mb-4 sm:mb-6">
               <Film className="w-12 h-12 sm:w-16 sm:h-16 text-[#ff3366]" strokeWidth={1.5} />
             </div>
-            <h3 className="text-xl sm:text-2xl font-bold text-[#a0a0b8] mb-2">No projects yet</h3>
-            <p className="text-sm sm:text-base text-[#6b6b7f] mb-6 sm:mb-8">Create your first dubbing project to get started</p>
+            <h3 className="text-xl sm:text-2xl font-bold text-[var(--text-secondary)] mb-2">No projects yet</h3>
+            <p className="text-sm sm:text-base text-[var(--text-muted)] mb-6 sm:mb-8">Create your first dubbing project to get started</p>
             <button
               onClick={() => setShowModal(true)}
               className="px-6 sm:px-8 py-3 sm:py-4 bg-gradient-to-r from-[#ff3366] to-[#ff4477] rounded-xl font-bold text-sm sm:text-base text-white hover:scale-105 transition-transform duration-300"
@@ -342,7 +342,7 @@ export default function Dashboard() {
                   }
                 }}
                 disabled={deletingId !== null}
-                className="flex-1 py-3 bg-[#1a1a24] border border-[#2a2a38] rounded-xl font-bold text-[#a0a0b8] hover:border-[#6b6b7f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 py-3 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl font-bold text-[var(--text-secondary)] hover:border-[var(--text-muted)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Cancel
               </button>
