@@ -203,10 +203,10 @@ export default function ProjectPage() {
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Upload Section */}
-          <div className={`bg-[#13131a] border border-[#2a2a38] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
+          <div className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 ${mounted ? 'animate-slide-up opacity-0' : 'opacity-0'}`}>
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4 md:mb-6">
-              <div className="p-2 sm:p-3 bg-gradient-to-br from-[#ff3366]/20 to-[#ff3366]/5 rounded-xl border border-[#ff3366]/30 flex-shrink-0">
-                <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-[#ff3366]" />
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-[var(--accent-primary)]/20 to-[var(--accent-primary)]/5 rounded-xl border border-[var(--accent-primary)]/30 flex-shrink-0">
+                <Upload className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent-primary)]" />
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] truncate">Upload Video</h2>
@@ -217,18 +217,18 @@ export default function ProjectPage() {
             {!project.video_url ? (
               <div className="space-y-3 sm:space-y-4">
                 <label className="block">
-                  <div className="border-2 border-dashed border-[#2a2a38] rounded-xl p-6 sm:p-8 text-center hover:border-[#ff3366] transition-colors cursor-pointer group active:scale-95">
+                  <div className="border-2 border-dashed border-[var(--border-color)] rounded-xl p-6 sm:p-8 text-center hover:border-[var(--accent-primary)] transition-colors cursor-pointer group active:scale-95 bg-[var(--bg-tertiary)]">
                     <input
                       type="file"
                       accept="video/*"
                       onChange={(e) => setFile(e.target.files?.[0] || null)}
                       className="hidden"
                     />
-                    <Film className="w-10 h-10 sm:w-12 sm:h-12 text-[#6b6b7f] mx-auto mb-2 sm:mb-3 group-hover:text-[#ff3366] transition-colors" />
-                    <p className="text-sm sm:text-base text-[#a0a0b8] font-semibold mb-1 break-words px-2">
+                    <Film className="w-10 h-10 sm:w-12 sm:h-12 text-[var(--text-muted)] mx-auto mb-2 sm:mb-3 group-hover:text-[var(--accent-primary)] transition-colors" />
+                    <p className="text-sm sm:text-base text-[var(--text-secondary)] font-semibold mb-1 break-words px-2">
                       {file ? file.name : 'Click to select video'}
                     </p>
-                    <p className="text-xs sm:text-sm text-[#6b6b7f] font-mono">
+                    <p className="text-xs sm:text-sm text-[var(--text-muted)] font-mono">
                       {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : 'or drag and drop'}
                     </p>
                   </div>
@@ -254,9 +254,9 @@ export default function ProjectPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                <div className="p-4 bg-[#1a1a24] border border-[#2a2a38] rounded-xl">
+                <div className="p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl">
                   <div className="flex items-center gap-3">
-                    <Play className="w-5 h-5 text-[#00d9ff]" />
+                    <Play className="w-5 h-5 text-[var(--accent-secondary)]" />
                     <div className="flex-1">
                       <p className="text-[var(--text-primary)] font-semibold">Video uploaded</p>
                       <p className="text-sm text-[var(--text-muted)] font-mono">Processing started automatically</p>
@@ -269,10 +269,10 @@ export default function ProjectPage() {
           </div>
 
           {/* Status Section */}
-          <div className={`bg-[#13131a] border border-[#2a2a38] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 ${mounted ? 'animate-slide-up opacity-0 delay-100' : 'opacity-0'}`}>
+          <div className={`bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 ${mounted ? 'animate-slide-up opacity-0 delay-100' : 'opacity-0'}`}>
             <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-              <div className="p-2 sm:p-3 bg-gradient-to-br from-[#00d9ff]/20 to-[#00d9ff]/5 rounded-xl border border-[#00d9ff]/30 flex-shrink-0">
-                <Film className="w-5 h-5 sm:w-6 sm:h-6 text-[#00d9ff]" />
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-[var(--accent-secondary)]/20 to-[var(--accent-secondary)]/5 rounded-xl border border-[var(--accent-secondary)]/30 flex-shrink-0">
+                <Film className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--accent-secondary)]" />
               </div>
               <div className="min-w-0 flex-1">
                 <h2 className="text-base sm:text-lg md:text-xl font-bold text-[var(--text-primary)] truncate">Processing Status</h2>
@@ -282,7 +282,7 @@ export default function ProjectPage() {
 
             {project.status === 'PROCESSING' && (
               <div className="space-y-4">
-                <div className="p-4 bg-[#1a1a24] border border-[#2a2a38] rounded-xl">
+                <div className="p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl">
                   <div className="flex items-center gap-3 mb-3">
                     <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
                     <span className="text-[var(--text-primary)] font-semibold">Dubbing in progress...</span>
@@ -294,14 +294,14 @@ export default function ProjectPage() {
                         ? 'text-green-400' 
                         : getStageStatus('STT') === 'PROCESSING'
                         ? 'text-green-400'
-                        : 'text-[#6b6b7f]'
+                        : 'text-[var(--text-muted)]'
                     }`}>
                       <div className={`w-2 h-2 rounded-full ${
                         getStageStatus('STT') === 'COMPLETED'
                           ? 'bg-green-400 shadow-[0_0_10px_rgba(74,222,128,0.8)]'
                           : getStageStatus('STT') === 'PROCESSING'
                           ? 'bg-green-400 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]'
-                          : 'bg-[#6b6b7f]'
+                          : 'bg-[var(--text-muted)]'
                       }`} />
                       Speech-to-text extraction
                       {getStageStatus('STT') === 'COMPLETED' && <CheckCircle2 className="w-4 h-4 ml-auto" />}
@@ -313,14 +313,14 @@ export default function ProjectPage() {
                         ? 'text-blue-400' 
                         : getStageStatus('MT') === 'PROCESSING'
                         ? 'text-blue-400'
-                        : 'text-[#6b6b7f]'
+                        : 'text-[var(--text-muted)]'
                     }`}>
                       <div className={`w-2 h-2 rounded-full ${
                         getStageStatus('MT') === 'COMPLETED'
                           ? 'bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.8)]'
                           : getStageStatus('MT') === 'PROCESSING'
                           ? 'bg-blue-400 animate-pulse shadow-[0_0_10px_rgba(96,165,250,0.8)]'
-                          : 'bg-[#6b6b7f]'
+                          : 'bg-[var(--text-muted)]'
                       }`} />
                       AI translation
                       {getStageStatus('MT') === 'COMPLETED' && <CheckCircle2 className="w-4 h-4 ml-auto" />}
@@ -332,14 +332,14 @@ export default function ProjectPage() {
                         ? 'text-yellow-400' 
                         : getStageStatus('TTS') === 'PROCESSING'
                         ? 'text-yellow-400'
-                        : 'text-[#6b6b7f]'
+                        : 'text-[var(--text-muted)]'
                     }`}>
                       <div className={`w-2 h-2 rounded-full ${
                         getStageStatus('TTS') === 'COMPLETED'
                           ? 'bg-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.8)]'
                           : getStageStatus('TTS') === 'PROCESSING'
                           ? 'bg-yellow-400 animate-pulse shadow-[0_0_10px_rgba(250,204,21,0.8)]'
-                          : 'bg-[#6b6b7f]'
+                          : 'bg-[var(--text-muted)]'
                       }`} />
                       Voice synthesis
                       {getStageStatus('TTS') === 'COMPLETED' && <CheckCircle2 className="w-4 h-4 ml-auto" />}
@@ -351,14 +351,14 @@ export default function ProjectPage() {
                         ? 'text-purple-400' 
                         : getStageStatus('MUXING') === 'PROCESSING'
                         ? 'text-purple-400'
-                        : 'text-[#6b6b7f]'
+                        : 'text-[var(--text-muted)]'
                     }`}>
                       <div className={`w-2 h-2 rounded-full ${
                         getStageStatus('MUXING') === 'COMPLETED'
                           ? 'bg-purple-400 shadow-[0_0_10px_rgba(192,132,252,0.8)]'
                           : getStageStatus('MUXING') === 'PROCESSING'
                           ? 'bg-purple-400 animate-pulse shadow-[0_0_10px_rgba(192,132,252,0.8)]'
-                          : 'bg-[#6b6b7f]'
+                          : 'bg-[var(--text-muted)]'
                       }`} />
                       Video muxing
                       {getStageStatus('MUXING') === 'COMPLETED' && <CheckCircle2 className="w-4 h-4 ml-auto" />}
@@ -375,7 +375,7 @@ export default function ProjectPage() {
                     <CheckCircle2 className="w-5 h-5 text-green-400" />
                     <span className="text-[var(--text-primary)] font-semibold">Dubbing complete!</span>
                   </div>
-                  <p className="text-sm text-[#6b6b7f] font-mono mb-4">
+                  <p className="text-sm text-[var(--text-muted)] font-mono mb-4">
                     Your dubbed video is ready to download
                   </p>
                   <a
@@ -404,10 +404,10 @@ export default function ProjectPage() {
             )}
 
             {project.status === 'DRAFT' && (
-              <div className="p-4 bg-[#1a1a24] border border-[#2a2a38] rounded-xl text-center">
-                <Film className="w-12 h-12 text-[#6b6b7f] mx-auto mb-3" />
-                <p className="text-[#a0a0b8] font-semibold mb-1">Ready to start</p>
-                <p className="text-sm text-[#6b6b7f] font-mono">Upload a video to begin dubbing</p>
+              <div className="p-4 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-xl text-center">
+                <Film className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-3" />
+                <p className="text-[var(--text-secondary)] font-semibold mb-1">Ready to start</p>
+                <p className="text-sm text-[var(--text-muted)] font-mono">Upload a video to begin dubbing</p>
               </div>
             )}
           </div>
