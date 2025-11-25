@@ -201,7 +201,8 @@ export default function Dashboard() {
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in">
           <div 
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            className="absolute inset-0 backdrop-blur-sm"
+            style={{ background: 'var(--modal-backdrop)' }}
             onClick={() => setShowModal(false)}
           />
           <div className="relative bg-[var(--bg-secondary)] border-t sm:border border-[var(--border-color)] rounded-t-3xl sm:rounded-3xl w-full sm:max-w-md p-6 sm:p-8 animate-slide-up shadow-2xl max-h-[85vh] sm:max-h-[90vh] overflow-y-auto">
@@ -288,7 +289,8 @@ export default function Dashboard() {
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in">
           <div 
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            className="absolute inset-0 backdrop-blur-sm"
+            style={{ background: 'var(--modal-backdrop)' }}
             onClick={() => {
               if (deletingId === null) {
                 setShowDeleteConfirm(false);

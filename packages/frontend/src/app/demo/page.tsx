@@ -59,7 +59,7 @@ export default function DemoPage() {
               </div>
             </div>
             
-            <div className="relative aspect-video bg-black rounded-xl overflow-hidden">
+            <div className="relative aspect-video bg-[var(--bg-tertiary)] rounded-xl overflow-hidden">
               <video
                 controls
                 className="w-full h-full"
@@ -90,7 +90,7 @@ export default function DemoPage() {
               </div>
             </div>
             
-            <div className="relative aspect-video bg-black rounded-xl overflow-hidden">
+            <div className="relative aspect-video bg-[var(--bg-tertiary)] rounded-xl overflow-hidden">
               <video
                 controls
                 className="w-full h-full"

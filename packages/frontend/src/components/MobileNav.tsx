@@ -48,7 +48,8 @@ export default function MobileNav({ onCreateProject }: MobileNavProps) {
       {isOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div 
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm animate-fade-in"
+            className="absolute inset-0 backdrop-blur-sm animate-fade-in"
+            style={{ background: 'var(--modal-backdrop)' }}
             onClick={() => setIsOpen(false)}
           />
           <div className="absolute top-0 left-0 w-80 max-w-[85vw] h-full bg-[var(--bg-secondary)] border-r border-[var(--border-color)] shadow-2xl animate-slide-in-left">
