@@ -13,6 +13,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#0a0a0f" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                const theme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', theme);
+                document.documentElement.classList.add('no-transition');
+                setTimeout(() => {
+                  document.documentElement.classList.remove('no-transition');
+                }, 0);
+              })();
+            `,
+          }}
+        />
       </head>
       <body className="antialiased">{children}</body>
     </html>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Menu, X, Home, FolderOpen, Plus } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
 
 interface MobileNavProps {
   onCreateProject?: () => void;
@@ -38,6 +39,11 @@ export default function MobileNav({ onCreateProject }: MobileNavProps) {
         )}
       </button>
 
+      {/* Theme Toggle - Desktop */}
+      <div className="fixed top-4 right-4 z-50 hidden lg:block">
+        <ThemeToggle />
+      </div>
+
       {/* Mobile Navigation Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
@@ -47,9 +53,12 @@ export default function MobileNav({ onCreateProject }: MobileNavProps) {
           />
           <div className="absolute top-0 left-0 w-80 max-w-[85vw] h-full bg-[var(--bg-secondary)] border-r border-[var(--border-color)] shadow-2xl animate-slide-in-left">
             <div className="p-6 pt-20">
-              <h2 className="text-3xl font-black text-white mb-8">
-                TRANSL8
-              </h2>
+              <div className="flex items-center justify-between mb-8">
+                <h2 className="text-3xl font-black text-[var(--text-primary)]">
+                  TRANSL8
+                </h2>
+                <ThemeToggle />
+              </div>
               
               <nav className="space-y-2">
                 {navItems.map((item) => (
